@@ -1,6 +1,8 @@
 set(socializer_SRCS
     facebook.cpp
+    foursquare.cpp
     twitter.cpp
+    oauth.cpp
 )
 
 set(socializer_MOC_HDRS

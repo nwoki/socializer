@@ -3,6 +3,8 @@
  *
  * This file is part of the Socializer library
  * Copyright (C) 2012 Ispirata <info@ispirata.com>
+ *
+ * Author Francesco Nwokeka <francesco@ispirata.com>
  */
 
 #ifndef TWITTER_H
@@ -12,8 +14,7 @@ namespace Socializer
 {
 
 /**
- * Twitter interface for authentication
- * @author Francesco Nwokeka (francesco@ispirata.com)
+ * Twitter interface
  */
 
 class Twitter
@@ -26,6 +27,6 @@ private:
 
 };
 
-}
+};
 
 #endif  // TWITTER_H
