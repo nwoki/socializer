@@ -13,6 +13,7 @@
 
 using namespace Socializer;
 
+
 OAuth::OAuth(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
     : QObject(parent)
     , m_appId(appId)

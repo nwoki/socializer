@@ -29,11 +29,16 @@ class OAuth : public QObject
     Q_PROPERTY(QByteArray redirectUrl READ redirectUrl WRITE setRedirectUrl)
 
 public:
+    /// TODO should redirectUrl be a needed param?
     OAuth(const QByteArray &appId, const QByteArray &redirectUrl = QByteArray(), QObject *parent = 0);
     ~OAuth();
 
     QByteArray appId() const;
     QByteArray authToken() const;
+
+    /** returns url to access for authentication */
+    virtual QString obtainAuthPageUrl() = 0;
+
     QByteArray redirectUrl() const;
 
     void setAppId(const QByteArray &appId);

@@ -16,14 +16,8 @@
 using namespace Socializer;
 
 
-Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl)
-    : m_oauth(new OAuth(appId, redirectUrl))
-{
-}
-
-
-Foursquare::Foursquare(OAuth *oauth)
-    : m_oauth(oauth)
+Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
+    : OAuth(appId, redirectUrl, parent)
 {
 }
 
@@ -38,20 +32,13 @@ QString Foursquare::obtainAuthPageUrl()
     QString urlStr(AUTH_URL);
 
     urlStr.append("client_id=");
-    urlStr.append(m_oauth->appId());
+    urlStr.append(appId());
     urlStr.append("&response_type=token");
 
     // there MUST be a redirect url value.
     /// TODO Check for empty parameter?
     urlStr.append("&redirect_uri=");
-    urlStr.append(m_oauth->redirectUrl());
+    urlStr.append(redirectUrl());
 
     return urlStr;
 }
-
-
-void Foursquare::setAuthToken(const QByteArray& token)
-{
-    m_oauth->setAuthToken(token);
-}
-

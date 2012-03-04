@@ -21,22 +21,15 @@ namespace Socializer
 * Foursquare interface
 */
 
-class Foursquare
+class Foursquare : public OAuth
 {
 public:
-    /// TODO redirectUrl should be a needed param
-    Foursquare(const QByteArray &appId, const QByteArray &redirectUrl = QByteArray());
-    Foursquare(OAuth *oauth);
+    /// TODO should redirectUrl be a needed param?
+    Foursquare(const QByteArray &appId, const QByteArray &redirectUrl = QByteArray(), QObject *parent = 0);
     ~Foursquare();
 
     /** returns url to access for authentication */
-    /// TODO if the creation of this url is the same for all social networks, move it to OAuth
     QString obtainAuthPageUrl();
-
-    void setAuthToken(const QByteArray &token);
-
-private:
-    OAuth *m_oauth;
 };
 
 };
