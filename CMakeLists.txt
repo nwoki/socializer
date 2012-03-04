@@ -7,7 +7,6 @@ FIND_PACKAGE(Qt4 REQUIRED)
 FIND_PACKAGE(Threads REQUIRED)
 
 set(QT_USE_QTCORE TRUE)
-set(QT_USE_QTNETWORK TRUE)
 set(QT_DONT_USE_QTGUI TRUE)
 
 include(${QT_USE_FILE})
@@ -23,3 +22,5 @@ add_subdirectory(src/)
 # tests
 # enable_testing()
 # add_subdirectory(tests)
+
+add_subdirectory(testApp)

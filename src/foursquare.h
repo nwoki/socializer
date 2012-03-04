@@ -12,6 +12,8 @@
 
 #include "oauth.h"
 
+#include <QtCore/QByteArray>
+
 namespace Socializer
 {
 
@@ -22,14 +24,20 @@ namespace Socializer
 class Foursquare
 {
 public:
-    Foursquare();
+    /// TODO redirectUrl should be a needed param
+    Foursquare(const QByteArray &appId, const QByteArray &redirectUrl = QByteArray());
     Foursquare(OAuth *oauth);
     ~Foursquare();
+
+    /** returns url to access for authentication */
+    /// TODO if the creation of this url is the same for all social networks, move it to OAuth
+    QString obtainAuthPageUrl();
+
+    void setAuthToken(const QByteArray &token);
 
 private:
     OAuth *m_oauth;
 };
-
 
 };
 

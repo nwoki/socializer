@@ -13,10 +13,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QObject>
 
-class QNetworkAccessManager;
-
 /**
- * Class used to recieve OAuth token from various services
+ * Class used to handle OAuth data for various services
  */
 
 namespace Socializer
@@ -24,17 +22,27 @@ namespace Socializer
 
 class OAuth : public QObject
 {
+    Q_OBJECT
+
     Q_PROPERTY(QByteArray appId READ appId WRITE setAppId)
+    Q_PROPERTY(QByteArray authToken READ authToken WRITE setAuthToken)
+    Q_PROPERTY(QByteArray redirectUrl READ redirectUrl WRITE setRedirectUrl)
 
 public:
-    OAuth();
+    OAuth(const QByteArray &appId, const QByteArray &redirectUrl = QByteArray(), QObject *parent = 0);
     ~OAuth();
 
+    QByteArray appId() const;
+    QByteArray authToken() const;
+    QByteArray redirectUrl() const;
 
+    void setAppId(const QByteArray &appId);
+    void setAuthToken(const QByteArray &authToken);
+    void setRedirectUrl(const QByteArray &redirectUrl);
 
 private:
 //     /**
-//      * Generates a unique token for a request
+//      * Generates a unique token for a request (Twitter)
 //      *
 //      * The oauth_nonce parameter is a unique token your application
 //      * should generate for each unique request. Twitter will use this
@@ -47,9 +55,8 @@ private:
 
     QByteArray m_appId;         /** id code to authenticate service to (consumerKey/clientId) */
     QByteArray m_authToken;     /** auth token recieved from service */
-    QByteArray m_nonce;         /** a unique token the application should generate for each unique request */
-
-    QNetworkAccessManager *m_accessManager;
+    QByteArray m_nonce;         /** a unique token the application should generate for each unique request (Twitter)*/
+    QByteArray m_redirectUrl;   /** url to redirect after auth */
 };
 
 };
