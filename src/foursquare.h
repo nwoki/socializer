@@ -25,7 +25,7 @@ class Foursquare : public OAuth
 {
 public:
     /// TODO should redirectUrl be a needed param?
-    Foursquare(const QByteArray &appId, const QByteArray &redirectUrl = QByteArray(), QObject *parent = 0);
+    Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
     ~Foursquare();
 
     /** returns url to access for authentication */

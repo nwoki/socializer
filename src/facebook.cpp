@@ -59,9 +59,6 @@ QString Facebook::obtainAuthPageUrl()
 
     urlStr.append("client_id=");
     urlStr.append(appId());
-
-    // there MUST be a redirect url value.
-    /// TODO Check for empty parameter?
     urlStr.append("&redirect_uri=");
     urlStr.append(redirectUrl());
 

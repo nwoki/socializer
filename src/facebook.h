@@ -27,7 +27,7 @@ class Facebook : public OAuth
     Q_PROPERTY (bool scopeReadStream READ scopeReadStream WRITE enableScopeReadStream)
 
 public:
-    Facebook(const QByteArray &appId, const QByteArray &redirectUrl = QByteArray(), QObject *parent = 0);
+    Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
     ~Facebook();
 
     void enableScopePublishActions(bool enable);
