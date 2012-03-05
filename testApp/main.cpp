@@ -8,6 +8,7 @@
  */
 
 #include "../include/Foursquare"
+#include "../include/Facebook"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
@@ -20,6 +21,11 @@ int main(int argc, char *argv[])
     Socializer::Foursquare *foursquare = new Socializer::Foursquare("UINBCI54PE04OECTALA03CFOO5YEGIOL5Q1EZ24CTXKJX4Z3"
                                                                     , "http://www.playgowar.com");
     qDebug() << foursquare->obtainAuthPageUrl();
+
+
+    Socializer::Facebook *face = new Socializer::Facebook("253316734751940"
+                                                        , "http://www.2s2h.com");
+    qDebug() << face->obtainAuthPageUrl();
 
     return app.exec();
 }

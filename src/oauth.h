@@ -36,7 +36,7 @@ public:
     QByteArray appId() const;
     QByteArray authToken() const;
 
-    /** returns url to access for authentication */
+    /** returns url to access for web page authentication */
     virtual QString obtainAuthPageUrl() = 0;
 
     QByteArray redirectUrl() const;
