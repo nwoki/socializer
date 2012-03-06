@@ -22,9 +22,11 @@ int main(int argc, char *argv[])
                                                                     , "http://www.playgowar.com");
     qDebug() << foursquare->obtainAuthPageUrl();
 
-
+    // Nwoki TestApp
     Socializer::Facebook *face = new Socializer::Facebook("253316734751940"
                                                         , "http://www.2s2h.com");
+    face->enableScopePublishActions(true);
+    face->enableScopePublishStream(true);
     qDebug() << face->obtainAuthPageUrl();
 
     return app.exec();

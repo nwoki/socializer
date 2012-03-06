@@ -29,6 +29,46 @@ Facebook::~Facebook()
 }
 
 
+QString Facebook::createScope()
+{
+    QList<QString> scopeList;
+    QString scopeLine("&scope=");
+    bool isFirst = true;
+
+    if (m_scopePublishAcions) {
+        scopeList.append("publish_actions");
+    }
+
+    if (m_scopePublishCheckins) {
+        scopeList.append("publish_checkins");
+    }
+
+    if (m_scopePublishStream) {
+        scopeList.append("publish_stream");
+    }
+
+    if (m_scopeReadStream) {
+        scopeList.append("read_stream");
+    }
+
+    foreach(QString scope, scopeList) {
+        if (!isFirst) {
+            scope.prepend(",");
+        } else {
+            isFirst = false;
+        }
+
+        scopeLine.append(scope);
+    }
+
+    if (!isFirst) {
+        return scopeLine;
+    } else {
+        return QString();
+    }
+}
+
+
 void Facebook::enableScopePublishActions(bool enable)
 {
     m_scopePublishAcions = enable;
@@ -61,9 +101,7 @@ QString Facebook::obtainAuthPageUrl()
     urlStr.append(appId());
     urlStr.append("&redirect_uri=");
     urlStr.append(redirectUrl());
-
-    /// TODO add scopes
-
+    urlStr.append(createScope());
     urlStr.append("&response_type=token");
 
     return urlStr;

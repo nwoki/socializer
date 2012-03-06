@@ -43,6 +43,8 @@ public:
     bool scopeReadStream() const;
 
 private:
+    QString createScope();          /** generates the scopes to add to the request url */
+
     // facebook scopes
     bool m_scopePublishAcions;      /** Enables your app to perform checkins on behalf of the user.*/
     bool m_scopePublishCheckins;    /** Enables your app to post content, comments, and likes to a user's stream and to the streams of the user's friends.*/
