@@ -12,6 +12,8 @@
 #include <QtCore/QDateTime>
 #include <QDebug>
 
+#define NONCE_SIZE 16
+
 using namespace Socializer;
 
 
@@ -43,6 +45,21 @@ QByteArray OAuth::authToken() const
 QByteArray OAuth::timeStamp()
 {
     return QByteArray::number(QDateTime::currentDateTime().toTime_t());
+}
+
+
+QByteArray OAuth::nonce()
+{
+    QByteArray chars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    int max = chars.size();
+
+    QByteArray nonce;
+
+    for(int i = 0; i < NONCE_SIZE; ++i){
+        nonce.append(chars[qrand() % max]);
+    }
+
+    return nonce;
 }
 
 
