@@ -36,6 +36,9 @@ public:
     QByteArray appId() const;
     QByteArray authToken() const;
 
+    /** returns timestamp in epoch time according to the OAuth spec. 8 http://oauth.net/core/1.0/#nonce */
+    QByteArray timeStamp();
+
     /** returns url to access for web page authentication */
     virtual QString obtainAuthPageUrl() = 0;
 

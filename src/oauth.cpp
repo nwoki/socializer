@@ -9,6 +9,7 @@
 
 #include "oauth.h"
 
+#include <QtCore/QDateTime>
 #include <QDebug>
 
 using namespace Socializer;
@@ -36,6 +37,12 @@ QByteArray OAuth::appId() const
 QByteArray OAuth::authToken() const
 {
     return m_authToken;
+}
+
+
+QByteArray OAuth::timeStamp()
+{
+    return QByteArray::number(QDateTime::currentDateTime().toTime_t());
 }
 
 
