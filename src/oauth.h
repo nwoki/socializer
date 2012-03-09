@@ -36,19 +36,24 @@ public:
     QByteArray appId() const;
     QByteArray authToken() const;
 
-    /** returns timestamp in epoch time according to the OAuth spec. 8 http://oauth.net/core/1.0/#nonce */
-    QByteArray timeStamp();
+    /**
+     * encode in hmacsha1 the given string
+     */
+    QByteArray hmacsha1Encode(const QByteArray &baseStr, QByteArray key);
 
     /**
      * Generates a unique token for a request (Twitter). random 16 length string
      *
-     * OAuth spec. 8 http://oauth.net/core/1.0/#nonce
+     * http://oauth.net/core/1.0/#nonce
      *
      * A nonce is a random string, uniquely generated for each request.
      * The nonce allows the Service Provider to verify that a request has never been made before
      * and helps prevent replay attacks when requests are made over a non-secure channel (such as HTTP).
      */
     QByteArray nonce();
+
+    /** returns timestamp in epoch time according to the OAuth spec http://oauth.net/core/1.0/#nonce */
+    QByteArray timeStamp();
 
     /** returns url to access for web page authentication */
     virtual QString obtainAuthPageUrl() = 0;
@@ -60,12 +65,8 @@ public:
     void setRedirectUrl(const QByteArray &redirectUrl);
 
 private:
-
-//     QByteArray generateNonce();
-
     QByteArray m_appId;         /** id code to authenticate service to (consumerKey/clientId) */
     QByteArray m_authToken;     /** auth token recieved from service */
-    QByteArray m_nonce;         /** a unique token the application should generate for each unique request (Twitter)*/
     QByteArray m_redirectUrl;   /** url to redirect after auth */
 };
 

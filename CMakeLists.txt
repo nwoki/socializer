@@ -10,9 +10,10 @@ set(QT_USE_QTCORE TRUE)
 set(QT_DONT_USE_QTGUI TRUE)
 
 include(${QT_USE_FILE})
-
 # add_definitions(${QT_DEFINITIONS})
-# add_definitions(-DSTATIC)
+
+# debug symbols
+add_definitions(-g)
 
 include_directories(${QT_INCLUDE_DIR})
 

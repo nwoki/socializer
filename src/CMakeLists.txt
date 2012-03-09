@@ -7,6 +7,7 @@ set(socializer_SRCS
 
 set(socializer_MOC_HDRS
     oauth.h
+    twitter.h
 )
 
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
