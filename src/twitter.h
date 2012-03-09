@@ -65,6 +65,7 @@ private:
     QNetworkReply *m_networkReply;
 
     QByteArray m_consumerSecret;
+    QByteArray m_authTokenSecret;
 };
 
 };

@@ -13,7 +13,7 @@ include(${QT_USE_FILE})
 # add_definitions(${QT_DEFINITIONS})
 
 # debug symbols
-add_definitions(-g)
+add_definitions(-g -DDEBUG_MODE)
 
 include_directories(${QT_INCLUDE_DIR})
 

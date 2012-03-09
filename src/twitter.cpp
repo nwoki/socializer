@@ -123,7 +123,31 @@ QString Twitter::obtainAuthPageUrl()
 
 void Twitter::onReplyRecieved()
 {
-    qDebug() << "RECIEVED: " << m_networkReply->readAll();
+    QByteArray received = m_networkReply->readAll();
+
+    // extract token
+    QList<QByteArray> chunks = received.split('&');
+    QByteArray chunk;
+
+    /// TODO do validity checks here?
+    foreach(chunk, chunks) {
+        QList<QByteArray>params = chunk.split('=');
+
+        QByteArray key = params.at(0);
+        QByteArray value = params.at(1);
+
+#ifdef DEBUG_MODE
+        qDebug() << "Twitter::onReplyRecieved RECIEVED: " << received;
+        qDebug() << "Key: " << key;
+        qDebug() << "Value: " << value;
+#endif
+
+        if (key == "oauth_token") {
+            setAuthToken(value);
+        } else if (key == "oauth_token_secret") {
+            m_authTokenSecret = value;
+        }
+    }
 }
 
 
