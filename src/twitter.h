@@ -38,14 +38,21 @@ public:
     Twitter(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject *parent = 0);
     ~Twitter();
 
+    /** obtain twitter auth page for authentication once the request token has been recieved */
     QString obtainAuthPageUrl();
 
-    /** sends request to twitter service for access token to be used with Twitter::obtainAuthPage */
+    /**
+     * sends request to twitter service for access token to be used with Twitter::obtainAuthPage
+     * This is to be used for first access to tiwtter or if the auth token has expired
+     */
     void requestAccessToken();
 
+Q_SIGNALS:
+    /** emitted when the request access token is received. User will then be directed to the twitter login page */
+    void requestAccessTokenRecieved();
 
 private Q_SLOTS:
-    void onReplyRecieved();
+    void onRequestTokenReplyRecieved();
 
 private:
     /**
@@ -64,8 +71,9 @@ private:
     QNetworkAccessManager *m_networkAccessManager;
     QNetworkReply *m_networkReply;
 
-    QByteArray m_consumerSecret;
     QByteArray m_authTokenSecret;
+    QByteArray m_consumerSecret;
+    QByteArray m_requestToken;
 };
 
 };

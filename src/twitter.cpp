@@ -114,14 +114,21 @@ QString Twitter::obtainAuthPageUrl()
     // https://dev.twitter.com/docs/auth/implementing-sign-twitter (see step 2)
 
     // need access token first
-    requestAccessToken();
+    if (authToken().isEmpty()) {
+        /// TODO notify error, we need to request the auth token first
+        qDebug("[ERROR] Twitter::obtainAuthPageUrl: need to request token first");
+        return QString();
+    }
 
     // once i have the access token, return the authentication url
-    return QString();
+    QString authPageUrl(AUTHENTICATE_URL);
+    authPageUrl += "?auth_token=" + m_requestToken;
+
+    return authPageUrl;
 }
 
 
-void Twitter::onReplyRecieved()
+void Twitter::onRequestTokenReplyRecieved()
 {
     QByteArray received = m_networkReply->readAll();
 
@@ -137,17 +144,20 @@ void Twitter::onReplyRecieved()
         QByteArray value = params.at(1);
 
 #ifdef DEBUG_MODE
-        qDebug() << "Twitter::onReplyRecieved RECIEVED: " << received;
+        qDebug() << "Twitter::onRequestTokenReplyRecieved RECIEVED: " << received;
         qDebug() << "Key: " << key;
         qDebug() << "Value: " << value;
 #endif
 
         if (key == "oauth_token") {
-            setAuthToken(value);
+            m_requestToken = value;
         } else if (key == "oauth_token_secret") {
             m_authTokenSecret = value;
         }
     }
+
+    // Notify that we have the request auth token
+    Q_EMIT(requestAccessTokenRecieved());
 }
 
 
@@ -159,7 +169,7 @@ void Twitter::requestAccessToken()
 
     m_networkReply = m_networkAccessManager->post(request, QByteArray());
 
-    connect(m_networkReply, SIGNAL(readyRead()), this, SLOT(onReplyRecieved()));
+    connect(m_networkReply, SIGNAL(readyRead()), this, SLOT(onRequestTokenReplyRecieved()));
 }
 
 
