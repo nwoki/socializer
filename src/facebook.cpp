@@ -20,6 +20,7 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
     , m_scopePublishCheckins(false)
     , m_scopePublishStream(false)
     , m_scopeReadStream(false)
+    , m_scopeUserAboutMe(false)
 {
 }
 
@@ -49,6 +50,10 @@ QString Facebook::createScope()
 
     if (m_scopeReadStream) {
         scopeList.append("read_stream");
+    }
+
+    if (m_scopeUserAboutMe) {
+        scopeList.append("user_about_me");
     }
 
     foreach(QString scope, scopeList) {
@@ -93,6 +98,12 @@ void Facebook::enableScopeReadStream(bool enable)
 }
 
 
+void Facebook::enableScopeUserAboutMe(bool enable)
+{
+    m_scopeUserAboutMe = enable;
+}
+
+
 QString Facebook::obtainAuthPageUrl()
 {
     QString urlStr(AUTH_URL);
@@ -130,3 +141,10 @@ bool Facebook::scopeReadStream() const
 {
     return m_scopeReadStream;
 }
+
+
+bool Facebook::scopeUserAboutMe() const
+{
+    return m_scopeUserAboutMe;
+}
+
