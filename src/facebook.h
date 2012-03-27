@@ -21,6 +21,9 @@ namespace Socializer
 
 class Facebook : public OAuth
 {
+    Q_OBJECT
+
+    Q_PROPERTY (QString authPageUrl         READ obtainAuthPageUrl)
     Q_PROPERTY (bool scopePublishActions    READ scopePublishActions    WRITE enableScopePublishActions)
     Q_PROPERTY (bool scopePublishCheckins   READ scopePublishCheckins   WRITE enableScopePublishCheckins)
     Q_PROPERTY (bool scopePublishStream     READ scopePublishStream     WRITE enableScopePublishStream)

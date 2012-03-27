@@ -9,7 +9,7 @@
 
 #include "facebook.h"
 
-#define AUTH_URL "https://www.facebook.com/dialog/oauth?"
+#define AUTH_URL "https://m.facebook.com/dialog/oauth?"
 
 using namespace Socializer;
 
