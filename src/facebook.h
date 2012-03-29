@@ -12,6 +12,8 @@
 
 #include "oauth.h"
 
+class QDeclarativeView;
+
 namespace Socializer
 {
 
@@ -48,6 +50,13 @@ public:
      * @param url the new url
      */
     Q_INVOKABLE void parseNewUrl(const QString &url);
+
+    /**
+     * Use this to set the correct context property in order to use the
+     * Socializer::Facebook object with the included FacebookQML component
+     * @param view pointer to the Declarative view used in the application
+     */
+    void setContextProperty(QDeclarativeView *view);
 
     bool scopePublishActions() const;
     bool scopePublishCheckins() const;

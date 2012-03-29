@@ -12,6 +12,8 @@
 #include <QtCore/QDebug>
 #include <QtCore/QRegExp>
 #include <QtCore/QStringList>
+#include <QtDeclarative/QDeclarativeView>
+#include <QtDeclarative/QDeclarativeContext>
 
 #define AUTH_URL "https://m.facebook.com/dialog/oauth?"
 
@@ -143,6 +145,12 @@ void Facebook::parseNewUrl(const QString& url)
 #endif
         }
     }
+}
+
+
+void Facebook::setContextProperty(QDeclarativeView *view)
+{
+    view->rootContext()->setContextProperty("Facebook", this);
 }
 
 

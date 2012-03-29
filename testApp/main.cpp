@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     QDeclarativeView *view = new QDeclarativeView;
 
-    view->rootContext()->setContextProperty("Facebook", fb);
+    fb->setContextProperty(view);
     view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/FacebookQML.qml"));
     view->setFixedSize(480, 600);
     view->show();
