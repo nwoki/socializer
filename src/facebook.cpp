@@ -9,6 +9,10 @@
 
 #include "facebook.h"
 
+#include <QtCore/QDebug>
+#include <QtCore/QRegExp>
+#include <QtCore/QStringList>
+
 #define AUTH_URL "https://m.facebook.com/dialog/oauth?"
 
 using namespace Socializer;
@@ -116,6 +120,29 @@ QString Facebook::obtainAuthPageUrl()
     urlStr.append("&response_type=token");
 
     return urlStr;
+}
+
+
+void Facebook::parseNewUrl(const QString& url)
+{
+#ifdef DEBUG_MODE
+    qDebug() << "[Facebook::parseNewUrl] got url: " << url;
+#endif
+
+    if (url.contains("access_token")) {
+        QRegExp regex("access_token=?[^&]+");
+
+        if (regex.indexIn(url) > -1) {
+            QString access = regex.cap(0);
+
+            // extract access token
+            setAuthToken(access.split("=").at(1).toUtf8());
+
+#ifdef DEBUG_MODE
+            qDebug() << "[Facebook::parseNewUrl] Auth token is: " << authToken();
+#endif
+        }
+    }
 }
 
 
