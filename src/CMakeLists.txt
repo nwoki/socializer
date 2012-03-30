@@ -11,7 +11,7 @@ set(socializer_MOC_HDRS
     facebook.h
 )
 
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
 qt4_wrap_cpp(socializer_MOC_SRCS ${socializer_MOC_HDRS})
 
