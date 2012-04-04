@@ -22,6 +22,7 @@ using namespace Socializer;
 
 Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
     : OAuth(appId, redirectUrl, parent)
+    , m_scopeEmail(false)
     , m_scopePublishAcions(false)
     , m_scopePublishCheckins(false)
     , m_scopePublishStream(false)
@@ -41,6 +42,10 @@ QString Facebook::createScope()
     QList<QString> scopeList;
     QString scopeLine("&scope=");
     bool isFirst = true;
+
+    if (m_scopeEmail) {
+        scopeList.append("email");
+    }
 
     if (m_scopePublishAcions) {
         scopeList.append("publish_actions");
@@ -77,6 +82,12 @@ QString Facebook::createScope()
     } else {
         return QString();
     }
+}
+
+
+void Facebook::enableScopeEmail(bool enable)
+{
+    m_scopeEmail = enable;
 }
 
 
@@ -145,6 +156,12 @@ void Facebook::parseNewUrl(const QString& url)
 #endif
         }
     }
+}
+
+
+bool Facebook::scopeEmail() const
+{
+    return m_scopeEmail;
 }
 
 
