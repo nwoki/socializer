@@ -114,6 +114,7 @@ void OAuth::setAppId(const QByteArray &appId)
 void OAuth::setAuthToken(const QByteArray &authToken)
 {
     m_authToken = authToken;
+    Q_EMIT authTokenChanged();
 }
 
 

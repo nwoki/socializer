@@ -24,9 +24,9 @@ class OAuth : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QByteArray appId READ appId WRITE setAppId)
-    Q_PROPERTY(QByteArray authToken READ authToken WRITE setAuthToken)
-    Q_PROPERTY(QByteArray redirectUrl READ redirectUrl WRITE setRedirectUrl)
+    Q_PROPERTY(QByteArray appId         READ appId          WRITE setAppId)
+    Q_PROPERTY(QByteArray authToken     READ authToken      WRITE setAuthToken)
+    Q_PROPERTY(QByteArray redirectUrl   READ redirectUrl    WRITE setRedirectUrl)
 
 public:
     /// TODO should redirectUrl be a needed param?
@@ -63,6 +63,9 @@ public:
     void setAppId(const QByteArray &appId);
     void setAuthToken(const QByteArray &authToken);
     void setRedirectUrl(const QByteArray &redirectUrl);
+
+Q_SIGNALS:
+    void authTokenChanged();
 
 private:
     QByteArray m_appId;         /** id code to authenticate service to (consumerKey/clientId) */
