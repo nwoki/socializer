@@ -25,7 +25,7 @@ class OAuth : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QByteArray appId         READ appId          WRITE setAppId)
-    Q_PROPERTY(QByteArray authToken     READ authToken      WRITE setAuthToken)
+    Q_PROPERTY(QByteArray authToken     READ authToken      WRITE setAuthToken      NOTIFY authTokenChanged)
     Q_PROPERTY(QByteArray redirectUrl   READ redirectUrl    WRITE setRedirectUrl)
 
 public:

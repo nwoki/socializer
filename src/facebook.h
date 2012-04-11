@@ -77,7 +77,6 @@ private:
     bool m_scopePublishStream;      /** Allows user to publish stories to their ticker, timeline, and news feed using Built-in Actions, Achievements, Scores, or Custom Actions.*/
     bool m_scopeReadStream;         /** Provides access to all the posts in the user's News Feed and enables your application to perform searches against the user's News Feed */
     bool m_scopeUserAboutMe;        /** Provides info about the user */
-
 };
 
 };

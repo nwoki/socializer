@@ -1,16 +1,26 @@
+/*
+ * FacebookQML.qml
+ *
+ * This file is part of the Socializer library
+ * Copyright (C) 2012 Ispirata <info@ispirata.com>
+ *
+ * Author Francesco Nwokeka <francesco@ispirata.com>
+ */
+
 import QtQuick 1.1
 import QtWebKit 1.0
 import com.nokia.symbian 1.1
 
 /**
- * Facebook QML component
+ * Facebook QML component for Symbian
  */
 
-/// TODO set the value Facebook to be default used by lib. Is this possibile?
 Page {
     WebView {
         id: fbWebView;
-//        anchors.fill: parent;
+
+        signal tokenChanged();
+
         preferredHeight: parent.height;
         preferredWidth: parent.width;
 
@@ -22,6 +32,18 @@ Page {
          */
         onLoadFinished: {
             Facebook.parseNewUrl(fbWebView.url);
+        }
+    }
+
+    // used to connect to the Facebook component set via ContextProperty to read when the auth token changes
+    Connections {
+        target: Facebook;
+        onAuthTokenChanged: {
+            console.log("[FacebookQML] new auth token: " + Facebook.authToken);
+            fbWebView.tokenChanged();
+
+            // pop back to previous page
+            pageStack.pop();
         }
     }
 }
