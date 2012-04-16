@@ -93,6 +93,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void onObtainRequestTokenReplyRecieved();
+    void onNetworkErrorRecieved(QNetworkReply::NetworkError error);
 
 // private:
 protected:

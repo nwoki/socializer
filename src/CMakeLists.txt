@@ -1,15 +1,17 @@
 set(socializer_SRCS
     facebook.cpp
     foursquare.cpp
+    linkedin.cpp
     oauth.cpp
     twitter.cpp
 )
 
 set(socializer_MOC_HDRS
-    oauth.h
-    twitter.h
     facebook.h
     foursquare.h
+    linkedin.h
+    oauth.h
+    twitter.h
 )
 
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)

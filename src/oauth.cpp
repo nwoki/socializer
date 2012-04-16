@@ -92,6 +92,10 @@ QByteArray OAuth::generateBaseString(QNetworkAccessManager::Operation opType, co
 
 QByteArray OAuth::generateRequestAccessTokenHeader(QNetworkAccessManager::Operation opType, QByteArray url)
 {
+#ifdef DEBUG_MODE
+    qDebug("[OAuth::generateRequestAccessTokenHeader]");
+#endif
+
     QByteArray timeStamp = OAuth::timeStamp();
     QByteArray nonce = OAuth::nonce();
 
@@ -117,6 +121,8 @@ QByteArray OAuth::generateRequestAccessTokenHeader(QNetworkAccessManager::Operat
 
     if (!m_redirectUrl.isEmpty()) {
         header += "oauth_callback=\"" + QUrl::toPercentEncoding(m_redirectUrl) + "\",";
+    } else {
+        header += "oauth_callback=\"oob\",";
     }
 
     header += "oauth_consumer_key=\"" + m_appId + "\",";
@@ -125,6 +131,10 @@ QByteArray OAuth::generateRequestAccessTokenHeader(QNetworkAccessManager::Operat
     header += "oauth_signature_method=\"HMAC-SHA1\",";
     header += "oauth_timestamp=\"" + timeStamp + "\",";
     header += "oauth_version=\"1.0\"";
+
+#ifdef DEBUG_MODE
+    qDebug() << "[OAuth::generateRequestAccessTokenHeader] header is: " << header;
+#endif
 
     return header;
 }
@@ -192,15 +202,23 @@ void OAuth::obtainRequestToken(const QByteArray &requestUrl)
     m_networkReply = m_networkAccessManager->post(request, QByteArray());
 
     connect(m_networkReply, SIGNAL(readyRead()), this, SLOT(onObtainRequestTokenReplyRecieved()));
-    /// TODO connect error signal
+    connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
 }
 
 
 void OAuth::onObtainRequestTokenReplyRecieved()
 {
     qDebug() << "REQUEST TOKEN RECIEVED: " << m_networkReply->readAll();
+    m_networkReply->deleteLater();
 }
 
+
+void OAuth::onNetworkErrorRecieved(QNetworkReply::NetworkError error)
+{
+    /// TODO implement cases
+    qDebug() << "[OAuth::onNetworkErrorRecieved] " << m_networkReply->errorString();
+    m_networkReply->deleteLater();
+}
 
 
 QByteArray OAuth::redirectUrl() const
