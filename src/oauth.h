@@ -13,6 +13,10 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QObject>
 
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+
+
 /**
  * Class used to handle OAuth data for various services
  */
@@ -24,17 +28,30 @@ class OAuth : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QByteArray appId         READ appId          WRITE setAppId)
-    Q_PROPERTY(QByteArray authToken     READ authToken      WRITE setAuthToken      NOTIFY authTokenChanged)
-    Q_PROPERTY(QByteArray redirectUrl   READ redirectUrl    WRITE setRedirectUrl)
+//     Q_PROPERTY(QByteArray appId         READ appId          WRITE setAppId)
+    Q_PROPERTY(QByteArray authToken     READ authToken  NOTIFY authTokenChanged)
+    Q_PROPERTY(QByteArray redirectUrl   READ redirectUrl)
 
 public:
     /// TODO should redirectUrl be a needed param?
-    OAuth(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
+    OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret = QByteArray(), QObject *parent = 0);
     ~OAuth();
 
-    QByteArray appId() const;
+//     QByteArray appId() const;
     QByteArray authToken() const;
+
+    /**
+     * generates the OAuth signature base to encrypt in HMAC-SHA1 later on
+     * https://dev.twitter.com/docs/auth/creating-signature - Creating the signature base string
+     */
+    QByteArray generateBaseString(QNetworkAccessManager::Operation opType, const QByteArray &url, QList<QPair<QByteArray, QByteArray> > params);
+
+    /**
+     * generates the auth header for auth_token request
+     * @param type the http method to generate the header for. Each method has different implementations
+     * @param url the url to use for the request
+     */
+    QByteArray generateRequestAccessTokenHeader(QNetworkAccessManager::Operation opType, QByteArray url);
 
     /**
      * encode in hmacsha1 the given string
@@ -58,19 +75,37 @@ public:
     /** returns url to access for web page authentication */
     virtual QString obtainAuthPageUrl() = 0;
 
+    /**
+     * sends request to service for access token to be used with OAuth::obtainAuthPage
+     * This is to be used for first access to the service or if the auth token has expired
+     * @param requestUrl url to request for the token
+     */
+    void obtainRequestToken(const QByteArray &requestUrl);
+
     QByteArray redirectUrl() const;
 
-    void setAppId(const QByteArray &appId);
+//     void setAppId(const QByteArray &appId);
     void setAuthToken(const QByteArray &authToken);
-    void setRedirectUrl(const QByteArray &redirectUrl);
+//     void setRedirectUrl(const QByteArray &redirectUrl);
 
 Q_SIGNALS:
     void authTokenChanged();
 
-private:
-    QByteArray m_appId;         /** id code to authenticate service to (consumerKey/clientId) */
-    QByteArray m_authToken;     /** auth token recieved from service */
-    QByteArray m_redirectUrl;   /** url to redirect after auth */
+private Q_SLOTS:
+    void onObtainRequestTokenReplyRecieved();
+
+// private:
+protected:
+    QByteArray m_appId;             /** id code to authenticate service to (consumerKey/clientId) */
+    QByteArray m_authToken;         /** auth token recieved from service */
+    QByteArray m_authTokenSecret;   /** secret for the auth token recieved with the auth token upon request */
+    QByteArray m_consumerSecret;
+    QByteArray m_redirectUrl;       /** url to redirect after auth */
+    QByteArray m_requestToken;
+
+    // network
+    QNetworkAccessManager *m_networkAccessManager;
+    QNetworkReply *m_networkReply;
 };
 
 };

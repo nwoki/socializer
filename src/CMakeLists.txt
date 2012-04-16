@@ -9,6 +9,7 @@ set(socializer_MOC_HDRS
     oauth.h
     twitter.h
     facebook.h
+    foursquare.h
 )
 
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)

@@ -13,7 +13,6 @@
 #include "oauth.h"
 
 #include <QtCore/QByteArray>
-#include <QtCore/QPair>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -30,50 +29,11 @@ class Twitter : public OAuth
     Q_OBJECT
 
 public:
-    enum RequestType {
-        GET,
-        POST
-    };
-
     Twitter(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject *parent = 0);
     ~Twitter();
 
     /** obtain twitter auth page for authentication once the request token has been recieved */
     QString obtainAuthPageUrl();
-
-    /**
-     * sends request to twitter service for access token to be used with Twitter::obtainAuthPage
-     * This is to be used for first access to tiwtter or if the auth token has expired
-     */
-    void requestAccessToken();
-
-Q_SIGNALS:
-    /** emitted when the request access token is received. User will then be directed to the twitter login page */
-    void requestAccessTokenRecieved();
-
-private Q_SLOTS:
-    void onRequestTokenReplyRecieved();
-
-private:
-    /**
-     * generates the auth header for auth_token request
-     * @param type the http method to generate the header for. Each method has different implementations
-     * @param url the url to use for the request
-     */
-    QByteArray generateRequestAccessTokenHeader(RequestType type, QByteArray url);
-
-    /**
-     * generates the OAuth signature base to encrypt in HMAC-SHA1 later on
-     * https://dev.twitter.com/docs/auth/creating-signature - Creating the signature base string
-     */
-    QByteArray generateBaseString(RequestType type, const QByteArray &url, QList<QPair<QByteArray, QByteArray> > params);
-
-    QNetworkAccessManager *m_networkAccessManager;
-    QNetworkReply *m_networkReply;
-
-    QByteArray m_authTokenSecret;
-    QByteArray m_consumerSecret;
-    QByteArray m_requestToken;
 };
 
 };

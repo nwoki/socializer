@@ -21,7 +21,7 @@ using namespace Socializer;
 
 
 Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
-    : OAuth(appId, redirectUrl, parent)
+    : OAuth(appId, redirectUrl, QByteArray(), parent)
     , m_scopeEmail(false)
     , m_scopePublishAcions(false)
     , m_scopePublishCheckins(false)
@@ -126,9 +126,9 @@ QString Facebook::obtainAuthPageUrl()
     QString urlStr(AUTH_URL);
 
     urlStr.append("client_id=");
-    urlStr.append(appId());
+    urlStr.append(m_appId);
     urlStr.append("&redirect_uri=");
-    urlStr.append(redirectUrl());
+    urlStr.append(m_redirectUrl);
     urlStr.append(createScope());
     urlStr.append("&response_type=token");
 
@@ -152,7 +152,7 @@ void Facebook::parseNewUrl(const QString& url)
             setAuthToken(access.split("=").at(1).toUtf8());
 
 #ifdef DEBUG_MODE
-            qDebug() << "[Facebook::parseNewUrl] Auth token is: " << authToken();
+            qDebug() << "[Facebook::parseNewUrl] Auth token is: " << m_authToken;
 #endif
         }
     }
