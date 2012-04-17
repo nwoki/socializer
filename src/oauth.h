@@ -29,7 +29,7 @@ class OAuth : public QObject
     Q_OBJECT
 
 //     Q_PROPERTY(QByteArray appId         READ appId          WRITE setAppId)
-    Q_PROPERTY(QByteArray authToken     READ authToken  NOTIFY authTokenChanged)
+    Q_PROPERTY(QByteArray authToken     READ authToken      NOTIFY authTokenChanged)
     Q_PROPERTY(QByteArray redirectUrl   READ redirectUrl)
 
 public:
@@ -73,7 +73,7 @@ public:
     QByteArray timeStamp();
 
     /** returns url to access for web page authentication */
-    virtual QString obtainAuthPageUrl() = 0;
+    virtual void obtainAuthPageUrl() = 0;
 
     /**
      * sends request to service for access token to be used with OAuth::obtainAuthPage
@@ -89,7 +89,9 @@ public:
 //     void setRedirectUrl(const QByteArray &redirectUrl);
 
 Q_SIGNALS:
+    void authPageUrlReady(const QString &authPageUrl);
     void authTokenChanged();
+    void requestTokenRecieved();
 
 private Q_SLOTS:
     void onObtainRequestTokenReplyRecieved();

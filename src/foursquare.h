@@ -29,7 +29,7 @@ public:
     ~Foursquare();
 
     /** returns url to access for authentication */
-    QString obtainAuthPageUrl();
+    Q_INVOKABLE void obtainAuthPageUrl();
 };
 
 };

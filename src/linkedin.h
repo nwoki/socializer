@@ -30,7 +30,10 @@ public:
     LinkedIn(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject *parent = 0);
     ~LinkedIn();
 
-    QString obtainAuthPageUrl();
+    Q_INVOKABLE void obtainAuthPageUrl();
+
+private Q_SLOTS:
+    void prepareAuthPageUrl();
 
 private:
 };

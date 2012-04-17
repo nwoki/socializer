@@ -121,8 +121,12 @@ void Facebook::enableScopeUserAboutMe(bool enable)
 }
 
 
-QString Facebook::obtainAuthPageUrl()
+void Facebook::obtainAuthPageUrl()
 {
+#ifdef DEBUG_MODE
+    qDebug("[Facebook::obtainAuthPageUrl]");
+#endif
+
     QString urlStr(AUTH_URL);
 
     urlStr.append("client_id=");
@@ -132,7 +136,7 @@ QString Facebook::obtainAuthPageUrl()
     urlStr.append(createScope());
     urlStr.append("&response_type=token");
 
-    return urlStr;
+    Q_EMIT authPageUrlReady(urlStr);
 }
 
 

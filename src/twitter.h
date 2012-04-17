@@ -33,7 +33,10 @@ public:
     ~Twitter();
 
     /** obtain twitter auth page for authentication once the request token has been recieved */
-    QString obtainAuthPageUrl();
+    Q_INVOKABLE  void obtainAuthPageUrl();
+
+private Q_SLOTS:
+    void prepareAuthPageUrl();
 };
 
 };

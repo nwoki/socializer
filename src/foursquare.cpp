@@ -27,7 +27,7 @@ Foursquare::~Foursquare()
 }
 
 
-QString Foursquare::obtainAuthPageUrl()
+void Foursquare::obtainAuthPageUrl()
 {
     QString urlStr(AUTH_URL);
 
@@ -36,5 +36,5 @@ QString Foursquare::obtainAuthPageUrl()
     urlStr.append("&response_type=token&redirect_uri=");
     urlStr.append(m_redirectUrl);
 
-    return urlStr;
+    Q_EMIT authPageUrlReady(urlStr);
 }

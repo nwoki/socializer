@@ -24,14 +24,21 @@ Page {
         preferredHeight: parent.height;
         preferredWidth: parent.width;
 
-        url: Facebook.authPageUrl;
-
         /**
          * on load finished, send new url to c++ to extract various
          * errors or, if present, the auth token
          */
         onLoadFinished: {
             Facebook.parseNewUrl(fbWebView.url);
+        }
+
+        Component.onCompleted: {
+            if (!Facebook.authToken == "") {
+                console.log("TOKEN NULL");
+                Facebook.obtainAuthPageUrl();
+            } else {
+                console.log("not null " + Facebook.authToken);
+            }
         }
     }
 
@@ -44,6 +51,11 @@ Page {
 
             // pop back to previous page
             pageStack.pop();
+        }
+
+        onAuthPageUrlReady: {
+            console.log("[FacebookQML] auth page url is: " + authPageUrl);
+            fbWebView.url = authPageUrl;
         }
     }
 }

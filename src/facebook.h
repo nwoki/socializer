@@ -25,7 +25,6 @@ class Facebook : public OAuth
 {
     Q_OBJECT
 
-    Q_PROPERTY (QString authPageUrl         READ obtainAuthPageUrl)
     Q_PROPERTY (bool scopeEmail             READ scopeEmail             WRITE enableScopeEmail)
     Q_PROPERTY (bool scopePublishActions    READ scopePublishActions    WRITE enableScopePublishActions)
     Q_PROPERTY (bool scopePublishCheckins   READ scopePublishCheckins   WRITE enableScopePublishCheckins)
@@ -44,7 +43,7 @@ public:
     void enableScopeReadStream(bool enable);
     void enableScopeUserAboutMe(bool enable);
 
-    QString obtainAuthPageUrl();
+    Q_INVOKABLE void obtainAuthPageUrl();
 
     /**
      * used to parse urls given by the QML Facebook component. It parses

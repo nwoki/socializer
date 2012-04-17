@@ -23,6 +23,7 @@ using namespace Socializer;
 Twitter::Twitter(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject *parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
 {
+    connect(this, SIGNAL(requestTokenRecieved()), this, SLOT(prepareAuthPageUrl()));
 }
 
 
@@ -31,7 +32,7 @@ Twitter::~Twitter()
 }
 
 
-QString Twitter::obtainAuthPageUrl()
+void Twitter::obtainAuthPageUrl()
 {
     // https://dev.twitter.com/docs/auth/implementing-sign-twitter (see step 2)
 
@@ -40,12 +41,22 @@ QString Twitter::obtainAuthPageUrl()
         /// TODO notify error, we need to request the auth token first
         qDebug("[ERROR] Twitter::obtainAuthPageUrl: need to obtain request token first");
         obtainRequestToken(REQUEST_TOKEN_URL);
-        return QString();
+    } else {
+        prepareAuthPageUrl();
     }
+}
 
+
+void Twitter::prepareAuthPageUrl()
+{
     // once i have the access token, return the authentication url
     QString authPageUrl(AUTHENTICATE_URL);
-    authPageUrl += "?auth_token=" + m_authToken;
+    authPageUrl += "?oauth_token=" + m_authToken;
 
-    return authPageUrl;
+#ifdef DEBUG_MODE
+    qDebug() << "[Twitter::prepareAuthPageUrl] Emitting auth page url: " << authPageUrl;
+#endif
+
+    Q_EMIT authPageUrlReady(authPageUrl);
 }
+

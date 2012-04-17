@@ -13,6 +13,7 @@
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 #include <stdio.h>
+
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
@@ -208,8 +209,39 @@ void OAuth::obtainRequestToken(const QByteArray &requestUrl)
 
 void OAuth::onObtainRequestTokenReplyRecieved()
 {
-    qDebug() << "REQUEST TOKEN RECIEVED: " << m_networkReply->readAll();
+    QByteArray rcv = m_networkReply->readAll();
+
+#ifdef DEBUG_MODE
+    qDebug() << "[OAuth::onObtainRequestTokenReplyRecieved] REQUEST TOKEN RECIEVED: " << rcv;
+#endif
+
     m_networkReply->deleteLater();
+
+    // extract oauth_token, auth_token_secret and check if the callback is confirmed
+    // split the string
+    QList<QByteArray> parts = rcv.split('&');
+    bool valid = false;
+
+    foreach (QByteArray part, parts) {
+        QList<QByteArray>subPart = part.split('=');
+
+        if (subPart.at(0) == "oauth_token") {
+            m_authToken = subPart.at(1);
+        } else if (subPart.at(0) == "oauth_token_secret") {
+            m_authTokenSecret = subPart.at(1);
+        } else if (subPart.at(0) == "oauth_callback_confirmed") {
+            if (subPart.at(1) != "true") {
+                valid = false;
+                /// TODO what to do in this case?
+            }
+        }
+    }
+
+#ifdef DEBUG_MODE
+    qDebug() << "[OAuth::onObtainRequestTokenReplyRecieved] Got values: " << m_authToken << " " << m_authTokenSecret;
+#endif
+
+    Q_EMIT requestTokenRecieved();
 }
 
 

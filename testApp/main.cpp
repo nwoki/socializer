@@ -35,11 +35,11 @@ int main(int argc, char *argv[])
 //     qDebug() << face->obtainAuthPageUrl();
 //
 //
-//     // Twitter Nwoki testApp
-//     Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
-//                                                         , "http://www.2s2h.com"
-//                                                         , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
-//     twitter->obtainAuthPageUrl();
+    // Twitter Nwoki testApp
+    Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
+                                                        , "http://www.2s2h.com"
+                                                        , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
+    twitter->obtainAuthPageUrl();
 
     // LINKEDIN
     Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "http://www.2s2h.com", "1tTwdCxMuiycme2R");
