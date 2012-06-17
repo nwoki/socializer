@@ -45,11 +45,6 @@ public:
 
     Q_INVOKABLE void obtainAuthPageUrl();
 
-    /**
-     * used to parse urls given by the QML Facebook component. It parses
-     * the url to extract various errors and/or the auth token if all goes well
-     * @param url the new url
-     */
     Q_INVOKABLE void parseNewUrl(const QString &url);
 
     /**

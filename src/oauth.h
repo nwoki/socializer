@@ -16,7 +16,6 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-
 /**
  * Class used to handle OAuth data for various services
  */
@@ -76,6 +75,14 @@ public:
 
     /** returns url to access for web page authentication */
     virtual void obtainAuthPageUrl() = 0;
+
+
+    /**
+     * used to parse urls given by the QML Facebook component. It parses
+     * the url to extract various errors and/or the auth token if all goes well
+     * @param url the new url
+     */
+    virtual void parseNewUrl(const QString &url) = 0;
 
 
     /**
