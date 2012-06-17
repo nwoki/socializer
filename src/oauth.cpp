@@ -24,7 +24,6 @@
 
 using namespace Socializer;
 
-
 OAuth::OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject *parent)
     : QObject(parent)
     , m_appId(appId)
@@ -91,7 +90,7 @@ QByteArray OAuth::generateBaseString(QNetworkAccessManager::Operation opType, co
 }
 
 
-QByteArray OAuth::generateRequestAccessTokenHeader(QNetworkAccessManager::Operation opType, QByteArray url)
+QByteArray OAuth::generateRequestHeader(QNetworkAccessManager::Operation opType, QByteArray url)
 {
 #ifdef DEBUG_MODE
     qDebug("[OAuth::generateRequestAccessTokenHeader]");
@@ -114,6 +113,11 @@ QByteArray OAuth::generateRequestAccessTokenHeader(QNetworkAccessManager::Operat
     params.append(QPair<QByteArray, QByteArray>("oauth_consumer_key", m_appId));
     params.append(QPair<QByteArray, QByteArray>("oauth_version", "1.0"));
 
+    // add auth token if present
+    if (!m_authToken.isEmpty()) {
+        params.append(QPair<QByteArray, QByteArray>("oauth_token", m_authToken));
+    }
+
     QByteArray baseStr = generateBaseString(opType, url, params);
     QByteArray signature = hmacsha1Encode(baseStr, key);
 
@@ -131,6 +135,12 @@ QByteArray OAuth::generateRequestAccessTokenHeader(QNetworkAccessManager::Operat
     header += "oauth_signature=\"" + QUrl::toPercentEncoding(signature) + "\",";
     header += "oauth_signature_method=\"HMAC-SHA1\",";
     header += "oauth_timestamp=\"" + timeStamp + "\",";
+
+    // auth token
+    if (!m_authToken.isEmpty()) {
+        header += "oauth_token=\"" + m_authToken + "\",";
+    }
+
     header += "oauth_version=\"1.0\"";
 
 #ifdef DEBUG_MODE
@@ -198,7 +208,7 @@ void OAuth::obtainRequestToken(const QByteArray &requestUrl)
     // https://dev.twitter.com/docs/auth/implementing-sign-twitter (see step 1)
     QUrl reqUrlized(requestUrl);
     QNetworkRequest request(reqUrlized);
-    request.setRawHeader("Authorization", generateRequestAccessTokenHeader(QNetworkAccessManager::PostOperation, requestUrl));
+    request.setRawHeader("Authorization", generateRequestHeader(QNetworkAccessManager::PostOperation, requestUrl));
 
     m_networkReply = m_networkAccessManager->post(request, QByteArray());
 
@@ -253,9 +263,75 @@ void OAuth::onNetworkErrorRecieved(QNetworkReply::NetworkError error)
 }
 
 
+void OAuth::onRequestAccessTokenReceived()
+{
+    QByteArray rcv = m_networkReply->readAll();
+
+#ifdef DEBUG_MODE
+    qDebug("[OAuth::onRequestAccessTokenReceived]");
+    qDebug() << rcv;
+#endif
+
+    m_networkReply->deleteLater();
+
+    // extract values
+    QList<QByteArray> params = rcv.split('&');
+
+    foreach (QByteArray param, params) {
+        QList<QByteArray> elements = param.split('=');
+
+        if (elements.at(0) == "oauth_token") {
+            m_authToken = elements.at(1);
+        } else if (elements.at(0) == "oauth_token_secret") {
+            m_authTokenSecret = elements.at(1);
+        } else if (elements.at(0) == "user_id") {
+            m_userId = elements.at(1);
+        } else if (elements.at(0) == "screen_name") {
+            m_screenName = elements.at(1);
+        }
+    }
+
+#ifdef DEBUG_MODE
+    qDebug("Definitive values after auth are: ");
+    qDebug() << "auth token: " << m_authToken;
+    qDebug() << "auth token secret: " << m_authTokenSecret;
+    qDebug() << "user id: " << m_userId;
+    qDebug() << "screen name: " << m_screenName;
+#endif
+}
+
+
 QByteArray OAuth::redirectUrl() const
 {
     return m_redirectUrl;
+}
+
+
+void OAuth::requestAccessToken(const QByteArray &url, const QByteArray &authVerifier)
+{
+#ifdef DEBUG_MODE
+    qDebug("[OAuth::requestAccessToken]");
+    qDebug() << "url: " << url;
+    qDebug() << "authTok: " << m_authToken;
+    qDebug() << "auth ver: " << authVerifier;
+#endif
+
+
+
+    // https://dev.twitter.com/docs/auth/implementing-sign-twitter (see step 1)
+    QUrl reqUrlized(url);
+    QNetworkRequest request(reqUrlized);
+    QByteArray data;
+    data += "oauth_verifier=";
+    data += authVerifier;
+
+    request.setRawHeader("Authorization", generateRequestHeader(QNetworkAccessManager::PostOperation, url));
+
+    m_networkReply = m_networkAccessManager->post(request, data);
+
+    connect(m_networkReply, SIGNAL(finished()), this, SLOT(onRequestAccessTokenReceived()));
+    connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
+
 }
 
 

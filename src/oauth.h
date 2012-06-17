@@ -51,7 +51,7 @@ public:
      * @param type the http method to generate the header for. Each method has different implementations
      * @param url the url to use for the request
      */
-    QByteArray generateRequestAccessTokenHeader(QNetworkAccessManager::Operation opType, QByteArray url);
+    QByteArray generateRequestHeader(QNetworkAccessManager::Operation opType, QByteArray url);
 
     /**
      * encode in hmacsha1 the given string
@@ -69,11 +69,14 @@ public:
      */
     QByteArray nonce();
 
+
     /** returns timestamp in epoch time according to the OAuth spec http://oauth.net/core/1.0/#nonce */
     QByteArray timeStamp();
 
+
     /** returns url to access for web page authentication */
     virtual void obtainAuthPageUrl() = 0;
+
 
     /**
      * sends request to service for access token to be used with OAuth::obtainAuthPage
@@ -82,7 +85,18 @@ public:
      */
     void obtainRequestToken(const QByteArray &requestUrl);
 
+
     QByteArray redirectUrl() const;
+
+
+    /**
+     * sends a post request to the server converting the previously received request token
+     * to a valid ACCESS TOKEN
+     * @param url url to send the POST request to (twitter, linkedin, dropbox.. )
+     * @param authVerifier auth verifier token received from the "obtainRequestToken" call
+     */
+    void requestAccessToken(const QByteArray &url ,const QByteArray &authVerifier);
+
 
 //     void setAppId(const QByteArray &appId);
     void setAuthToken(const QByteArray &authToken);
@@ -94,8 +108,9 @@ Q_SIGNALS:
     void requestTokenRecieved();
 
 private Q_SLOTS:
-    void onObtainRequestTokenReplyRecieved();
     void onNetworkErrorRecieved(QNetworkReply::NetworkError error);
+    void onObtainRequestTokenReplyRecieved();
+    void onRequestAccessTokenReceived();
 
 // private:
 protected:
@@ -105,6 +120,8 @@ protected:
     QByteArray m_consumerSecret;
     QByteArray m_redirectUrl;       /** url to redirect after auth */
     QByteArray m_requestToken;
+    QByteArray m_screenName;
+    QByteArray m_userId;
 
     // network
     QNetworkAccessManager *m_networkAccessManager;

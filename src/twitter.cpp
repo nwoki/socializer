@@ -11,11 +11,14 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QUrl>
+#include <QtDeclarative/QDeclarativeView>
+#include <QtDeclarative/QDeclarativeContext>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-#define AUTHENTICATE_URL "https://api.twitter.com/oauth/authenticate"
-#define REQUEST_TOKEN_URL "https://api.twitter.com/oauth/request_token"
+#define AUTHENTICATE_URL    "https://api.twitter.com/oauth/authenticate"
+#define REQUEST_TOKEN_URL   "https://api.twitter.com/oauth/request_token"
+#define ACCESS_TOKEN_URL    "https://api.twitter.com/oauth/access_token"
 
 using namespace Socializer;
 
@@ -44,6 +47,56 @@ void Twitter::obtainAuthPageUrl()
     } else {
         prepareAuthPageUrl();
     }
+}
+
+
+void Twitter::parseNewUrl(const QString &url)
+{
+#ifdef DEBUG_MODE
+    qDebug("[Twitter::parseNewUrl]");
+    qDebug() << "url: " << url;
+#endif
+
+    QByteArray authVerifier;
+
+    // check that server has returned correct keys after user login
+    if (url.contains("oauth_token") && url.contains("oauth_verifier")) {
+        // extract part after the "?" from the url
+        QStringList sections = url.split('?');
+
+        // extract oauth_token, auth_verifier
+        QStringList parts = sections.at(1).split('&');
+        bool valid = false;
+
+        foreach (QString part, parts) {
+            QStringList subPart = part.split('=');
+
+            if (subPart.at(0) == "oauth_token") {
+                m_authToken = subPart.at(1).toUtf8();
+            } else if (subPart.at(0) == "oauth_verifier") {
+                authVerifier = subPart.at(1).toUtf8();
+            }
+        }
+
+        // check values are not empty
+        if (m_authToken.isEmpty() || authVerifier.isEmpty()) {
+            /// TODO handle this error (should never be emtpy)
+#ifdef DEBUG_MODE
+            qDebug("[Twitter::parseNewUrl] ERROR: auth token and auth verifier values are empty!");
+#endif
+            return;
+        }
+
+        // convert the request token to an access token
+        // https://dev.twitter.com/docs/auth/implementing-sign-twitter (step 3)
+        requestAccessToken(ACCESS_TOKEN_URL, authVerifier);
+    }
+}
+
+
+void Twitter::setContextProperty(QDeclarativeView *view)
+{
+    view->rootContext()->setContextProperty("Twitter", this);
 }
 
 

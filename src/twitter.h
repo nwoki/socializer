@@ -14,8 +14,7 @@
 
 #include <QtCore/QByteArray>
 
-class QNetworkAccessManager;
-class QNetworkReply;
+class QDeclarativeView;
 
 namespace Socializer
 {
@@ -34,6 +33,22 @@ public:
 
     /** obtain twitter auth page for authentication once the request token has been recieved */
     Q_INVOKABLE  void obtainAuthPageUrl();
+
+
+    /**
+     * used to parse urls given by the QML Facebook component. It parses
+     * the url to extract various errors and/or the auth token if all goes well
+     * @param url the new url
+     */
+    Q_INVOKABLE void parseNewUrl(const QString &url);
+
+
+    /**
+     * Use this to set the correct context property in order to use the
+     * Socializer::Facebook object with the included FacebookQML component
+     * @param view pointer to the Declarative view used in the application
+     */
+    void setContextProperty(QDeclarativeView *view);
 
 private Q_SLOTS:
     void prepareAuthPageUrl();
