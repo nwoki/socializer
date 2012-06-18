@@ -35,14 +35,14 @@ int main(int argc, char *argv[])
 //     qDebug() << face->obtainAuthPageUrl();
 //
 //
-    // Twitter Nwoki testApp
-    Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
-                                                        , "http://www.2s2h.com"
-                                                        , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
+//     // Twitter Nwoki testApp
+//     Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
+//                                                         , "http://www.2s2h.com"
+//                                                         , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
 //     twitter->obtainAuthPageUrl();
 
     // LINKEDIN
-//     Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "http://www.2s2h.com", "1tTwdCxMuiycme2R");
+    Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "http://www.2s2h.com", "1tTwdCxMuiycme2R");
 //     link->obtainAuthPageUrl();
 
     // QML component test
@@ -61,9 +61,13 @@ int main(int argc, char *argv[])
 
     // TWITTER
 
-    twitter->setContextProperty(view);
-    view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/TwitterQML.qml"));
+//     twitter->setContextProperty(view);
+//     view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/TwitterQML.qml"));
 
+
+    // LINKEDIN
+    link->setContextProperty(view);
+    view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/LinkedinQML.qml"));
 
 
 

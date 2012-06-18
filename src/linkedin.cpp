@@ -10,6 +10,8 @@
 #include "linkedin.h"
 
 #include <QtCore/QDebug>
+#include <QtDeclarative/QDeclarativeView>
+#include <QtDeclarative/QDeclarativeContext>
 #include <QtNetwork/QNetworkAccessManager>
 
 #define AUTHENTICATE_URL "https://api.linkedin.com/uas/oauth/authenticate"
@@ -42,6 +44,17 @@ void LinkedIn::obtainAuthPageUrl()
 }
 
 
+void LinkedIn::parseNewUrl(const QString& url)
+{
+#ifdef DEBUG_MODE
+    qDebug("[LinkedIn::parseNewUrl]");
+    qDebug() << "url: " << url;
+#endif
+
+    /// TODO parse links for values
+}
+
+
 void LinkedIn::prepareAuthPageUrl()
 {
     // once i have the access token, return the authentication url
@@ -54,6 +67,13 @@ void LinkedIn::prepareAuthPageUrl()
 
     Q_EMIT authPageUrlReady(authPageUrl);
 }
+
+
+void LinkedIn::setContextProperty(QDeclarativeView *view)
+{
+    view->rootContext()->setContextProperty("LinkedIn", this);
+}
+
 
 
 
