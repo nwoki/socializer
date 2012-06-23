@@ -212,7 +212,7 @@ void OAuth::obtainRequestToken(const QByteArray &requestUrl)
 
     m_networkReply = m_networkAccessManager->post(request, QByteArray());
 
-    connect(m_networkReply, SIGNAL(readyRead()), this, SLOT(onObtainRequestTokenReplyRecieved()));
+    connect(m_networkReply, SIGNAL(finished()), this, SLOT(onObtainRequestTokenReplyRecieved()));
     connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
 }
 
@@ -257,9 +257,19 @@ void OAuth::onObtainRequestTokenReplyRecieved()
 
 void OAuth::onNetworkErrorRecieved(QNetworkReply::NetworkError error)
 {
-    /// TODO implement cases
-    qDebug() << "[OAuth::onNetworkErrorRecieved] " << m_networkReply->errorString();
+    // don't need to do check for int conversion here. I trust Qt's code ;)
+    int statusCode = m_networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QByteArray errStr = m_networkReply->readAll();
+
+#ifdef DEBUG_MODE
+    qDebug("[OAuth::onNetworkErrorRecieved]");
+    qDebug() << "Error msg: " << errStr;
+    qDebug() << "Status code: " << statusCode;
+#endif
+
     m_networkReply->deleteLater();
+
+    /// TODO implement cases
 }
 
 
