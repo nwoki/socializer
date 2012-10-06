@@ -1,19 +1,10 @@
-TEMPLATE = lib
-TARGET = Socializer
+TEMPLATE = subdirs
 
-CONFIG += create_prl \
-        static
+# CONFIG += create_prl \
+#         static
 
-DEPENDPATH += . \
-              src \
-              testApp \
+# CONFIG += static
 
-INCLUDEPATH += . src include
-
-include(socializer.pri)
-
-UI_DIR = qmakeBuild/
-MOC_DIR = qmakeBuild/
-OBJECTS_DIR = qmakeBuild/
-DESTDIR = lib/
-
+SUBDIRS += \
+    src \
+#     test
