@@ -7,4 +7,16 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     src \
-#     test
+    testApp
+
+
+# DO I NEED THIS?
+#################
+
+# INCLUDEPATH += \
+#     $$PWD/include \
+#     $$PWD/lib
+
+# DEPENDPATH += \
+#     $$PWD/include \
+#     $$PWD/lib
