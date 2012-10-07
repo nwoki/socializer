@@ -210,7 +210,7 @@ void OAuth::obtainRequestToken(const QByteArray &requestUrl)
     QNetworkRequest request(reqUrlized);
     request.setRawHeader("Authorization", generateRequestHeader(QNetworkAccessManager::PostOperation, requestUrl));
 
-    m_networkReply = m_networkAccessManager->post(request, QByteArray());
+    m_networkReply = m_networkAccessManager->post(request, "application/octet-stream");
 
     connect(m_networkReply, SIGNAL(finished()), this, SLOT(onObtainRequestTokenReplyRecieved()));
     connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
@@ -230,7 +230,7 @@ void OAuth::onObtainRequestTokenReplyRecieved()
     // extract oauth_token, auth_token_secret and check if the callback is confirmed
     // split the string
     QList<QByteArray> parts = rcv.split('&');
-    bool valid = false;
+    bool valid = true;
 
     foreach (QByteArray part, parts) {
         QList<QByteArray>subPart = part.split('=');
@@ -251,7 +251,11 @@ void OAuth::onObtainRequestTokenReplyRecieved()
     qDebug() << "[OAuth::onObtainRequestTokenReplyRecieved] Got values: " << m_authToken << " " << m_authTokenSecret;
 #endif
 
-    Q_EMIT requestTokenRecieved();
+    if (valid) {
+        Q_EMIT requestTokenRecieved();
+    } else {
+        qDebug("ERROR [OAuth::onObtainRequestTokenReplyRecieved] Callback was not comfirmed");
+    }
 }
 
 
@@ -270,6 +274,9 @@ void OAuth::onNetworkErrorRecieved(QNetworkReply::NetworkError error)
     m_networkReply->deleteLater();
 
     /// TODO implement cases
+    Q_UNUSED(error)
+    Q_UNUSED(errStr)
+    Q_UNUSED(statusCode)
 }
 
 

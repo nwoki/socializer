@@ -38,15 +38,15 @@ int main(int argc, char *argv[])
 //     fb->enableScopeUserAboutMe(true);           // TODO test this after setting context property
 //     fb->enableScopePublishActions(true);        // TODO test this after setting context property
 //     fb->setContextProperty(view);
-//     view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/FacebookQML.qml"));
+//     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
 
     // TWITTER
-//     Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
-//                                                          , "http://www.2s2h.com"
-//                                                          , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
-//     twitter->obtainAuthPageUrl();       // TODO test this after setting context property
-//     twitter->setContextProperty(view);
-//     view->setSource(QUrl("qmlcomponents/TwitterQML.qml"));
+    Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
+                                                         , "http://www.2s2h.com"
+                                                         , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
+    twitter->obtainAuthPageUrl();       // TODO test this after setting context property
+    twitter->setContextProperty(view);
+    view->setSource(QUrl("qmlcomponents/TwitterQML.qml"));
 
 
     // LINKEDIN
