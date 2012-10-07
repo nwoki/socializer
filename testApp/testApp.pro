@@ -1,16 +1,9 @@
-# VPATH += $${PWD}
-# INCLUDEPATH += $${PWD}
-# DEPENDPATH += $${PWD}
-
 TARGET = testApp
 TEMPLATE = app
 
 QT += \
     declarative \
     network
-
-# INCLUDEPATH += \
-#     $$PWD
 
 MOC_DIR = .moc/
 OBJECTS_DIR = .obj/
@@ -32,9 +25,7 @@ HEADERS += \
     ../include/Foursquare \
     ../include/Facebook \
     ../include/LinkedIn \
-    ../include/Twitter \
-    mainwindow.h
+    ../include/Twitter
 
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp
+    main.cpp

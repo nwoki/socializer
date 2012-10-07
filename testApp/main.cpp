@@ -26,53 +26,39 @@ int main(int argc, char *argv[])
 //     Socializer::Foursquare *foursquare = new Socializer::Foursquare("UINBCI54PE04OECTALA03CFOO5YEGIOL5Q1EZ24CTXKJX4Z3"
 //                                                                     , "http://www.playgowar.com");
 //     qDebug() << foursquare->obtainAuthPageUrl();
-//
-//     // Nwoki TestApp
-//     Socializer::Facebook *face = new Socializer::Facebook("253316734751940"
-//                                                         , "http://www.2s2h.com");
-//     face->enableScopePublishActions(true);
-//     face->enableScopePublishStream(true);
-//     qDebug() << face->obtainAuthPageUrl();
-//
-//
-//     // Twitter Nwoki testApp
-//     Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
-//                                                         , "http://www.2s2h.com"
-//                                                         , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
-//     twitter->obtainAuthPageUrl();
 
-    // LINKEDIN
-    Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "http://www.2s2h.com", "1tTwdCxMuiycme2R");
-//     link->obtainAuthPageUrl();
 
     // QML component test
     QApplication app(argc, argv);
-//     Socializer::Facebook *fb = new Socializer::Facebook("253316734751940"
-//                                                         , "http://www.2s2h.com");
-//     fb->enableScopeUserAboutMe(true);
-//     fb->enableScopePublishActions(true);
-//
     QDeclarativeView *view = new QDeclarativeView;
 
-//     // FACEBOOK
-//
+    // FACEBOOK
+//     Socializer::Facebook *fb = new Socializer::Facebook("253316734751940"
+//                                                       , "http://www.2s2h.com");
+//     fb->enableScopeUserAboutMe(true);           // TODO test this after setting context property
+//     fb->enableScopePublishActions(true);        // TODO test this after setting context property
 //     fb->setContextProperty(view);
 //     view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/FacebookQML.qml"));
 
     // TWITTER
-
+//     Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
+//                                                          , "http://www.2s2h.com"
+//                                                          , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
+//     twitter->obtainAuthPageUrl();       // TODO test this after setting context property
 //     twitter->setContextProperty(view);
-//     view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/TwitterQML.qml"));
+//     view->setSource(QUrl("qmlcomponents/TwitterQML.qml"));
 
 
     // LINKEDIN
-    link->setContextProperty(view);
-    view->setSource(QUrl("/home/z3r0/GitProjects/Ispirata/socializer/qmlcomponents/LinkedinQML.qml"));
+//     Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "http://www.2s2h.com", "1tTwdCxMuiycme2R");
+//     link->obtainAuthPageUrl();          // TODO test this after setting context property
+//     link->setContextProperty(view);
+//     view->setSource(QUrl("qmlcomponents/LinkedinQML.qml"));
 
 
 
-        view->setFixedSize(480, 600);
-        view->show();
+    view->setFixedSize(480, 600);
+    view->show();
 
 
 
