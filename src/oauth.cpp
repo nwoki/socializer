@@ -35,6 +35,19 @@ OAuth::OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByte
 }
 
 
+OAuth::OAuth(const QByteArray& authToken, QObject *parent)
+    : QObject(parent)
+    , m_appId(QByteArray())
+    , m_authToken(authToken)
+    , m_consumerSecret(QByteArray())
+    , m_redirectUrl(QByteArray())
+    , m_networkAccessManager(new QNetworkAccessManager(this))
+    , m_networkReply(0)
+{
+
+}
+
+
 OAuth::~OAuth()
 {
 }

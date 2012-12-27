@@ -32,6 +32,13 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
 }
 
 
+Facebook::Facebook(const QByteArray &authToken)
+    : OAuth(authToken, this)
+{
+}
+
+
+
 Facebook::~Facebook()
 {
 }

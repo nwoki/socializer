@@ -40,13 +40,19 @@ int main(int argc, char *argv[])
 //     fb->setContextProperty(view);
 //     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
 
+    Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBAOxhf6uzZCWbmr5RjcpdsTKb5bpThk3qqJshyFvSiDPRNyv0eE1YOhu6LLPgS5QIFPtjE5rY5BvihSwczZAEEqZC7O5nwZDZD");
+
+    // FOURSQUARE
+//     Socializer::Foursquare *fq = new Socializer::Foursquare(""
+//                                                         , "");
+
     // TWITTER
-    Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
-                                                         , "http://www.2s2h.com"
-                                                         , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
-    twitter->obtainAuthPageUrl();       // TODO test this after setting context property
-    twitter->setContextProperty(view);
-    view->setSource(QUrl("qmlcomponents/TwitterQML.qml"));
+//     Socializer::Twitter *twitter = new Socializer::Twitter("ihWJWsvkIJrTNmMAssh1ZA"
+//                                                          , "http://www.2s2h.com"
+//                                                          , "MuQN5yLBWjG5D7CWJ0YCL5O7AfOOhWsDJyq1iSGfb0");
+//     twitter->obtainAuthPageUrl();       // TODO test this after setting context property
+//     twitter->setContextProperty(view);
+//     view->setSource(QUrl("qm/*l*/components/TwitterQML.qml"));
 
 
     // LINKEDIN

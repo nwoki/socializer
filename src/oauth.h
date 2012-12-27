@@ -34,6 +34,7 @@ class OAuth : public QObject
 public:
     /// TODO should redirectUrl be a needed param?
     OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret = QByteArray(), QObject *parent = 0);
+    OAuth(const QByteArray &authToken, QObject *parent = 0);
     ~OAuth();
 
 //     QByteArray appId() const;

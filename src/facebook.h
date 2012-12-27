@@ -34,6 +34,15 @@ class Facebook : public OAuth
 
 public:
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
+
+    /**
+     * Creates the Facebook class already with an auth token. Useful for when using Socializer
+     * with a web interface delegating the authentication to a web page.
+     *
+     * @param authToken auth token for the facebook account
+     */
+    Facebook(const QByteArray &authToken);
+
     ~Facebook();
 
     void enableScopeEmail(bool enable);
