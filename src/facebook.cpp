@@ -7,6 +7,7 @@
  * Author Francesco Nwokeka <francesco@ispirata.com>
  */
 
+#include "qjson/include/QJson/Parser"
 #include "facebook.h"
 
 #include <QtCore/QDebug>
@@ -89,6 +90,8 @@ QString Facebook::createScope()
         scopeList.append("user_religion_politics");
         scopeList.append("user_website");
         scopeList.append("user_work_history");
+        scopeList.append("user_relationships");
+        scopeList.append("user_relationship_details");
     }
 
     foreach(QString scope, scopeList) {
@@ -205,6 +208,37 @@ void Facebook::onNetReplyReceived()
 
     qDebug() << "[Facebook::onNetReplyReceived] rcv: " << rcv;
 
+    // parse incoming json
+    QJson::Parser parser;
+    bool ok;
+
+    QVariantMap result = parser.parse(rcv, &ok).toMap();
+
+    if (!ok) {
+        qDebug("[Facebook::onNetReplyReceived] ERROR: invalid json");
+        return;
+    }
+
+    m_userInfo.brithday = result["birthday"].toString();
+    m_userInfo.email = result["email"].toString();
+    m_userInfo.firstName = result["first_name"].toString();
+    m_userInfo.gender = result["gender"].toString();
+    m_userInfo.id = result["id"].toString();
+    m_userInfo.lastName = result["last_name"].toString();
+    m_userInfo.link = result["link"].toString();
+    m_userInfo.name = result["name"].toString();
+    m_userInfo.relationshipStatus = result["relationship_status"].toString();
+    m_userInfo.username = result["username"].toString();
+    m_userInfo.verified = result["verified"].toBool();
+
+    // extract picture
+    QVariantMap pictureMap = result["picture"].toMap();
+    QVariantMap pictureDataMap = pictureMap["data"].toMap();
+
+    m_userInfo.picture = pictureDataMap["url"].toString();
+
+    qDebug() << "INFO: " << m_userInfo.firstName << " : " << m_userInfo.id << " : " << m_userInfo.email << " : " << m_userInfo.picture;
+
     reply->deleteLater();
 }
 
@@ -241,10 +275,13 @@ void Facebook::populateData()
         QNetworkRequest req;
         QNetworkReply *netRep;
 
-        QString reqUrl(GRAPH_URL);
-        reqUrl += "?access_token=" + m_authToken;
+        QString reqStr(GRAPH_URL);
+        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,political,relationship_status,religion,sports,username,verified,website,picture,friends.fields(id,name,first_name,last_name,picture)";
+        reqStr += "&access_token=" + m_authToken;
 
-        req.setUrl(QUrl(reqUrl));
+        qDebug() << "[Facebook::populateData] requesting: " << reqStr;
+
+        req.setUrl(QUrl(reqStr));
         netRep = m_networkAccessManager->get(req);
 
         // connect

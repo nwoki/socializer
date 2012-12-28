@@ -38,7 +38,9 @@ public:
     struct Friends {
         QString id;
         QString name;
-        QString surname;
+        QString firstName;
+        QString lastName;
+        QString picture;
     };
 
     // user
@@ -47,12 +49,14 @@ public:
         QString name;
         QString firstName;
         QString lastName;
+        QString email;
         QString link;
         QString username;
         QString brithday;       /// TODO make it a QDate?
         QString gender;
         QString relationshipStatus;
-        QString verified;
+        QString picture;
+        bool verified;
     };
 
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
@@ -110,7 +114,7 @@ private:
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
     Me m_userInfo;                      /** User info */
-    QList<Friends> m_friends;           /** List of users friends */
+    QList<Friends> m_friends;           /** List of users friends */ // TODO make QHash<QString, Friend*>. stirng is ID
 
 //     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
 };
