@@ -43,6 +43,21 @@ public:
         QString picture;
     };
 
+    // game
+//     struct Game {
+// 
+//     };
+// 
+//     // movie
+//     struct Movie {
+// 
+//     };
+// 
+//     // music
+//     struct Music {
+// 
+//     };
+
     // user
     struct Me {
         QString id;
