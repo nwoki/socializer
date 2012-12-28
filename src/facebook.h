@@ -82,7 +82,7 @@ public:
      *
      * @param authToken auth token for the facebook account
      */
-    Facebook(const QByteArray &authToken);
+    Facebook(const QByteArray &authToken, QObject *parent = 0);
 
     ~Facebook();
 

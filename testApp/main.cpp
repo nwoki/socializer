@@ -33,15 +33,15 @@ int main(int argc, char *argv[])
     QDeclarativeView *view = new QDeclarativeView;
 
     // FACEBOOK
-    Socializer::Facebook *fb = new Socializer::Facebook("253316734751940"
-                                                      , "http://www.2s2h.com");
-    fb->enableScopeUserInfo(true);           // TODO test this after setting context property
+//     Socializer::Facebook *fb = new Socializer::Facebook("253316734751940"
+//                                                       , "http://www.2s2h.com");
+//     fb->enableScopeUserInfo(true);           // TODO test this after setting context property
 //     fb->enableScopePublishActions(true);        // TODO test this after setting context property
-    fb->setContextProperty(view);
-    view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
+//     fb->setContextProperty(view);
+//     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
 
-//     Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBAOxhf6uzZCWbmr5RjcpdsTKb5bpThk3qqJshyFvSiDPRNyv0eE1YOhu6LLPgS5QIFPtjE5rY5BvihSwczZAEEqZC7O5nwZDZD");
-
+    Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBADKFQBLjgjyZAWhqHEokw0LV3Hb4M6ytJufy5cU7czVZBsZAcanSLzTFMZBa6XPaZBg430KVm6PDqMI0nDVllhMAZBTa4bx6v1GwShP5ZBw");
+    fb->enableScopeUserInfo(true);
     // FOURSQUARE
 //     Socializer::Foursquare *fq = new Socializer::Foursquare(""
 //                                                         , "");
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 
 
 
-    view->setFixedSize(480, 600);
-    view->show();
+//     view->setFixedSize(480, 600);
+//     view->show();
 
 
 

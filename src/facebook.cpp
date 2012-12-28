@@ -35,8 +35,8 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
 }
 
 
-Facebook::Facebook(const QByteArray &authToken)
-    : OAuth(authToken, this)
+Facebook::Facebook(const QByteArray &authToken, QObject *parent)
+    : OAuth(authToken, parent)
     , m_scopeEmail(false)
     , m_scopePublishAcions(false)
     , m_scopePublishCheckins(false)
@@ -145,6 +145,10 @@ void Facebook::enableScopeReadStream(bool enable)
 void Facebook::enableScopeUserInfo(bool enable)
 {
     m_scopeUserInfo = enable;
+
+    if (m_scopeUserInfo) {
+        populateData();
+    }
 }
 
 
@@ -297,12 +301,15 @@ void Facebook::populateData()
     }
 
     if (m_scopeUserInfo) {
+
+        qDebug("[Facebook::populateData] user info scope");
+
         QNetworkRequest req;
         QNetworkReply *netRep;
 
         QString reqStr(GRAPH_URL);
         reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,political,relationship_status,religion,sports,username,verified,website,picture.type(normal)";
-                ",friends.fields(id,name,first_name,last_name,picture)";
+        reqStr += ",friends.fields(id,name,first_name,last_name,picture)";
 //                 ",games.fields(id,link,website,name,picture.type(normal))";
 //                 ",music.fields(id,bio,description,hometown,link,name,picture.type(normal),website)";
         reqStr += "&access_token=" + m_authToken;

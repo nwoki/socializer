@@ -44,7 +44,6 @@ OAuth::OAuth(const QByteArray& authToken, QObject *parent)
     , m_networkAccessManager(new QNetworkAccessManager(this))
     , m_networkReply(0)
 {
-
 }
 
 
