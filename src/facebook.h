@@ -41,6 +41,20 @@ public:
         QString surname;
     };
 
+    // user
+    struct Me {
+        QString id;
+        QString name;
+        QString firstName;
+        QString lastName;
+        QString link;
+        QString username;
+        QString brithday;       /// TODO make it a QDate?
+        QString gender;
+        QString relationshipStatus;
+        QString verified;
+    };
+
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
 
     /**
@@ -78,6 +92,11 @@ public:
     bool scopeReadStream() const;
     bool scopeUserInfo() const;
 
+private Q_SLOTS:
+    void onAuthTokenChanged();
+    void onNetReplyReceived();
+    void onNetReplyError(QNetworkReply::NetworkError error);
+
 private:
     QString createScope();              /** generates the scopes to add to the request url */
     void populateData();                /** pulls info from all graphs where permissions allow it and populates data */
@@ -90,8 +109,10 @@ private:
     bool m_scopeReadStream;             /** Provides access to all the posts in the user's News Feed and enables your application to perform searches against the user's News Feed */
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
-    // user info
+    Me m_userInfo;                      /** User info */
     QList<Friends> m_friends;           /** List of users friends */
+
+//     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
 };
 
 };

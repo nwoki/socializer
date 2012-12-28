@@ -120,7 +120,6 @@ private Q_SLOTS:
     void onObtainRequestTokenReplyRecieved();
     void onRequestAccessTokenReceived();
 
-// private:
 protected:
     QByteArray m_appId;             /** id code to authenticate service to (consumerKey/clientId) */
     QByteArray m_authToken;         /** auth token recieved from service */
@@ -133,6 +132,8 @@ protected:
 
     // network
     QNetworkAccessManager *m_networkAccessManager;
+
+private:
     QNetworkReply *m_networkReply;
 };
 

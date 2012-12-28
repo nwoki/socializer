@@ -16,6 +16,7 @@
 #include <QtDeclarative/QDeclarativeContext>
 
 #define AUTH_URL "https://m.facebook.com/dialog/oauth?"
+#define GRAPH_URL "https://graph.facebook.com/me/"
 
 using namespace Socializer;
 
@@ -29,12 +30,20 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
     , m_scopeReadStream(false)
     , m_scopeUserInfo(false)
 {
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
 
 
 Facebook::Facebook(const QByteArray &authToken)
     : OAuth(authToken, this)
+    , m_scopeEmail(false)
+    , m_scopePublishAcions(false)
+    , m_scopePublishCheckins(false)
+    , m_scopePublishStream(false)
+    , m_scopeReadStream(false)
+    , m_scopeUserInfo(false)
 {
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
 
 
@@ -153,6 +162,53 @@ void Facebook::obtainAuthPageUrl()
 }
 
 
+void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
+{
+    qDebug("[Facebook::onNetReplyError]");
+
+    // don't need to do check for int conversion here. I trust Qt's code ;)
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QString errStr = reply->errorString();
+
+    qDebug() << "Error msg: " << errStr;
+    qDebug() << "Status code: " << statusCode;
+
+
+    reply->deleteLater();
+
+    /// TODO implement cases
+    Q_UNUSED(error)
+    Q_UNUSED(errStr)
+    Q_UNUSED(statusCode)
+
+//     qDebug() << "Remaining replies in list: " << m_fbNetReplies.count();
+}
+
+
+void Facebook::onAuthTokenChanged()
+{
+    qDebug("[Facebook::onAuthTokenChanged]");
+
+    qDebug() << "TOKEN: " << m_authToken;
+
+    populateData();
+}
+
+
+void Facebook::onNetReplyReceived()
+{
+    qDebug("[Facebook::onNetReplyReceived]");
+
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    QByteArray rcv = reply->readAll();
+
+    qDebug() << "[Facebook::onNetReplyReceived] rcv: " << rcv;
+
+    reply->deleteLater();
+}
+
+
 void Facebook::parseNewUrl(const QString& url)
 {
     qDebug() << "[Facebook::parseNewUrl] got url: " << url;
@@ -176,6 +232,25 @@ void Facebook::populateData()
 {
     qDebug("[Facebook::populateData]");
 
+    if (m_authToken.isEmpty()) {
+        qDebug("[Facebook::populateData] no access token has been set!");
+        return;
+    }
+
+    if (m_scopeUserInfo) {
+        QNetworkRequest req;
+        QNetworkReply *netRep;
+
+        QString reqUrl(GRAPH_URL);
+        reqUrl += "?access_token=" + m_authToken;
+
+        req.setUrl(QUrl(reqUrl));
+        netRep = m_networkAccessManager->get(req);
+
+        // connect
+        connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
+        connect(netRep, SIGNAL(readyRead()), this, SLOT(onNetReplyReceived()));
+    }
 }
 
 

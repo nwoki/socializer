@@ -373,6 +373,8 @@ void OAuth::requestAccessToken(const QByteArray &url, const QByteArray &authVeri
 
 void OAuth::setAuthToken(const QByteArray &authToken)
 {
+    qDebug("[OAuth::setAuthToken]");
+
     m_authToken = authToken;
     Q_EMIT authTokenChanged();
 }
