@@ -35,7 +35,7 @@ class Facebook : public OAuth
 public:
 
     // friends
-    struct Friends {
+    struct Friend {
         QString id;
         QString name;
         QString firstName;
@@ -114,7 +114,7 @@ private:
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
     Me m_userInfo;                      /** User info */
-    QList<Friends> m_friends;           /** List of users friends */ // TODO make QHash<QString, Friend*>. stirng is ID
+    QHash<QString, Friend*>m_friends;   /** List of users friends */ // TODO make QHash<QString, Friend*>. stirng is ID
 
 //     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
 };

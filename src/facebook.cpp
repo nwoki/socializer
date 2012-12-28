@@ -219,6 +219,7 @@ void Facebook::onNetReplyReceived()
         return;
     }
 
+    // populate user data
     m_userInfo.brithday = result["birthday"].toString();
     m_userInfo.email = result["email"].toString();
     m_userInfo.firstName = result["first_name"].toString();
@@ -237,7 +238,31 @@ void Facebook::onNetReplyReceived()
 
     m_userInfo.picture = pictureDataMap["url"].toString();
 
-    qDebug() << "INFO: " << m_userInfo.firstName << " : " << m_userInfo.id << " : " << m_userInfo.email << " : " << m_userInfo.picture;
+//     qDebug() << "INFO: " << m_userInfo.firstName << " : " << m_userInfo.id << " : " << m_userInfo.email << " : " << m_userInfo.picture;
+
+
+    // populate FRIENDS data
+    QVariantMap friendsMap = result["friends"].toMap();
+
+    Q_FOREACH (QVariant friendData, friendsMap["data"].toList()) {
+        QVariantMap friendDataMap = friendData.toMap();
+        Friend *newFriend = new Friend;
+
+        newFriend->id = friendDataMap["id"].toString();
+        newFriend->firstName = friendDataMap["first_name"].toString();;
+        newFriend->lastName = friendDataMap["last_name"].toString();;
+        newFriend->name = friendDataMap["name"].toString();;
+
+        QVariantMap friendPictureMap = friendDataMap["picture"].toMap();
+        QVariantMap friendPictureDataMap = friendPictureMap["data"].toMap();
+
+        newFriend->picture = friendPictureDataMap["url"].toString();
+
+        // add to hash
+        m_friends.insert(newFriend->id, newFriend);
+
+//         qDebug() << "new friend: " << newFriend->id << ":" << newFriend->name << ":" << newFriend->picture;
+    }
 
     reply->deleteLater();
 }
