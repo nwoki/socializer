@@ -27,7 +27,7 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
     , m_scopePublishCheckins(false)
     , m_scopePublishStream(false)
     , m_scopeReadStream(false)
-    , m_scopeUserAboutMe(false)
+    , m_scopeUserInfo(false)
 {
 }
 
@@ -70,8 +70,16 @@ QString Facebook::createScope()
         scopeList.append("read_stream");
     }
 
-    if (m_scopeUserAboutMe) {
+    if (m_scopeUserInfo) {
         scopeList.append("user_about_me");
+        scopeList.append("user_birthday");
+        scopeList.append("user_education_history");
+        scopeList.append("user_hometown");
+        scopeList.append("user_interests");
+        scopeList.append("user_likes");
+        scopeList.append("user_religion_politics");
+        scopeList.append("user_website");
+        scopeList.append("user_work_history");
     }
 
     foreach(QString scope, scopeList) {
@@ -122,17 +130,15 @@ void Facebook::enableScopeReadStream(bool enable)
 }
 
 
-void Facebook::enableScopeUserAboutMe(bool enable)
+void Facebook::enableScopeUserInfo(bool enable)
 {
-    m_scopeUserAboutMe = enable;
+    m_scopeUserInfo = enable;
 }
 
 
 void Facebook::obtainAuthPageUrl()
 {
-#ifdef DEBUG_MODE
     qDebug("[Facebook::obtainAuthPageUrl]");
-#endif
 
     QString urlStr(AUTH_URL);
 
@@ -149,9 +155,7 @@ void Facebook::obtainAuthPageUrl()
 
 void Facebook::parseNewUrl(const QString& url)
 {
-#ifdef DEBUG_MODE
     qDebug() << "[Facebook::parseNewUrl] got url: " << url;
-#endif
 
     if (url.contains("access_token")) {
         QRegExp regex("access_token=?[^&]+");
@@ -162,11 +166,16 @@ void Facebook::parseNewUrl(const QString& url)
             // extract access token
             setAuthToken(access.split("=").at(1).toUtf8());
 
-#ifdef DEBUG_MODE
             qDebug() << "[Facebook::parseNewUrl] Auth token is: " << m_authToken;
-#endif
         }
     }
+}
+
+
+void Facebook::populateData()
+{
+    qDebug("[Facebook::populateData]");
+
 }
 
 
@@ -206,8 +215,8 @@ bool Facebook::scopeReadStream() const
 }
 
 
-bool Facebook::scopeUserAboutMe() const
+bool Facebook::scopeUserInfo() const
 {
-    return m_scopeUserAboutMe;
+    return m_scopeUserInfo;
 }
 
