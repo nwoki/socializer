@@ -203,14 +203,14 @@ void Facebook::onAuthTokenChanged()
 }
 
 
-void Facebook::onNetReplyReceived()
+void Facebook::onPopulateDataReplyReceived()
 {
-    qDebug("[Facebook::onNetReplyReceived]");
+    qDebug("[Facebook::onPopulateDataReplyReceived]");
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     QByteArray rcv = reply->readAll();
 
-    qDebug() << "[Facebook::onNetReplyReceived] rcv: " << rcv;
+    qDebug() << "[Facebook::onPopulateDataReplyReceived] rcv: " << rcv;
 
     // parse incoming json
     QJson::Parser parser;
@@ -219,7 +219,7 @@ void Facebook::onNetReplyReceived()
     QVariantMap result = parser.parse(rcv, &ok).toMap();
 
     if (!ok) {
-        qDebug("[Facebook::onNetReplyReceived] ERROR: invalid json");
+        qDebug("[Facebook::onPopulateDataReplyReceived] ERROR: invalid json");
         return;
     }
 
@@ -269,6 +269,9 @@ void Facebook::onNetReplyReceived()
     }
 
     reply->deleteLater();
+
+    // tell that the profile data has been updated
+    Q_EMIT profileUpdated();
 }
 
 
@@ -321,7 +324,7 @@ void Facebook::populateData()
 
         // connect
         connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
-        connect(netRep, SIGNAL(readyRead()), this, SLOT(onNetReplyReceived()));
+        connect(netRep, SIGNAL(readyRead()), this, SLOT(onPopulateDataReplyReceived()));
     }
 }
 
@@ -366,4 +369,13 @@ bool Facebook::scopeUserInfo() const
 {
     return m_scopeUserInfo;
 }
+
+
+Facebook::Me Facebook::userInfo() const
+{
+    qDebug("[Facebook::userInfo]");
+
+    return m_userInfo;
+}
+
 

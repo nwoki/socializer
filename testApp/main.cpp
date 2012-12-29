@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 //     fb->setContextProperty(view);
 //     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
 
-    Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBADKFQBLjgjyZAWhqHEokw0LV3Hb4M6ytJufy5cU7czVZBsZAcanSLzTFMZBa6XPaZBg430KVm6PDqMI0nDVllhMAZBTa4bx6v1GwShP5ZBw");
+    Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBAGdUCjdgI4jtI6PyYBn11mUitTqpEY6BmIy0o436RaImZAiFCamRi6j2LMj4xZBFnNxDnyBcANJxlIGZBogQa3SoTuercAJn9G92yPL");
     fb->enableScopeUserInfo(true);
     // FOURSQUARE
 //     Socializer::Foursquare *fq = new Socializer::Foursquare(""

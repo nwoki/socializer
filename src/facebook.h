@@ -111,9 +111,14 @@ public:
     bool scopeReadStream() const;
     bool scopeUserInfo() const;
 
+    Me userInfo() const;        /** returns facebook profile data stored */
+
+Q_SIGNALS:
+    void profileUpdated();      /** emitted when new profile data has been parsed */
+
 private Q_SLOTS:
     void onAuthTokenChanged();
-    void onNetReplyReceived();
+    void onPopulateDataReplyReceived();
     void onNetReplyError(QNetworkReply::NetworkError error);
 
 private:
