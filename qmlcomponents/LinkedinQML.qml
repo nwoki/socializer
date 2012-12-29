@@ -19,9 +19,9 @@ WebView {
 
     signal tokenChanged();
 
-    anchors.fill: parent;
-    preferredHeight: 600;
-    preferredWidth: 480;
+//     anchors.fill: parent;
+//     preferredHeight: 600;
+//     preferredWidth: 480;
 
     /**
      * on load finished, send new url to c++ to extract various
