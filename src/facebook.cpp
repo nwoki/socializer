@@ -311,10 +311,10 @@ void Facebook::populateData()
         QNetworkReply *netRep;
 
         QString reqStr(GRAPH_URL);
-        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,political,relationship_status,religion,sports,username,verified,website,picture.type(normal)";
-        reqStr += ",friends.fields(id,name,first_name,last_name,picture)";
-//                 ",games.fields(id,link,website,name,picture.type(normal))";
-//                 ",music.fields(id,bio,description,hometown,link,name,picture.type(normal),website)";
+        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,political,relationship_status,religion,sports,username,verified,website,picture.type(large)";
+        reqStr += ",friends.fields(id,name,first_name,last_name,picture.type(large))";
+//                 ",games.fields(id,link,website,name,picture.type(large))";
+//                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";
         reqStr += "&access_token=" + m_authToken;
 
         qDebug() << "[Facebook::populateData] requesting: " << reqStr;
