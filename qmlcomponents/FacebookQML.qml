@@ -13,15 +13,19 @@ import QtWebKit 1.0
 /**
  * Facebook QML component
  */
+Item {
+    id: root;
+
+    signal tokenChanged();
 
 WebView {
     id: fbWebView;
 
-    signal tokenChanged();
+//     signal tokenChanged();
 
-//     anchors.fill: parent;
-//     preferredHeight: 600;
-//     preferredWidth: 480;
+    anchors.fill: parent;
+    preferredHeight: parent.height;
+    preferredWidth: parent.width;
 
     /**
      * on load finished, send new url to c++ to extract various
@@ -45,7 +49,7 @@ WebView {
         target: Facebook;
         onAuthTokenChanged: {
             console.log("[FacebookQML] new auth token: " + Facebook.authToken);
-            fbWebView.tokenChanged();
+            root.tokenChanged();
         }
 
         onAuthPageUrlReady: {
@@ -53,4 +57,5 @@ WebView {
             fbWebView.url = authPageUrl;
         }
     }
+}
 }
