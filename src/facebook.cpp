@@ -30,6 +30,7 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
     , m_scopePublishStream(false)
     , m_scopeReadStream(false)
     , m_scopeUserInfo(false)
+    , m_userInfo(new Me)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -43,6 +44,7 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
     , m_scopePublishStream(false)
     , m_scopeReadStream(false)
     , m_scopeUserInfo(false)
+    , m_userInfo(new Me)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -51,6 +53,7 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 
 Facebook::~Facebook()
 {
+    delete m_userInfo;
 }
 
 
@@ -224,23 +227,23 @@ void Facebook::onPopulateDataReplyReceived()
     }
 
     // populate user data
-    m_userInfo.brithday = result["birthday"].toString();
-    m_userInfo.email = result["email"].toString();
-    m_userInfo.firstName = result["first_name"].toString();
-    m_userInfo.gender = result["gender"].toString();
-    m_userInfo.id = result["id"].toString();
-    m_userInfo.lastName = result["last_name"].toString();
-    m_userInfo.link = result["link"].toString();
-    m_userInfo.name = result["name"].toString();
-    m_userInfo.relationshipStatus = result["relationship_status"].toString();
-    m_userInfo.username = result["username"].toString();
-    m_userInfo.verified = result["verified"].toBool();
+    m_userInfo->brithday = result["birthday"].toString();
+    m_userInfo->email = result["email"].toString();
+    m_userInfo->firstName = result["first_name"].toString();
+    m_userInfo->gender = result["gender"].toString();
+    m_userInfo->id = result["id"].toString();
+    m_userInfo->lastName = result["last_name"].toString();
+    m_userInfo->link = result["link"].toString();
+    m_userInfo->name = result["name"].toString();
+    m_userInfo->relationshipStatus = result["relationship_status"].toString();
+    m_userInfo->username = result["username"].toString();
+    m_userInfo->verified = result["verified"].toString();
 
     // extract picture
     QVariantMap pictureMap = result["picture"].toMap();
     QVariantMap pictureDataMap = pictureMap["data"].toMap();
 
-    m_userInfo.picture = pictureDataMap["url"].toString();
+    m_userInfo->picture = pictureDataMap["url"].toString();
 
 //     qDebug() << "INFO: " << m_userInfo.firstName << " : " << m_userInfo.id << " : " << m_userInfo.email << " : " << m_userInfo.picture;
 
@@ -371,7 +374,7 @@ bool Facebook::scopeUserInfo() const
 }
 
 
-Facebook::Me Facebook::userInfo() const
+Facebook::Me *Facebook::userInfo() const
 {
     qDebug("[Facebook::userInfo]");
 

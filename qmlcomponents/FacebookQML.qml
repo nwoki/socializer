@@ -7,7 +7,7 @@
  * Author Francesco Nwokeka <francesco@ispirata.com>
  */
 
-import Qt 4.7
+import QtQuick 1.1
 import QtWebKit 1.0
 
 /**
@@ -18,14 +18,18 @@ Item {
 
     signal tokenChanged();
 
+    // set these if screen size is different!
+    property int screenHeight: 600;
+    property int screenWidth: 480;
+
 WebView {
     id: fbWebView;
 
 //     signal tokenChanged();
 
-    anchors.fill: parent;
-    preferredHeight: parent.height;
-    preferredWidth: parent.width;
+//     anchors.fill: parent;
+    preferredHeight: root.screenHeight;
+    preferredWidth: root.screenWidth;
 
     /**
      * on load finished, send new url to c++ to extract various

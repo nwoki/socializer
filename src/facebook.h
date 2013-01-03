@@ -71,7 +71,7 @@ public:
         QString gender;
         QString relationshipStatus;
         QString picture;
-        bool verified;
+        QString verified;
     };
 
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
@@ -111,7 +111,7 @@ public:
     bool scopeReadStream() const;
     bool scopeUserInfo() const;
 
-    Me userInfo() const;        /** returns facebook profile data stored */
+    Me *userInfo() const;       /** returns facebook profile data stored */
 
 Q_SIGNALS:
     void profileUpdated();      /** emitted when new profile data has been parsed */
@@ -133,7 +133,7 @@ private:
     bool m_scopeReadStream;             /** Provides access to all the posts in the user's News Feed and enables your application to perform searches against the user's News Feed */
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
-    Me m_userInfo;                      /** User info */
+    Me *m_userInfo;                     /** User info */
     QHash<QString, Friend*>m_friends;   /** List of users friends */ // TODO make QHash<QString, Friend*>. stirng is ID
 
 //     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
