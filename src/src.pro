@@ -34,6 +34,7 @@ HEADERS += \
     linkedin.h \
     oauth.h \
     twitter.h \
+    foursquareuser.h \
     # QJSON PART
     qjson/src/parser.h \
     qjson/src/qobjecthelper.h \
@@ -49,6 +50,7 @@ SOURCES += \
     linkedin.cpp \
     oauth.cpp \
     twitter.cpp \
+    foursquareuser.cpp \
         # QJSON PART
     qjson/src/parser.cpp \
     qjson/src/qobjecthelper.cpp \
