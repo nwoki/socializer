@@ -175,6 +175,10 @@ void Foursquare::onPopulateDataReplyReceived()
         qDebug("LAST CHECKIN IS: ");
         qDebug() << checkin->id << " : " << checkin->name << " : " << checkin->country;
     }
+
+    Q_EMIT profileUpdated();
+
+    // TODO populate checkins and friends as well?
 }
 
 

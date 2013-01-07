@@ -52,6 +52,9 @@ private Q_SLOTS:
     void onPopulateDataReplyReceived();
     void parseAccessToken();
 
+Q_SIGNALS:
+    void profileUpdated();      /** emitted when profile data has been populated */
+
 private:
     QString dateVerifier() const;
     void populateData();                /** retreives user info from the social network */
