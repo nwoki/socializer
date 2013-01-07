@@ -94,6 +94,14 @@ QString FoursquareUser::id() const
 }
 
 
+FoursquareUser::Venue* FoursquareUser::lastCheckin() const
+{
+    qDebug("[FoursquareUser::lastCheckin]");
+
+    return m_lastCheckin;
+}
+
+
 QString FoursquareUser::lastName() const
 {
     qDebug("[FoursquareUser::lastName]");

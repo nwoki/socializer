@@ -65,6 +65,7 @@ public:
     QString photo() const;
 
     Contact *contact() const;
+    Venue *lastCheckin() const;
 
     void addCheckin(Venue *checkin);
     void setId(const QString &id);
