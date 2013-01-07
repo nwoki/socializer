@@ -54,6 +54,14 @@ QString Foursquare::dateVerifier() const
 }
 
 
+FoursquareUser* Foursquare::foursquareUser() const
+{
+    qDebug("[Foursquare::foursquareUser]");
+
+    return m_fqUser;
+}
+
+
 void Foursquare::obtainAuthPageUrl()
 {
     qDebug("[Foursquare::obtainAuthPageUrl]");
