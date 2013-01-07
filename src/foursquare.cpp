@@ -9,6 +9,7 @@
 
 #include "qjson/include/QJson/Parser"
 #include "foursquare.h"
+#include "foursquareuser.h"
 
 #include <QtCore/QDebug>
 #include <QtDeclarative/QDeclarativeContext>
@@ -16,6 +17,7 @@
 
 #define AUTH_URL "https://foursquare.com/oauth2/authenticate?"
 #define ACCESS_TOKEN_URL "https://foursquare.com/oauth2/access_token?"
+#define API_URL "https://api.foursquare.com/v2/"
 
 using namespace Socializer;
 
@@ -23,21 +25,32 @@ using namespace Socializer;
 Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
     : OAuth(appId, redirectUrl, QByteArray(), parent)
     , m_networkReply(0)
+    , m_fqUser(new FoursquareUser(this))
 {
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
 
 
 Foursquare::Foursquare(const QByteArray& appId, const QByteArray& redirectUrl, const QByteArray& consumerSecret, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
     , m_networkReply(0)
+    , m_fqUser(new FoursquareUser(this))
 {
     qDebug() << "[Foursquare::Foursquare] secret: " << consumerSecret;
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
-
 
 
 Foursquare::~Foursquare()
 {
+}
+
+
+QString Foursquare::dateVerifier() const
+{
+    qDebug("[Foursquare::dateVerifier]");
+    qDebug() << "[Foursquare::dateVerifier] returning: " << "&v=" + QDate::currentDate().toString("yyyyMMdd");
+    return "&v=" + QDate::currentDate().toString("yyyyMMdd");
 }
 
 
@@ -62,13 +75,54 @@ void Foursquare::obtainAuthPageUrl()
 }
 
 
-void Foursquare::parseIncomingJson()
+void Foursquare::onAuthTokenChanged()
 {
-    qDebug("[Foursquare::parseIncomingJson]");
+    qDebug("[Foursquare::onAuthTokenChanged]");
+
+    populateData();
+}
+
+
+void Foursquare::onNetReplyError(QNetworkReply::NetworkError error)
+{
+    qDebug("[Foursquare::onNetReplyError]");
+
+    // don't need to do check for int conversion here. I trust Qt's code ;)
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QString errStr = reply->errorString();
+
+    qDebug() << "[Foursquare::onNetReplyError] Error msg: " << errStr;
+    qDebug() << "[Foursquare::onNetReplyError] Status code: " << statusCode;
+
+    reply->deleteLater();
+
+    /// TODO implement cases
+    Q_UNUSED(error)
+    Q_UNUSED(errStr)
+    Q_UNUSED(statusCode)
+}
+
+
+void Foursquare::onPopulateDataReplyReceived()
+{
+    qDebug("[Foursquare::onPopulateDataReplyReceived]");
+
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+
+    qDebug() << "RCV: " << reply->readAll();
+
+    reply->deleteLater();
+}
+
+
+void Foursquare::parseAccessToken()
+{
+    qDebug("[Foursquare::parseAccessToken]");
 
     QByteArray incoming = m_networkReply->readAll();
 
-    qDebug() << "[Foursquare::parseIncomingJson] incoming: " << incoming;
+    qDebug() << "[Foursquare::parseAccessToken] incoming: " << incoming;
 
     QJson::Parser parser;
     bool ok;
@@ -76,7 +130,7 @@ void Foursquare::parseIncomingJson()
     QVariantMap result = parser.parse(incoming, &ok).toMap();
 
     if (!ok) {
-        qDebug() << "[Foursquare::parseIncomingJson] ERROR: " << parser.errorString();
+        qDebug() << "[Foursquare::parseAccessToken] ERROR: " << parser.errorString();
         m_networkReply->deleteLater();
         return;
     }
@@ -122,11 +176,37 @@ void Foursquare::parseNewUrl(const QString& url)
 
             m_networkReply = m_networkAccessManager->get(req);
 
-            connect(m_networkReply, SIGNAL(finished()), this, SLOT(parseIncomingJson()));
+            connect(m_networkReply, SIGNAL(finished()), this, SLOT(parseAccessToken()));
         }
     }
 }
 
+
+void Foursquare::populateData()
+{
+    qDebug("[Foursquare::populateData]");
+
+    if (m_authToken.isEmpty()) {
+        qDebug("[Foursquare::populateData] no access token has been set!");
+        return;
+    }
+
+    QNetworkRequest req;
+    QNetworkReply *netRep;
+
+    QString reqStr(API_URL);
+    reqStr += "users/self?oauth_token=" + m_authToken;
+    reqStr += dateVerifier();
+
+    qDebug() << "[Foursquare::populateData] requesting: " << reqStr;
+
+    req.setUrl(QUrl(reqStr));
+    netRep = m_networkAccessManager->get(req);
+
+    // connect
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
+    connect(netRep, SIGNAL(readyRead()), this, SLOT(onPopulateDataReplyReceived()));
+}
 
 
 void Foursquare::setContextProperty(QDeclarativeView* view)

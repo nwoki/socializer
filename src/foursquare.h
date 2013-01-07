@@ -14,6 +14,7 @@
 
 #include <QtCore/QByteArray>
 
+class FoursquareUser;
 class QDeclarativeView;
 
 namespace Socializer
@@ -46,9 +47,16 @@ public:
     void setContextProperty(QDeclarativeView *view);
 
 private Q_SLOTS:
-    void parseIncomingJson();
+    void onAuthTokenChanged();
+    void onNetReplyError(QNetworkReply::NetworkError error);
+    void onPopulateDataReplyReceived();
+    void parseAccessToken();
 
 private:
+    QString dateVerifier() const;
+    void populateData();                /** retreives user info from the social network */
+
+    FoursquareUser *m_fqUser;           /** the account of the user authed with fq */
     QNetworkReply *m_networkReply;
 };
 
