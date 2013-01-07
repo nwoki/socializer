@@ -22,7 +22,7 @@ class FoursquareUser : public QObject
     Q_PROPERTY (QString relationship    READ relationship       NOTIFY userInfoChanged)
     Q_PROPERTY (QString homecity        READ homecity           NOTIFY userInfoChanged)
     Q_PROPERTY (QString bio             READ bio                NOTIFY userInfoChanged)
-    Q_PROPERTY (Contact*contact         READ contact            NOTIFY userInfoChanged)
+//     Q_PROPERTY (Contact*contact         READ contact            NOTIFY userInfoChanged)
 
 public:
 
@@ -33,6 +33,8 @@ public:
         QString phone;
     };
 
+
+    // TODO make this a class
     struct Venue {
         QString id;
         QString name;
@@ -60,6 +62,7 @@ public:
     QString relationship() const;
     QString homecity() const;
     QString bio() const;
+    QString photo() const;
 
     Contact *contact() const;
 
@@ -71,6 +74,8 @@ public:
     void setRelationship(const QString &relationship);
     void setHomeCity(const QString &homecity);
     void setBio(const QString &bio);
+    void setLastCheckin(Venue *lastCheckin);
+    void setPhoto(const QString &photo);
 
 Q_SIGNALS:
     void userInfoChanged();
@@ -86,7 +91,7 @@ private:
     QString m_bio;
 
     Contact* m_contact;
-
+    Venue *m_lastCheckin;
     QList<Venue*> m_checkins;
 };
 

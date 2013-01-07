@@ -109,10 +109,72 @@ void Foursquare::onPopulateDataReplyReceived()
     qDebug("[Foursquare::onPopulateDataReplyReceived]");
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-
-    qDebug() << "RCV: " << reply->readAll();
+    QByteArray rcv = reply->readAll();
+    qDebug() << "RCV: " << rcv;
 
     reply->deleteLater();
+
+
+    // populate user info
+    QJson::Parser parser;
+    bool ok;
+
+    QVariantMap jsonMap = parser.parse(rcv, &ok).toMap();
+
+    if (!ok) {
+        qDebug("[Foursquare::onPopulateDataReplyReceived] ERROR parsing json");
+        return;
+    }
+
+    QVariantMap responseMap = jsonMap["response"].toMap();
+    QVariantMap userMap = responseMap["user"].toMap();
+
+    m_fqUser->setId(userMap["id"].toString());
+    m_fqUser->setFirstName(userMap["firstName"].toString());
+    m_fqUser->setLastName(userMap["lastName"].toString());
+    m_fqUser->setGender(userMap["gender"].toString());
+    m_fqUser->setRelationship(userMap["relationship"].toString());
+    m_fqUser->setHomeCity(userMap["homeCity"].toString());
+    m_fqUser->setBio(userMap["bio"].toString());
+
+    QVariantMap photoMap = userMap["photo"].toMap();
+    QString photoStr = photoMap["prefix"].toString();
+    m_fqUser->setPhoto(photoStr.left(photoStr.size()-1) + photoMap["suffix"].toString());
+
+    // DEBUG
+    qDebug("[Foursquare::onPopulateDataReplyReceived] user info");
+    qDebug() << m_fqUser->id() << " : " << m_fqUser->firstName() << " : " << m_fqUser->homecity() << " : " << m_fqUser->photo();
+
+    QVariantMap lastCheckinMap = userMap["checkins"].toMap();
+    QList<QVariant> checkinList = lastCheckinMap["items"].toList();
+
+    // extract last checkin
+    if (checkinList.size() != 0) {
+        FoursquareUser::Venue *checkin = new FoursquareUser::Venue;
+
+        QVariantMap checkingObj = checkinList.at(0).toMap();
+        QVariantMap venueObj = checkingObj["venue"].toMap();
+
+        checkin->id = venueObj["id"].toString();
+        checkin->name = venueObj["name"].toString();
+
+        QVariantMap locationMap = venueObj["location"].toMap();
+
+        checkin->address = locationMap["address"].toString();
+        checkin->latitude = locationMap["lat"].toDouble();
+        checkin->longitude = locationMap["lng"].toDouble();
+        checkin->postalCode = locationMap["address"].toString();
+        checkin->city = locationMap["city"].toString();
+        checkin->state = locationMap["state"].toString();
+        checkin->country = locationMap["country"].toString();
+        checkin->cc = locationMap["cc"].toString();
+
+        m_fqUser->setLastCheckin(checkin);
+
+        // DEBUG
+        qDebug("LAST CHECKIN IS: ");
+        qDebug() << checkin->id << " : " << checkin->name << " : " << checkin->country;
+    }
 }
 
 

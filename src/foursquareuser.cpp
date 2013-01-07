@@ -31,6 +31,7 @@ FoursquareUser::FoursquareUser(QObject *parent)
 FoursquareUser::~FoursquareUser()
 {
     delete m_contact;
+    delete m_lastCheckin;
 
     qDeleteAll(m_checkins);
     m_checkins.clear();
@@ -101,6 +102,14 @@ QString FoursquareUser::lastName() const
 }
 
 
+QString FoursquareUser::photo() const
+{
+    qDebug("[FoursquareUser::photo]");
+
+    return m_photo;
+}
+
+
 QString FoursquareUser::relationship() const
 {
     qDebug("[FoursquareUser::relationship]");
@@ -154,11 +163,31 @@ void FoursquareUser::setId(const QString &id)
 }
 
 
+void FoursquareUser::setLastCheckin(FoursquareUser::Venue* lastCheckin)
+{
+    qDebug("[FoursquareUser::setLastCheckin]");
+
+    delete m_lastCheckin;
+    m_lastCheckin = lastCheckin;
+
+    Q_EMIT userInfoChanged();
+}
+
+
 void FoursquareUser::setLastName(const QString &lastName)
 {
     qDebug("[FoursquareUser::setLastName]");
 
     m_lastName = lastName;
+    Q_EMIT userInfoChanged();
+}
+
+
+void FoursquareUser::setPhoto(const QString &photo)
+{
+    qDebug("[FoursquareUser::setPhoto]");
+
+    m_photo = photo;
     Q_EMIT userInfoChanged();
 }
 
