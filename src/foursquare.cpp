@@ -171,7 +171,7 @@ void Foursquare::onPopulateDataReplyReceived()
         checkin->address = locationMap["address"].toString();
         checkin->latitude = locationMap["lat"].toDouble();
         checkin->longitude = locationMap["lng"].toDouble();
-        checkin->postalCode = locationMap["address"].toString();
+        checkin->postalCode = locationMap["postalCode"].toString();
         checkin->city = locationMap["city"].toString();
         checkin->state = locationMap["state"].toString();
         checkin->country = locationMap["country"].toString();
