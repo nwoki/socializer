@@ -17,12 +17,14 @@ FoursquareUser::FoursquareUser(const QString& id, const QString& firstName, cons
     , m_relationship(relationship)
     , m_homecity(homecity)
     , m_bio(bio)
+    , m_lastCheckin(0)
 {
 }
 
 
 FoursquareUser::FoursquareUser(QObject *parent)
     : QObject(parent)
+    , m_lastCheckin(0)
 {
 }
 
@@ -175,7 +177,11 @@ void FoursquareUser::setLastCheckin(FoursquareUser::Venue* lastCheckin)
 {
     qDebug("[FoursquareUser::setLastCheckin]");
 
-    delete m_lastCheckin;
+    if (m_lastCheckin != 0) {
+        Venue *toDel = m_lastCheckin;
+        delete toDel;
+    }
+
     m_lastCheckin = lastCheckin;
 
     Q_EMIT userInfoChanged();
