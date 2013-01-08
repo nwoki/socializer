@@ -279,7 +279,7 @@ void Foursquare::populateData()
 
     // connect
     connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
-    connect(netRep, SIGNAL(readyRead()), this, SLOT(onPopulateDataReplyReceived()));
+    connect(netRep, SIGNAL(finished()), this, SLOT(onPopulateDataReplyReceived()));
 }
 
 
