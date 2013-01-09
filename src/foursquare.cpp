@@ -24,8 +24,8 @@ using namespace Socializer;
 
 Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
     : OAuth(appId, redirectUrl, QByteArray(), parent)
-    , m_networkReply(0)
     , m_fqUser(new FoursquareUser(this))
+    , m_networkReply(0)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -33,10 +33,9 @@ Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, Q
 
 Foursquare::Foursquare(const QByteArray& appId, const QByteArray& redirectUrl, const QByteArray& consumerSecret, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
-    , m_networkReply(0)
     , m_fqUser(new FoursquareUser(this))
+    , m_networkReply(0)
 {
-    qDebug() << "[Foursquare::Foursquare] secret: " << consumerSecret;
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
 
