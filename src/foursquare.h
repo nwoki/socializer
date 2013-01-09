@@ -14,7 +14,6 @@
 
 #include <QtCore/QByteArray>
 
-class FoursquareUser;
 class QDeclarativeView;
 
 namespace Socializer
@@ -23,6 +22,8 @@ namespace Socializer
 /**
 * Foursquare interface
 */
+
+class FoursquareUser;
 
 class Foursquare : public OAuth
 {

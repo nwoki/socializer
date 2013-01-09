@@ -11,6 +11,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+
+namespace Socializer {
+
 class FoursquareUser : public QObject
 {
     Q_OBJECT
@@ -94,6 +97,8 @@ private:
     Contact* m_contact;
     Venue *m_lastCheckin;
     QList<Venue*> m_checkins;
+};
+
 };
 
 #endif // FOURSQUAREUSER_H

@@ -7,6 +7,8 @@
 
 #include "foursquareuser.h"
 
+using namespace Socializer;
+
 FoursquareUser::FoursquareUser(const QString& id, const QString& firstName, const QString& lastName, const QString gender
                             , const QString& relationship, const QString& homecity, const QString bio, QObject *parent)
     : QObject(parent)
