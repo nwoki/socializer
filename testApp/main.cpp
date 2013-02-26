@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     Socializer::Facebook *fb = new Socializer::Facebook("AAAGEQS531rkBAIstNeQq54btWmriW5Vs7lu3P8sBQ6htj3axqPGApODAZASxSQQkoEpD1DqLhqzhBZA6ZBTRDRsmsVNYF4TPHkyh1bTCDWAQO1ZCuAt6");
     fb->enableScopeUserInfo(true);
 
+    
 //     Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBAE8BJPCEZCMGF26rSXfgAdeEpuQjn2aB9A6c5f2LapGZA69KnYm33iLlD1KCT4cZAycc7zo6uFM3mfc1BFZCLxBbD2EL1pZAJLtmYOtMq");
 //     fb->enableScopeUserInfo(true);
 

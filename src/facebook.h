@@ -119,7 +119,8 @@ public:
     bool scopeReadStream() const;
     bool scopeUserInfo() const;
 
-    Me *userInfo() const;       /** returns facebook profile data stored */
+    Me *userInfo() const;               /** returns facebook profile data stored */
+    QList<Like*> userLikes() const;     /** returns the user's list of likes */
 
 Q_SIGNALS:
     void profileUpdated();      /** emitted when new profile data has been parsed */
