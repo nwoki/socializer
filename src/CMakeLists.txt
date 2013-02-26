@@ -30,4 +30,5 @@ target_link_libraries(Socializer
                       ${QT_QTNETWORK_LIBRARIES}
                       ${QT_QTDECLARATIVE_LIBRARIES}
                       ${CMAKE_THREAD_LIBS_INIT}
-                      ${CMAKE_DL_LIBS})
+                      ${CMAKE_DL_LIBS}
+                      qjson)
