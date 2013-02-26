@@ -39,6 +39,10 @@ int main(int argc, char *argv[])
 // //     fb->enableScopePublishActions(true);        // TODO test this after setting context property
 //     fb->setContextProperty(view);
 //     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
+    
+    // with auth token
+    Socializer::Facebook *fb = new Socializer::Facebook("AAAGEQS531rkBAIstNeQq54btWmriW5Vs7lu3P8sBQ6htj3axqPGApODAZASxSQQkoEpD1DqLhqzhBZA6ZBTRDRsmsVNYF4TPHkyh1bTCDWAQO1ZCuAt6");
+    fb->enableScopeUserInfo(true);
 
 //     Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBAE8BJPCEZCMGF26rSXfgAdeEpuQjn2aB9A6c5f2LapGZA69KnYm33iLlD1KCT4cZAycc7zo6uFM3mfc1BFZCLxBbD2EL1pZAJLtmYOtMq");
 //     fb->enableScopeUserInfo(true);
@@ -52,11 +56,11 @@ int main(int argc, char *argv[])
 //     view->setSource(QUrl("qm/*l*/components/TwitterQML.qml"));
 
     // FOURSQUARE
-    Socializer::Foursquare *fq = new Socializer::Foursquare("T53ZTLQSG1CVGKHYRA3OPEUVDGQ5ICFXMMHB01XNEESMSJQP"
-                                                            , "http://www.ispirata.com"
-                                                            , "QOMLRRLTNM3L0CRLNGMBM1MZTCUFNKUFIFOKAU2QZBS3RPPR");
-    fq->setContextProperty(view);
-    view->setSource(QUrl("qmlcomponents/FoursquareQML.qml"));
+//     Socializer::Foursquare *fq = new Socializer::Foursquare("T53ZTLQSG1CVGKHYRA3OPEUVDGQ5ICFXMMHB01XNEESMSJQP"
+//                                                             , "http://www.ispirata.com"
+//                                                             , "QOMLRRLTNM3L0CRLNGMBM1MZTCUFNKUFIFOKAU2QZBS3RPPR");
+//     fq->setContextProperty(view);
+//     view->setSource(QUrl("qmlcomponents/FoursquareQML.qml"));
 
     // LINKEDIN
 //     Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "http://www.2s2h.com", "1tTwdCxMuiycme2R");

@@ -239,6 +239,8 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->username = result["username"].toString();
     m_userInfo->verified = result["verified"].toString();
 
+    // status (for now, just the last one) TODO
+
     // extract picture
     QVariantMap pictureMap = result["picture"].toMap();
     QVariantMap pictureDataMap = pictureMap["data"].toMap();
@@ -246,6 +248,23 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->picture = pictureDataMap["url"].toString();
 
 //     qDebug() << "INFO: " << m_userInfo.firstName << " : " << m_userInfo.id << " : " << m_userInfo.email << " : " << m_userInfo.picture;
+    // populate LIKES data
+    QVariantMap likesMap = result["likes"].toMap();
+
+    Q_FOREACH (QVariant likeData, likesMap["data"].toList()) {
+        QVariantMap likeDataMap = likeData.toMap();
+        Like *newLike = new Like;
+
+        newLike->category = likeDataMap["category"].toString();
+        newLike->createdTime = likeDataMap["created_time"].toString();
+        newLike->id = likeDataMap["id"].toString();
+        newLike->name = likeDataMap["name"].toString();
+
+        // add to hash
+        m_likes.insert(newLike->id, newLike);
+
+//         qDebug() << "new like: " << newLike->id << ":" << newLike->name << ":" << newLike->category;
+    }
 
 
     // populate FRIENDS data
@@ -313,11 +332,14 @@ void Facebook::populateData()
         QNetworkRequest req;
         QNetworkReply *netRep;
 
+        // request all possible data. The access token will return only the data that the user has agreed to share with us
+        // statuses.limit(1) -> keep last status the user posted
         QString reqStr(GRAPH_URL);
-        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,political,relationship_status,religion,sports,username,verified,website,picture.type(large)";
-        reqStr += ",friends.fields(id,name,first_name,last_name,picture.type(large))";
-//                 ",games.fields(id,link,website,name,picture.type(large))";
-//                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";
+
+        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,political,relationship_status,religion,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
+        reqStr += ",friends.fields(id,name,first_name,last_name,picture.type(large))";                  // friends
+//                 ",games.fields(id,link,website,name,picture.type(large))";                           // games
+//                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";  // music
         reqStr += "&access_token=" + m_authToken;
 
         qDebug() << "[Facebook::populateData] requesting: " << reqStr;

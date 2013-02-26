@@ -43,6 +43,13 @@ public:
         QString picture;
     };
 
+    struct Like {
+        QString category;
+        QString name;
+        QString id;
+        QString createdTime;
+    };
+
     // game
 //     struct Game {
 // 
@@ -72,6 +79,7 @@ public:
         QString relationshipStatus;
         QString picture;
         QString verified;
+        QString status;         // last status message displayed by user
     };
 
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
@@ -134,7 +142,8 @@ private:
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
     Me *m_userInfo;                     /** User info */
-    QHash<QString, Friend*>m_friends;   /** List of users friends */ // TODO make QHash<QString, Friend*>. stirng is ID
+    QHash<QString, Friend*>m_friends;   /** List of users friends */            // key is ID
+    QHash<QString, Like*>m_likes;       /** List of the users "likes" */        // key is ID
 
 //     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
 };
