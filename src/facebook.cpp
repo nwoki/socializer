@@ -239,7 +239,15 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->username = result["username"].toString();
     m_userInfo->verified = result["verified"].toString();
 
-    // status (for now, just the last one) TODO
+    // status (for now, just the last one)
+    QVariantMap statusesMap = result["statuses"].toMap();
+    QList<QVariant> statusesList = statusesMap["data"].toList();
+
+    if (statusesList.count() >= 1) {
+        // set the last status
+        QVariantMap status = statusesList.at(0).toMap();
+        m_userInfo->status = status["message"].toString();
+    }
 
     // extract picture
     QVariantMap pictureMap = result["picture"].toMap();
