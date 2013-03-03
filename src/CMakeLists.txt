@@ -26,7 +26,6 @@ add_library(Socializer STATIC ${socializer_SRCS} ${socializer_MOC_SRCS})
 target_link_libraries(Socializer
                       ${QT_QTCORE_LIBRARIES}
                       ${QT_QTNETWORK_LIBRARIES}
-                      ${QT_QTDECLARATIVE_LIBRARIES}
                       ${CMAKE_THREAD_LIBS_INIT}
                       ${CMAKE_DL_LIBS}
                       qjson)

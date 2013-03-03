@@ -370,7 +370,7 @@ bool Facebook::scopeEmail() const
 
 void Facebook::setContextProperty(QDeclarativeView *view)
 {
-    view->rootContext()->setContextProperty("Facebook", this);
+//    view->rootContext()->setContextProperty("Facebook", this);
 }
 
 
