@@ -292,6 +292,7 @@ void Facebook::onPopulateDataReplyReceived()
         newFriend->name = friendDataMap["name"].toString();
         newFriend->gender = friendDataMap["gender"].toString();
         newFriend->locale = friendDataMap["locale"].toString();
+        newFriend->username = friendDataMap["username"].toString();
 
         QVariantMap friendPictureMap = friendDataMap["picture"].toMap();
         QVariantMap friendPictureDataMap = friendPictureMap["data"].toMap();
@@ -351,7 +352,7 @@ void Facebook::populateData()
         QString reqStr(GRAPH_URL);
 
         reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
-        reqStr += ",friends.fields(id,name,first_name,last_name,locale,gender,picture.type(large))";                  // friends
+        reqStr += ",friends.fields(id,name,username,first_name,last_name,locale,gender,picture.type(large))";                  // friends
 //                 ",games.fields(id,link,website,name,picture.type(large))";                           // games
 //                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";  // music
         reqStr += "&access_token=" + m_authToken;

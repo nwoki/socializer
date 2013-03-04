@@ -45,6 +45,7 @@ public:
         QString gender;
         QString picture;
         QString locale;
+        QString username;
     };
 
     struct Like {
