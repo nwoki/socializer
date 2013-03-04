@@ -2,17 +2,13 @@ project(socializer)
 
 cmake_minimum_required(VERSION 2.6)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
 # Find Qt4. Need this to link and create static lib
-FIND_PACKAGE(Qt4 REQUIRED)
-FIND_PACKAGE(Threads REQUIRED)
-
+find_package(Qt4 REQUIRED QtCore QtNetwork QtTest)
 include(${QT_USE_FILE})
-
-# debug symbols
-add_definitions(-g -DDEBUG_MODE)
 add_definitions(${QT_DEFINITIONS})
-
-include_directories(${QT_INCLUDE_DIR})
+set(CMAKE_AUTOMOC TRUE)
 
 # sources
 add_subdirectory(src)
