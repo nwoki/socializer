@@ -7,7 +7,6 @@
  * Author Francesco Nwokeka <francesco@ispirata.com>
  */
 
-#include "qjson/include/QJson/Parser"
 #include "facebook.h"
 
 #include <QtCore/QDebug>
@@ -15,6 +14,8 @@
 #include <QtCore/QStringList>
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeContext>
+
+#include <qjson/parser.h>
 
 #define AUTH_URL "https://m.facebook.com/dialog/oauth?"
 #define GRAPH_URL "https://graph.facebook.com/me/"
