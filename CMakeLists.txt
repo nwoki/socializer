@@ -10,6 +10,9 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 set(CMAKE_AUTOMOC TRUE)
 
+find_package(QJson REQUIRED)
+include_directories(${QJSON_INCLUDE_DIR})
+
 # sources
 add_subdirectory(src)
 

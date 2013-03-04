@@ -16,4 +16,4 @@ add_library(Socializer STATIC ${socializer_SRCS})
 target_link_libraries(Socializer
                       ${QT_QTCORE_LIBRARIES}
                       ${QT_QTNETWORK_LIBRARIES}
-                      qjson)
+                      ${QJSON_LIBRARIES})
