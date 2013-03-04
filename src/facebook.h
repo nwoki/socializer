@@ -69,6 +69,7 @@ public:
     // user
     struct Me {
         QString id;
+        QString bio;
         QString name;
         QString firstName;
         QString lastName;

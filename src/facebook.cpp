@@ -239,6 +239,7 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->relationshipStatus = result["relationship_status"].toString();
     m_userInfo->username = result["username"].toString();
     m_userInfo->verified = result["verified"].toString();
+    m_userInfo->bio = result["bio"].toString();
 
     // status (for now, just the last one)
     QVariantMap statusesMap = result["statuses"].toMap();
