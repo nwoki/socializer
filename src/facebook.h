@@ -40,6 +40,7 @@ public:
         QString name;
         QString firstName;
         QString lastName;
+        QString gender;
         QString picture;
     };
 
