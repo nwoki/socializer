@@ -287,5 +287,5 @@ void Foursquare::setContextProperty(QDeclarativeView* view)
 {
     qDebug("[Foursquare::setContextProperty]");
 
-    view->rootContext()->setContextProperty("Foursquare", this);
+//    view->rootContext()->setContextProperty("Foursquare", this);
 }

@@ -71,7 +71,7 @@ void LinkedIn::prepareAuthPageUrl()
 
 void LinkedIn::setContextProperty(QDeclarativeView *view)
 {
-    view->rootContext()->setContextProperty("LinkedIn", this);
+//    view->rootContext()->setContextProperty("LinkedIn", this);
 }
 
 
