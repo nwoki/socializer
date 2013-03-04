@@ -7,13 +7,14 @@
  * Author Francesco Nwokeka <francesco@ispirata.com>
  */
 
-#include "qjson/include/QJson/Parser"
 #include "foursquare.h"
 #include "foursquareuser.h"
 
 #include <QtCore/QDebug>
 #include <QtDeclarative/QDeclarativeContext>
 #include <QtDeclarative/QDeclarativeView>
+
+#include <qjson/parser.h>
 
 #define AUTH_URL "https://foursquare.com/oauth2/authenticate?"
 #define ACCESS_TOKEN_URL "https://foursquare.com/oauth2/access_token?"
