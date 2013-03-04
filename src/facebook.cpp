@@ -48,6 +48,7 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
     , m_userInfo(new Me)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
+
     populateData();
 }
 
@@ -340,32 +341,29 @@ void Facebook::populateData()
         return;
     }
 
-    if (m_scopeUserInfo) {
+    qDebug("[Facebook::populateData] pulling user info");
 
-        qDebug("[Facebook::populateData] user info scope");
+    QNetworkRequest req;
+    QNetworkReply *netRep;
 
-        QNetworkRequest req;
-        QNetworkReply *netRep;
+    // request all possible data. The access token will return only the data that the user has agreed to share with us
+    // statuses.limit(1) -> keep last status the user posted
+    QString reqStr(GRAPH_URL);
 
-        // request all possible data. The access token will return only the data that the user has agreed to share with us
-        // statuses.limit(1) -> keep last status the user posted
-        QString reqStr(GRAPH_URL);
-
-        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
-        reqStr += ",friends.fields(id,name,username,first_name,last_name,locale,gender,picture.type(large))";                  // friends
+    reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
+    reqStr += ",friends.fields(id,name,username,first_name,last_name,locale,gender,picture.type(large))";                  // friends
 //                 ",games.fields(id,link,website,name,picture.type(large))";                           // games
 //                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";  // music
-        reqStr += "&access_token=" + m_authToken;
+    reqStr += "&access_token=" + m_authToken;
 
-        qDebug() << "[Facebook::populateData] requesting: " << reqStr;
+    qDebug() << "[Facebook::populateData] requesting: " << reqStr;
 
-        req.setUrl(QUrl(reqStr));
-        netRep = m_networkAccessManager->get(req);
+    req.setUrl(QUrl(reqStr));
+    netRep = m_networkAccessManager->get(req);
 
-        // connect
-        connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
-        connect(netRep, SIGNAL(finished()), this, SLOT(onPopulateDataReplyReceived()));
-    }
+    // connect
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
+    connect(netRep, SIGNAL(finished()), this, SLOT(onPopulateDataReplyReceived()));
 }
 
 
