@@ -47,6 +47,7 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
     , m_userInfo(new Me)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
+    populateData();
 }
 
 
