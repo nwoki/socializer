@@ -78,7 +78,7 @@ public:
         QString email;
         QString link;
         QString username;
-        QDate brithday;
+        QDate birthday;
         QString gender;
         QString relationshipStatus;
         QString picture;

@@ -229,7 +229,7 @@ void Facebook::onPopulateDataReplyReceived()
     }
 
     // populate user data
-    m_userInfo->brithday = result["birthday"].toDate();
+    m_userInfo->birthday = result["birthday"].toDate();
     m_userInfo->email = result["email"].toString();
     m_userInfo->firstName = result["first_name"].toString();
     m_userInfo->gender = result["gender"].toString();
