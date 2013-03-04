@@ -12,6 +12,8 @@
 
 #include "oauth.h"
 
+#include <QtCore/QDate>
+
 class QDeclarativeView;
 
 namespace Socializer
@@ -76,7 +78,7 @@ public:
         QString email;
         QString link;
         QString username;
-        QString brithday;       /// TODO make it a QDate?
+        QDate brithday;
         QString gender;
         QString relationshipStatus;
         QString picture;
