@@ -413,6 +413,23 @@ Facebook::Me *Facebook::userInfo() const
 }
 
 
+QList<Facebook::Friend*> Facebook::friends() const
+{
+    qDebug("[Facebook::friends]");
+
+    QHash<QString, Friend*>::const_iterator it = m_friends.constBegin();
+    QList<Friend*> friends;
+
+    while (it != m_friends.constEnd()) {
+        friends.append(it.value());
+        qDebug() << "FRIEND is: " << it.value()->name;
+        it++;
+    }
+
+    return friends;
+}
+
+
 QList<Facebook::Like*> Facebook::userLikes() const
 {
     qDebug("[Facebook::userLikes]");

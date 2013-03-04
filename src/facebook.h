@@ -120,6 +120,7 @@ public:
     bool scopeUserInfo() const;
 
     Me *userInfo() const;               /** returns facebook profile data stored */
+    QList<Friend*> friends() const;     /** returns a list of the user's friends */
     QList<Like*> userLikes() const;     /** returns the user's list of likes */
 
 Q_SIGNALS:
