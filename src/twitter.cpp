@@ -98,7 +98,7 @@ void Twitter::parseNewUrl(const QString &url)
 
 void Twitter::setContextProperty(QDeclarativeView *view)
 {
-    view->rootContext()->setContextProperty("Twitter", this);
+//    view->rootContext()->setContextProperty("Twitter", this);
 }
 
 
