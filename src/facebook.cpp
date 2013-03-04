@@ -241,6 +241,7 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->username = result["username"].toString();
     m_userInfo->verified = result["verified"].toString();
     m_userInfo->bio = result["bio"].toString();
+    m_userInfo->locale = result["locale"].toString();
 
     // status (for now, just the last one)
     QVariantMap statusesMap = result["statuses"].toMap();
@@ -290,6 +291,7 @@ void Facebook::onPopulateDataReplyReceived()
         newFriend->lastName = friendDataMap["last_name"].toString();
         newFriend->name = friendDataMap["name"].toString();
         newFriend->gender = friendDataMap["gender"].toString();
+        newFriend->locale = friendDataMap["locale"].toString();
 
         QVariantMap friendPictureMap = friendDataMap["picture"].toMap();
         QVariantMap friendPictureDataMap = friendPictureMap["data"].toMap();
@@ -348,8 +350,8 @@ void Facebook::populateData()
         // statuses.limit(1) -> keep last status the user posted
         QString reqStr(GRAPH_URL);
 
-        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,political,relationship_status,religion,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
-        reqStr += ",friends.fields(id,name,first_name,last_name,gender,picture.type(large))";                  // friends
+        reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
+        reqStr += ",friends.fields(id,name,first_name,last_name,locale,gender,picture.type(large))";                  // friends
 //                 ",games.fields(id,link,website,name,picture.type(large))";                           // games
 //                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";  // music
         reqStr += "&access_token=" + m_authToken;

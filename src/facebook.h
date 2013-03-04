@@ -44,6 +44,7 @@ public:
         QString lastName;
         QString gender;
         QString picture;
+        QString locale;
     };
 
     struct Like {
@@ -84,6 +85,7 @@ public:
         QString picture;
         QString verified;
         QString status;         // last status message displayed by user
+        QString locale;
     };
 
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
