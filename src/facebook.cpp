@@ -244,6 +244,20 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->bio = result["bio"].toString();
     m_userInfo->locale = result["locale"].toString();
 
+    // hometown
+    QVariantMap hometownMap = result["hometown"].toMap();
+    m_userInfo->hometown.id = hometownMap["id"].toString();
+    m_userInfo->hometown.name = hometownMap["name"].toString();
+
+    qDebug() << "HOME TOWN: " << m_userInfo->hometown.name;
+
+    // location
+    QVariantMap locationMap = result["location"].toMap();
+    m_userInfo->location.id = locationMap["id"].toString();
+    m_userInfo->location.name = locationMap["name"].toString();
+
+    qDebug() << "LOCATION NAME: " << m_userInfo->location.name << locationMap;
+
     // status (for now, just the last one)
     QVariantMap statusesMap = result["statuses"].toMap();
     QList<QVariant> statusesList = statusesMap["data"].toList();
@@ -319,7 +333,8 @@ void Facebook::onPopulateDataReplyReceived()
         QVariantMap positionMap = workDataMap["position"].toMap();
 
         newWork->employer = employerMap["name"].toString();
-        newWork->location = locationMap["name"].toString();
+        newWork->location.id = locationMap["id"].toString();
+        newWork->location.name = locationMap["name"].toString();
         newWork->position = positionMap["name"].toString();
         newWork->description = workDataMap["description"].toString();
         newWork->startDate = workDataMap["start_date"].toDate();
@@ -329,6 +344,9 @@ void Facebook::onPopulateDataReplyReceived()
 
         qDebug() << "new work: " << newWork->description << " " << newWork->employer;
     }
+
+
+    
 
     reply->deleteLater();
 

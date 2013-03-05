@@ -70,6 +70,12 @@ public:
 // 
 //     };
 
+    // location/hometown struct
+    struct Place {
+        QString id;
+        QString name;
+    };
+
     // user
     struct Me {
         QString id;
@@ -87,11 +93,13 @@ public:
         QString verified;
         QString status;         // last status message displayed by user
         QString locale;
+        Place location;
+        Place hometown;
     };
 
     struct Work {
         QString employer;
-        QString location;
+        Place location;
         QString position;
         QString description;
         QDate startDate;
