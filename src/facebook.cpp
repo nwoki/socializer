@@ -306,6 +306,30 @@ void Facebook::onPopulateDataReplyReceived()
 //         qDebug() << "new friend: " << newFriend->id << ":" << newFriend->name << ":" << newFriend->picture;
     }
 
+
+    // populate WORK data
+    QList<QVariant> workMap = result["work"].toList();
+
+    Q_FOREACH (QVariant workData, workMap) {
+        QVariantMap workDataMap = workData.toMap();
+        Work *newWork = new Work;
+
+        QVariantMap employerMap = workDataMap["employer"].toMap();
+        QVariantMap locationMap = workDataMap["location"].toMap();
+        QVariantMap positionMap = workDataMap["position"].toMap();
+
+        newWork->employer = employerMap["name"].toString();
+        newWork->location = locationMap["name"].toString();
+        newWork->position = positionMap["name"].toString();
+        newWork->description = workDataMap["description"].toString();
+        newWork->startDate = workDataMap["start_date"].toDate();
+        newWork->endDate = workDataMap["end_date"].toDate();
+
+        m_work.append(newWork);
+
+        qDebug() << "new work: " << newWork->description << " " << newWork->employer;
+    }
+
     reply->deleteLater();
 
     // tell that the profile data has been updated
@@ -432,6 +456,15 @@ QList<Facebook::Friend*> Facebook::friends() const
 
     return friends;
 }
+
+
+QList<Facebook::Work*> Facebook::work() const
+{
+    qDebug("[Facebook::work]");
+
+    return m_work;
+}
+
 
 
 QList<Facebook::Like*> Facebook::userLikes() const

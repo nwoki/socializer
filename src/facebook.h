@@ -89,6 +89,15 @@ public:
         QString locale;
     };
 
+    struct Work {
+        QString employer;
+        QString location;
+        QString position;
+        QString description;
+        QDate startDate;
+        QDate endDate;
+    };
+
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
 
     /**
@@ -129,6 +138,7 @@ public:
     Me *userInfo() const;               /** returns facebook profile data stored */
     QList<Friend*> friends() const;     /** returns a list of the user's friends */
     QList<Like*> userLikes() const;     /** returns the user's list of likes */
+    QList<Work*> work() const;          /** returns the user's list of work experiences */
 
 Q_SIGNALS:
     void profileUpdated();      /** emitted when new profile data has been parsed */
@@ -153,6 +163,7 @@ private:
     Me *m_userInfo;                     /** User info */
     QHash<QString, Friend*>m_friends;   /** List of users friends */            // key is ID
     QHash<QString, Like*>m_likes;       /** List of the users "likes" */        // key is ID
+    QList<Work*>m_work;
 
 //     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
 };

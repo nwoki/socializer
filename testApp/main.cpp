@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 //     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
     
     // with auth token
-    Socializer::Facebook *fb = new Socializer::Facebook("AAAGEQS531rkBAIstNeQq54btWmriW5Vs7lu3P8sBQ6htj3axqPGApODAZASxSQQkoEpD1DqLhqzhBZA6ZBTRDRsmsVNYF4TPHkyh1bTCDWAQO1ZCuAt6");
+    Socializer::Facebook *fb = new Socializer::Facebook("AAAGEQS531rkBAC5P41XtTFCYoEvLmDOyuzEbr4SfrIqYZBkKr7BqfzBQEnMTPD6EkIjK80doQVG8qA98RDZBlPlim8BvEpWOO77ZAfMBrXif0Szlfrh");
     fb->enableScopeUserInfo(true);
 
     
