@@ -249,14 +249,14 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->hometown.id = hometownMap["id"].toString();
     m_userInfo->hometown.name = hometownMap["name"].toString();
 
-    qDebug() << "HOME TOWN: " << m_userInfo->hometown.name;
+//     qDebug() << "HOME TOWN: " << m_userInfo->hometown.name;
 
     // location
     QVariantMap locationMap = result["location"].toMap();
     m_userInfo->location.id = locationMap["id"].toString();
     m_userInfo->location.name = locationMap["name"].toString();
 
-    qDebug() << "LOCATION NAME: " << m_userInfo->location.name << locationMap;
+//     qDebug() << "LOCATION NAME: " << m_userInfo->location.name << locationMap;
 
     // status (for now, just the last one)
     QVariantMap statusesMap = result["statuses"].toMap();
@@ -322,9 +322,9 @@ void Facebook::onPopulateDataReplyReceived()
 
 
     // populate WORK data
-    QList<QVariant> workMap = result["work"].toList();
+    QList<QVariant> workList = result["work"].toList();
 
-    Q_FOREACH (QVariant workData, workMap) {
+    Q_FOREACH (QVariant workData, workList) {
         QVariantMap workDataMap = workData.toMap();
         Work *newWork = new Work;
 
@@ -346,7 +346,24 @@ void Facebook::onPopulateDataReplyReceived()
     }
 
 
-    
+    // populate EDUCATION
+    QList<QVariant> educationList = result["education"].toList();
+
+    Q_FOREACH (QVariant educationData, educationList) {
+        QVariantMap educationMap = educationData.toMap();
+        Education *newEducation = new Education;
+
+        QVariantMap schoolMap = educationMap["school"].toMap();
+        newEducation->school.id = schoolMap["id"].toString();
+        newEducation->school.name = schoolMap["name"].toString();
+
+        newEducation->type = educationMap["type"].toString();
+
+        m_education.append(newEducation);
+
+        qDebug() << "EDUCATION: " << newEducation->type << " " << newEducation->school.name;
+    }
+
 
     reply->deleteLater();
 
@@ -392,7 +409,7 @@ void Facebook::populateData()
     // statuses.limit(1) -> keep last status the user posted
     QString reqStr(GRAPH_URL);
 
-    reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
+    reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,education,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
     reqStr += ",friends.fields(id,name,username,first_name,last_name,locale,gender,picture.type(large))";                  // friends
 //                 ",games.fields(id,link,website,name,picture.type(large))";                           // games
 //                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";  // music
@@ -483,6 +500,13 @@ QList<Facebook::Work*> Facebook::work() const
     return m_work;
 }
 
+
+QList<Facebook::Education*> Facebook::education() const
+{
+    qDebug("[Facebook::education]");
+
+    return m_education;
+}
 
 
 QList<Facebook::Like*> Facebook::userLikes() const

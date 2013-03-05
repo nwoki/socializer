@@ -36,6 +36,18 @@ class Facebook : public OAuth
 
 public:
 
+    // common struct for all pairs (id/name)
+    struct Pair {
+        QString id;
+        QString name;
+    };
+
+    // education
+    struct Education {
+        Pair school;
+        QString type;
+    };
+
     // friends
     struct Friend {
         QString id;
@@ -70,12 +82,6 @@ public:
 // 
 //     };
 
-    // location/hometown struct
-    struct Place {
-        QString id;
-        QString name;
-    };
-
     // user
     struct Me {
         QString id;
@@ -93,13 +99,13 @@ public:
         QString verified;
         QString status;         // last status message displayed by user
         QString locale;
-        Place location;
-        Place hometown;
+        Pair location;
+        Pair hometown;
     };
 
     struct Work {
         QString employer;
-        Place location;
+        Pair location;
         QString position;
         QString description;
         QDate startDate;
@@ -143,10 +149,11 @@ public:
     bool scopeReadStream() const;
     bool scopeUserInfo() const;
 
-    Me *userInfo() const;               /** returns facebook profile data stored */
-    QList<Friend*> friends() const;     /** returns a list of the user's friends */
-    QList<Like*> userLikes() const;     /** returns the user's list of likes */
-    QList<Work*> work() const;          /** returns the user's list of work experiences */
+    Me *userInfo() const;                       /** returns facebook profile data stored */
+    QList<Friend*> friends() const;             /** returns a list of the user's friends */
+    QList<Like*> userLikes() const;             /** returns the user's list of likes */
+    QList<Work*> work() const;                  /** returns the user's list of work experiences */
+    QList<Education*> education() const;        /** returns the user's list of education history */
 
 Q_SIGNALS:
     void profileUpdated();      /** emitted when new profile data has been parsed */
@@ -171,8 +178,8 @@ private:
     Me *m_userInfo;                     /** User info */
     QHash<QString, Friend*>m_friends;   /** List of users friends */            // key is ID
     QHash<QString, Like*>m_likes;       /** List of the users "likes" */        // key is ID
-    QList<Work*>m_work;
-
+    QList<Work*>m_work;                 /** List of the users job history */
+    QList<Education*>m_education;       /** List of the users education history */
 //     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
 };
 
