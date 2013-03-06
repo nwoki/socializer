@@ -332,17 +332,19 @@ void Facebook::onPopulateDataReplyReceived()
         QVariantMap locationMap = workDataMap["location"].toMap();
         QVariantMap positionMap = workDataMap["position"].toMap();
 
-        newWork->employer = employerMap["name"].toString();
+        newWork->employer.id = employerMap["id"].toString();
+        newWork->employer.name = employerMap["name"].toString();
         newWork->location.id = locationMap["id"].toString();
         newWork->location.name = locationMap["name"].toString();
-        newWork->position = positionMap["name"].toString();
+        newWork->position.id = positionMap["id"].toString();
+        newWork->position.name = positionMap["name"].toString();
         newWork->description = workDataMap["description"].toString();
         newWork->startDate = workDataMap["start_date"].toDate();
         newWork->endDate = workDataMap["end_date"].toDate();
 
         m_work.append(newWork);
 
-        qDebug() << "new work: " << newWork->description << " " << newWork->employer;
+        qDebug() << "new work: " << newWork->description << " " << newWork->employer.name;
     }
 
 

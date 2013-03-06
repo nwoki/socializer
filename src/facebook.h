@@ -104,9 +104,9 @@ public:
     };
 
     struct Work {
-        QString employer;
+        Pair employer;
         Pair location;
-        QString position;
+        Pair position;
         QString description;
         QDate startDate;
         QDate endDate;
