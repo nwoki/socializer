@@ -57,6 +57,16 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 Facebook::~Facebook()
 {
     delete m_userInfo;
+
+    qDeleteAll(m_friends);
+    qDeleteAll(m_likes);
+    qDeleteAll(m_work);
+    qDeleteAll(m_education);
+
+    m_friends.clear();
+    m_likes.clear();
+    m_work.clear();
+    m_education.clear();
 }
 
 
@@ -100,9 +110,9 @@ QString Facebook::createScope()
         scopeList.append("user_relationship_details");
     }
 
-    foreach(QString scope, scopeList) {
+    foreach(const QString &scope, scopeList) {
         if (!isFirst) {
-            scope.prepend(",");
+            scopeLine.append(',');
         } else {
             isFirst = false;
         }
@@ -278,7 +288,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate LIKES data
     QVariantMap likesMap = result["likes"].toMap();
 
-    Q_FOREACH (QVariant likeData, likesMap["data"].toList()) {
+    Q_FOREACH (const QVariant &likeData, likesMap["data"].toList()) {
         QVariantMap likeDataMap = likeData.toMap();
         Like *newLike = new Like;
 
@@ -297,7 +307,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate FRIENDS data
     QVariantMap friendsMap = result["friends"].toMap();
 
-    Q_FOREACH (QVariant friendData, friendsMap["data"].toList()) {
+    Q_FOREACH (const QVariant &friendData, friendsMap["data"].toList()) {
         QVariantMap friendDataMap = friendData.toMap();
         Friend *newFriend = new Friend;
 
@@ -324,7 +334,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate WORK data
     QList<QVariant> workList = result["work"].toList();
 
-    Q_FOREACH (QVariant workData, workList) {
+    Q_FOREACH (const QVariant &workData, workList) {
         QVariantMap workDataMap = workData.toMap();
         Work *newWork = new Work;
 
@@ -351,7 +361,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate EDUCATION
     QList<QVariant> educationList = result["education"].toList();
 
-    Q_FOREACH (QVariant educationData, educationList) {
+    Q_FOREACH (const QVariant &educationData, educationList) {
         QVariantMap educationMap = educationData.toMap();
         Education *newEducation = new Education;
 
@@ -385,7 +395,7 @@ void Facebook::parseNewUrl(const QString& url)
             QString access = regex.cap(0);
 
             // extract access token
-            setAuthToken(access.split("=").at(1).toUtf8());
+            setAuthToken(access.split('=').at(1).toUtf8());
 
             qDebug() << "[Facebook::parseNewUrl] Auth token is: " << m_authToken;
         }
@@ -482,16 +492,7 @@ QList<Facebook::Friend*> Facebook::friends() const
 {
     qDebug("[Facebook::friends]");
 
-    QHash<QString, Friend*>::const_iterator it = m_friends.constBegin();
-    QList<Friend*> friends;
-
-    while (it != m_friends.constEnd()) {
-        friends.append(it.value());
-        qDebug() << "FRIEND is: " << it.value()->name;
-        it++;
-    }
-
-    return friends;
+    return m_friends.values();
 }
 
 
@@ -515,17 +516,5 @@ QList<Facebook::Like*> Facebook::userLikes() const
 {
     qDebug("[Facebook::userLikes]");
 
-    QHash<QString, Like*>::const_iterator it = m_likes.constBegin();
-    QList<Like*> likes;
-
-    while (it != m_likes.constEnd()) {
-        likes.append(it.value());
-        qDebug() << "LIKS is: " << it.value()->name;
-        it++;
-    }
-
-    return likes;
+    return m_likes.values();
 }
-
-
-

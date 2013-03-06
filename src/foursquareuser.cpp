@@ -19,6 +19,7 @@ FoursquareUser::FoursquareUser(const QString& id, const QString& firstName, cons
     , m_relationship(relationship)
     , m_homecity(homecity)
     , m_bio(bio)
+    , m_contact(0)
     , m_lastCheckin(0)
 {
 }
@@ -26,6 +27,7 @@ FoursquareUser::FoursquareUser(const QString& id, const QString& firstName, cons
 
 FoursquareUser::FoursquareUser(QObject *parent)
     : QObject(parent)
+    , m_contact(0)
     , m_lastCheckin(0)
 {
 }

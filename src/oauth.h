@@ -12,6 +12,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -134,7 +135,7 @@ protected:
     QNetworkAccessManager *m_networkAccessManager;
 
 private:
-    QNetworkReply *m_networkReply;
+    QWeakPointer<QNetworkReply> m_networkReply;
 };
 
 };
