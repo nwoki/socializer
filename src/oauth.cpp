@@ -30,7 +30,6 @@ OAuth::OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByte
     , m_consumerSecret(consumerSecret)
     , m_redirectUrl(redirectUrl)
     , m_networkAccessManager(new QNetworkAccessManager(this))
-    , m_networkReply(0)
 {
 }
 
@@ -42,7 +41,6 @@ OAuth::OAuth(const QByteArray& authToken, QObject *parent)
     , m_consumerSecret(QByteArray())
     , m_redirectUrl(QByteArray())
     , m_networkAccessManager(new QNetworkAccessManager(this))
-    , m_networkReply(0)
 {
 }
 
@@ -222,22 +220,30 @@ void OAuth::obtainRequestToken(const QByteArray &requestUrl)
     QNetworkRequest request(reqUrlized);
     request.setRawHeader("Authorization", generateRequestHeader(QNetworkAccessManager::PostOperation, requestUrl));
 
+    if (!m_networkReply.isNull()) {
+        m_networkReply.data()->deleteLater();
+    }
+
     m_networkReply = m_networkAccessManager->post(request, "application/octet-stream");
 
-    connect(m_networkReply, SIGNAL(finished()), this, SLOT(onObtainRequestTokenReplyRecieved()));
-    connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
+    connect(m_networkReply.data(), SIGNAL(finished()), this, SLOT(onObtainRequestTokenReplyRecieved()));
+    connect(m_networkReply.data(), SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
 }
 
 
 void OAuth::onObtainRequestTokenReplyRecieved()
 {
-    QByteArray rcv = m_networkReply->readAll();
+    if (m_networkReply.isNull()) {
+        return;
+    }
+
+    QByteArray rcv = m_networkReply.data()->readAll();
 
 #ifdef DEBUG_MODE
     qDebug() << "[OAuth::onObtainRequestTokenReplyRecieved] REQUEST TOKEN RECIEVED: " << rcv;
 #endif
 
-    m_networkReply->deleteLater();
+    m_networkReply.data()->deleteLater();
 
     // extract oauth_token, auth_token_secret and check if the callback is confirmed
     // split the string
@@ -273,9 +279,13 @@ void OAuth::onObtainRequestTokenReplyRecieved()
 
 void OAuth::onNetworkErrorRecieved(QNetworkReply::NetworkError error)
 {
+    if (m_networkReply.isNull()) {
+        return;
+    }
+
     // don't need to do check for int conversion here. I trust Qt's code ;)
-    int statusCode = m_networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    QByteArray errStr = m_networkReply->readAll();
+    int statusCode = m_networkReply.data()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QByteArray errStr = m_networkReply.data()->readAll();
 
 #ifdef DEBUG_MODE
     qDebug("[OAuth::onNetworkErrorRecieved]");
@@ -283,7 +293,7 @@ void OAuth::onNetworkErrorRecieved(QNetworkReply::NetworkError error)
     qDebug() << "Status code: " << statusCode;
 #endif
 
-    m_networkReply->deleteLater();
+    m_networkReply.data()->deleteLater();
 
     /// TODO implement cases
     Q_UNUSED(error)
@@ -294,14 +304,18 @@ void OAuth::onNetworkErrorRecieved(QNetworkReply::NetworkError error)
 
 void OAuth::onRequestAccessTokenReceived()
 {
-    QByteArray rcv = m_networkReply->readAll();
+    if (m_networkReply.isNull()) {
+        return;
+    }
+
+    QByteArray rcv = m_networkReply.data()->readAll();
 
 #ifdef DEBUG_MODE
     qDebug("[OAuth::onRequestAccessTokenReceived]");
     qDebug() << rcv;
 #endif
 
-    m_networkReply->deleteLater();
+    m_networkReply.data()->deleteLater();
 
     // extract values
     QList<QByteArray> params = rcv.split('&');
@@ -356,10 +370,14 @@ void OAuth::requestAccessToken(const QByteArray &url, const QByteArray &authVeri
 
     request.setRawHeader("Authorization", generateRequestHeader(QNetworkAccessManager::PostOperation, url));
 
+    if (!m_networkReply.isNull()) {
+        m_networkReply.data()->deleteLater();
+    }
+
     m_networkReply = m_networkAccessManager->post(request, data);
 
-    connect(m_networkReply, SIGNAL(finished()), this, SLOT(onRequestAccessTokenReceived()));
-    connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
+    connect(m_networkReply.data(), SIGNAL(finished()), this, SLOT(onRequestAccessTokenReceived()));
+    connect(m_networkReply.data(), SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetworkErrorRecieved(QNetworkReply::NetworkError)));
 
 }
 

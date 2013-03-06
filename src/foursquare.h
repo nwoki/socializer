@@ -13,6 +13,7 @@
 #include "oauth.h"
 
 #include <QtCore/QByteArray>
+#include <QtCore/QWeakPointer>
 
 class QDeclarativeView;
 
@@ -65,7 +66,7 @@ private:
     void populateData();                /** retreives user info from the social network */
 
     FoursquareUser *m_fqUser;           /** the account of the user authed with fq */
-    QNetworkReply *m_networkReply;
+    QWeakPointer<QNetworkReply> m_networkReply;
 };
 
 };
