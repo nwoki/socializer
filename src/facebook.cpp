@@ -492,16 +492,7 @@ QList<Facebook::Friend*> Facebook::friends() const
 {
     qDebug("[Facebook::friends]");
 
-    QHash<QString, Friend*>::const_iterator it = m_friends.constBegin();
-    QList<Friend*> friends;
-
-    while (it != m_friends.constEnd()) {
-        friends.append(it.value());
-        qDebug() << "FRIEND is: " << it.value()->name;
-        it++;
-    }
-
-    return friends;
+    return m_friends.values();
 }
 
 
@@ -525,17 +516,5 @@ QList<Facebook::Like*> Facebook::userLikes() const
 {
     qDebug("[Facebook::userLikes]");
 
-    QHash<QString, Like*>::const_iterator it = m_likes.constBegin();
-    QList<Like*> likes;
-
-    while (it != m_likes.constEnd()) {
-        likes.append(it.value());
-        qDebug() << "LIKS is: " << it.value()->name;
-        it++;
-    }
-
-    return likes;
+    return m_likes.values();
 }
-
-
-
