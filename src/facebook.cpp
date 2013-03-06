@@ -57,6 +57,16 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 Facebook::~Facebook()
 {
     delete m_userInfo;
+
+    qDeleteAll(m_friends);
+    qDeleteAll(m_likes);
+    qDeleteAll(m_work);
+    qDeleteAll(m_education);
+
+    m_friends.clear();
+    m_likes.clear();
+    m_work.clear();
+    m_education.clear();
 }
 
 
