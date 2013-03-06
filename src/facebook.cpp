@@ -395,7 +395,7 @@ void Facebook::parseNewUrl(const QString& url)
             QString access = regex.cap(0);
 
             // extract access token
-            setAuthToken(access.split("=").at(1).toUtf8());
+            setAuthToken(access.split('=').at(1).toUtf8());
 
             qDebug() << "[Facebook::parseNewUrl] Auth token is: " << m_authToken;
         }
