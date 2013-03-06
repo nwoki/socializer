@@ -110,9 +110,9 @@ QString Facebook::createScope()
         scopeList.append("user_relationship_details");
     }
 
-    foreach(QString scope, scopeList) {
+    foreach(const QString &scope, scopeList) {
         if (!isFirst) {
-            scope.prepend(",");
+            scopeLine.append(',');
         } else {
             isFirst = false;
         }
@@ -288,7 +288,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate LIKES data
     QVariantMap likesMap = result["likes"].toMap();
 
-    Q_FOREACH (QVariant likeData, likesMap["data"].toList()) {
+    Q_FOREACH (const QVariant &likeData, likesMap["data"].toList()) {
         QVariantMap likeDataMap = likeData.toMap();
         Like *newLike = new Like;
 
@@ -307,7 +307,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate FRIENDS data
     QVariantMap friendsMap = result["friends"].toMap();
 
-    Q_FOREACH (QVariant friendData, friendsMap["data"].toList()) {
+    Q_FOREACH (const QVariant &friendData, friendsMap["data"].toList()) {
         QVariantMap friendDataMap = friendData.toMap();
         Friend *newFriend = new Friend;
 
@@ -334,7 +334,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate WORK data
     QList<QVariant> workList = result["work"].toList();
 
-    Q_FOREACH (QVariant workData, workList) {
+    Q_FOREACH (const QVariant &workData, workList) {
         QVariantMap workDataMap = workData.toMap();
         Work *newWork = new Work;
 
@@ -361,7 +361,7 @@ void Facebook::onPopulateDataReplyReceived()
     // populate EDUCATION
     QList<QVariant> educationList = result["education"].toList();
 
-    Q_FOREACH (QVariant educationData, educationList) {
+    Q_FOREACH (const QVariant &educationData, educationList) {
         QVariantMap educationMap = educationData.toMap();
         Education *newEducation = new Education;
 
