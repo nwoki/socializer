@@ -12,10 +12,7 @@
 
 #include "oauth.h"
 
-#include <QtNetwork/QNetworkReply>
-
 class QDeclarativeView;
-class QNetworkAccessManager;
 
 namespace Socializer
 {
@@ -28,13 +25,25 @@ class LinkedIn : public OAuth
     Q_OBJECT
 
 public:
-    LinkedIn(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject *parent = 0);
+    /**
+     * Creates the Facebook class already with an auth token. Useful for when using Socializer
+     * with a web interface delegating the authentication to a web page.
+     *
+     * @param authToken auth token for the facebook account
+     */
+    LinkedIn(const QByteArray &authToken, QObject *parent = 0);
+
+    /**
+     * Creates the Facebook class ready to obtain the auth token. To use this method you must first set
+     * the required permissions and then call "LinkedIn::obtainAuthPageUrl"
+     *
+     * @param authToken auth token for the facebook account
+     */
+    LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject *parent = 0);
     ~LinkedIn();
 
     Q_INVOKABLE void obtainAuthPageUrl();
-
     Q_INVOKABLE void parseNewUrl(const QString &url);
-
 
     /**
      * Use this to set the correct context property in order to use the
@@ -44,7 +53,20 @@ public:
     void setContextProperty(QDeclarativeView *view);
 
 private Q_SLOTS:
+    QString createScope();              /** generates the scopes to add to the request url */
+    void onAccessTokenReceived();       /** parses json to extract access token */
+    void onNetReplyError(QNetworkReply::NetworkError error);
+
+private:
+    void onAuthTokenChanged();
     void prepareAuthPageUrl();
+    void requestAuthToken(const QString &code);
+
+    bool m_basicProfileScope;           // Name, photo, headline, and current positions
+    bool m_fullProfileScope;            // Full profile including experience, education, skills, and recommendations
+    bool m_emailAddressScope;           // The primary email address you use for your LinkedIn account
+    bool m_networkScope;                // Your 1st and 2nd degree connections
+    bool m_contactInfoScope;            // Address, phone number, and bound accounts
 };
 
 };

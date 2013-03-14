@@ -132,7 +132,6 @@ public:
     void enableScopeUserInfo(bool enable);
 
     Q_INVOKABLE void obtainAuthPageUrl();
-
     Q_INVOKABLE void parseNewUrl(const QString &url);
 
     /**

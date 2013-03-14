@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
 //     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
     
     // with auth token
-    Socializer::Facebook *fb = new Socializer::Facebook("AAACEdEose0cBACsRUFT2pKox4FAHyYIdFoQpE75hyZCdM0QuFlASM4PTytkyaie1fbiUH7PJE1xlgKK8GadExvjJBcyFiahZAKHR8hZCNEY9BBjLLCW ");
-    fb->enableScopeUserInfo(true);
+//     Socializer::Facebook *fb = new Socializer::Facebook("AAACEdEose0cBACsRUFT2pKox4FAHyYIdFoQpE75hyZCdM0QuFlASM4PTytkyaie1fbiUH7PJE1xlgKK8GadExvjJBcyFiahZAKHR8hZCNEY9BBjLLCW ");
+//     fb->enableScopeUserInfo(true);
 
     
 //     Socializer::Facebook *fb = new Socializer::Facebook("AAADmYZBX9lMQBAE8BJPCEZCMGF26rSXfgAdeEpuQjn2aB9A6c5f2LapGZA69KnYm33iLlD1KCT4cZAycc7zo6uFM3mfc1BFZCLxBbD2EL1pZAJLtmYOtMq");
@@ -64,10 +64,10 @@ int main(int argc, char *argv[])
 //     view->setSource(QUrl("qmlcomponents/FoursquareQML.qml"));
 
     // LINKEDIN
-//     Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "http://www.2s2h.com", "1tTwdCxMuiycme2R");
-//     link->obtainAuthPageUrl();          // TODO test this after setting context property
-//     link->setContextProperty(view);
-//     view->setSource(QUrl("qmlcomponents/LinkedinQML.qml"));
+    Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "1tTwdCxMuiycme2R", "http://www.2s2h.com");
+    link->obtainAuthPageUrl();          // TODO test this after setting context property
+    link->setContextProperty(view);
+    view->setSource(QUrl("/home/nwoki/GitProjects/Ispirata/R&D/socializer/qmlcomponents/LinkedinQML.qml"));
 
 
 

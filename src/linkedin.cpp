@@ -12,18 +12,28 @@
 #include <QtCore/QDebug>
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeContext>
-#include <QtNetwork/QNetworkAccessManager>
 
-#define AUTHENTICATE_URL "https://api.linkedin.com/uas/oauth/authenticate"
-#define REQUEST_URL "https://api.linkedin.com/uas/oauth/requestToken"
+#include <qjson/parser.h>
+
+#define AUTH_URL "https://www.linkedin.com/uas/oauth2/authorization?"
+#define ACCESS_TOKEN_URL "https://www.linkedin.com/uas/oauth2/accessToken?"
 
 using namespace Socializer;
 
 
-LinkedIn::LinkedIn(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject* parent)
+LinkedIn::LinkedIn(const QByteArray& authToken, QObject* parent)
+    : OAuth(authToken, parent)
+{
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
+
+//     populateData();
+}
+
+
+LinkedIn::LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
 {
-    connect(this, SIGNAL(requestTokenRecieved()), this, SLOT(prepareAuthPageUrl()));
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
 
 
@@ -32,38 +42,165 @@ LinkedIn::~LinkedIn()
 }
 
 
-void LinkedIn::obtainAuthPageUrl()
+QString LinkedIn::createScope()
 {
-    if (m_authTokenSecret.isEmpty()) {
-        qDebug("sending request cos auth is empty");
-        obtainRequestToken(REQUEST_URL);
+    qDebug("[LinkedIn::createScope]");
+
+    QList<QString> scopeList;
+    QString scopeLine("&scope=");
+    bool isFirst = true;
+
+    if (m_basicProfileScope && !m_fullProfileScope) {
+        scopeList.append("r_basicprofile");
+    } else if (!m_basicProfileScope && m_fullProfileScope) {
+        scopeList.append("r_fullprofile");
+    }
+
+    if (m_contactInfoScope) {
+        scopeList.append("r_contactinfo");
+    }
+
+    if (m_emailAddressScope) {
+        scopeList.append("r_emailaddress");
+    }
+
+    if (m_networkScope) {
+        scopeList.append("r_network");
+    }
+
+
+    Q_FOREACH (const QString &scope, scopeList) {
+        if (!isFirst) {
+            scopeLine.append(',');
+        } else {
+            isFirst = false;
+        }
+
+        scopeLine.append(scope);
+    }
+
+    if (!isFirst) {
+        return scopeLine;
     } else {
-        qDebug("requesting auth..");
-        prepareAuthPageUrl();
+        return QString();
     }
 }
 
 
-void LinkedIn::parseNewUrl(const QString& url)
+void LinkedIn::obtainAuthPageUrl()
 {
-#ifdef DEBUG_MODE
+    qDebug("[LinkedIn::obtainAuthPageUrl]");
+
+    QString urlStr(AUTH_URL);
+
+    urlStr.append("response_type=code");
+    urlStr.append("&client_id=");
+    urlStr.append(m_appId);
+    urlStr.append(createScope());
+    urlStr.append("&state=");
+    urlStr.append(nonce());             // here any value will suffice. To prevent CSRF
+    urlStr.append("&redirect_uri=");
+    urlStr.append(m_redirectUrl);
+
+    Q_EMIT authPageUrlReady(urlStr);
+}
+
+
+void LinkedIn::onAccessTokenReceived()
+{
+    qDebug("[LinkedIn::onAccessTokenReceived]");
+
+    QNetworkReply *netReply = qobject_cast<QNetworkReply*>(sender());
+    QByteArray rcv = netReply->readAll();
+
+    qDebug() << "[LinkedIn::onAccessTokenReceived] got: " << rcv;
+
+    netReply->deleteLater();
+
+    // extract auth token
+    QJson::Parser parser;
+    bool ok;
+    QVariantMap jsonMap = parser.parse(rcv, &ok).toMap();
+
+    if (!ok) {
+        qDebug("[LinkedIn::onAccessTokenReceived] ERROR in parsing json");
+        return;
+    }
+
+    setAuthToken(jsonMap.value("access_token").toString().toUtf8());
+}
+
+
+void LinkedIn::parseNewUrl(const QString &url)
+{
+    // TODO check state matches as well
+    // YOUR_REDIRECT_URI/?code=AUTHORIZATION_CODE&state=STATE
+
     qDebug("[LinkedIn::parseNewUrl]");
     qDebug() << "url: " << url;
-#endif
 
-    /// TODO parse links for values
+    if (url.contains("code")) {
+        QRegExp regex("code=?[^&]+");
+
+        if (regex.indexIn(url) > -1) {
+            QString access = regex.cap(0);
+
+
+            // got the code, now i need to exchange it for an access token
+            requestAuthToken(access.split('=').at(1));
+        }
+    }
+}
+
+
+void LinkedIn::onAuthTokenChanged()
+{
+    qDebug("[LinkedIn::onAuthTokenChanged]");
+    qDebug() << "[LinkedIn::onAuthTokenChanged] new token: " << m_authToken;
+
+//     populateData();
+}
+
+
+void LinkedIn::onNetReplyError(QNetworkReply::NetworkError error)
+{
+    qDebug("[LinkedIn::onNetReplyError]");
+    // TODO
+    Q_UNUSED(error);
+}
+
+
+void LinkedIn::requestAuthToken(const QString &code)
+{
+    qDebug("[LinkedIn::requestAuthToken]");
+    qDebug() << "[LinkedIn::requestAuthToken] with code: " << code;
+
+    QNetworkRequest req;
+    QNetworkReply *netRep;
+    QString reqUrl(ACCESS_TOKEN_URL);
+
+    reqUrl.append("grant_type=authorization_code");
+    reqUrl.append("&code=" + code);
+    reqUrl.append("&redirect_uri=" + redirectUrl());
+    reqUrl.append("&client_id=" + m_appId);
+    reqUrl.append("&client_secret=" + m_consumerSecret);
+
+    req.setUrl(reqUrl);
+
+    netRep = m_networkAccessManager->post(req, QByteArray());
+
+    connect(netRep, SIGNAL(finished()), this, SLOT(onAccessTokenReceived()));
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
 }
 
 
 void LinkedIn::prepareAuthPageUrl()
 {
     // once i have the access token, return the authentication url
-    QString authPageUrl(AUTHENTICATE_URL);
+    QString authPageUrl(AUTH_URL);
     authPageUrl += "?oauth_token=" + m_authToken;
 
-#ifdef DEBUG_MODE
     qDebug() << "[LinkedIn::prepareAuthPageUrl] Emitting auth page url: " << authPageUrl;
-#endif
 
     Q_EMIT authPageUrlReady(authPageUrl);
 }
@@ -71,7 +208,9 @@ void LinkedIn::prepareAuthPageUrl()
 
 void LinkedIn::setContextProperty(QDeclarativeView *view)
 {
-//    view->rootContext()->setContextProperty("LinkedIn", this);
+    qDebug("[LinkedIn::setContextProperty]");
+
+    view->rootContext()->setContextProperty("LinkedIn", this);
 }
 
 
