@@ -81,6 +81,14 @@ bool LinkedIn::fullProfileScope() const
 }
 
 
+LinkedInUser *LinkedIn::linkedinUser() const
+{
+    qDebug("[LinkedIn::linkedinUser]");
+
+    return m_linkedinUser;
+}
+
+
 bool LinkedIn::networkScope() const
 {
     qDebug("[LinkedIn::networkScope]");

@@ -49,6 +49,8 @@ public:
     LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject *parent = 0);
     ~LinkedIn();
 
+    LinkedInUser *linkedinUser() const;
+
     bool basicProfileScope() const;
     bool fullProfileScope() const;
     bool emailProfileScope() const;
