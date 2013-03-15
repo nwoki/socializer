@@ -90,6 +90,9 @@ private:
     void updateProfileInfo();
     void updateEmailInfo();
 
+    /** checks to see if the response doesn't contain errors */
+    bool isResponseValid(const QByteArray &msg);
+
     bool m_basicProfileScope;           // Name, photo, headline, and current positions
     bool m_fullProfileScope;            // Full profile including experience, education, skills, and recommendations
     bool m_emailAddressScope;           // The primary email address you use for your LinkedIn account

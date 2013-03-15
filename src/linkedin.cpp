@@ -10,8 +10,11 @@
 #include "linkedin.h"
 
 #include <QtCore/QDebug>
+
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeContext>
+
+#include <QtXml/QXmlStreamReader>
 
 #include <qjson/parser.h>
 
@@ -168,6 +171,36 @@ QString LinkedIn::createScope()
 }
 
 
+bool LinkedIn::isResponseValid(const QByteArray &msg)
+{
+    qDebug("[LinkedIn::isResponseValid]");
+
+    QByteArray asd("<error><script/><status>401</status><timestamp>1363338159749</timestamp><request-id>8EXBO8NC3I</request-id><error-code>0</error-code><message>Unable to verify access token</message></error>");
+    QXmlStreamReader xmlReader(asd);
+
+    while (!xmlReader.atEnd()) {
+        if (xmlReader.readNextStartElement()) {
+            qDebug() << xmlReader.name() << " is da name";
+
+            // TODO save error code and string
+            if (xmlReader.name() == "error") {
+                // extract error code and message
+                while (!xmlReader.atEnd()) {
+                    if (xmlReader.readNextStartElement()) {
+                        if (xmlReader.name() == "status") {
+                            qDebug() << "[LinkedIn::isResponseValid] ERROR CODE: " << xmlReader.readElementText();
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+
 void LinkedIn::obtainAuthPageUrl()
 {
     qDebug("[LinkedIn::obtainAuthPageUrl]");
@@ -317,6 +350,13 @@ void LinkedIn::profileInfoReceived()
     QByteArray rcv = rep->readAll();
 
     qDebug() << "GOTCHA: " << rcv;
+
+    // check response
+    if (!isResponseValid(rcv)) {
+        return;
+    }
+
+    // parse
 
     rep->deleteLater();
 }
