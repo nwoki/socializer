@@ -397,9 +397,22 @@ void LinkedIn::emailInfoReceived()
     QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
     QByteArray rcv = rep->readAll();
 
-    qDebug() << "GOTCHA: " << rcv;
-
     rep->deleteLater();
+
+    qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
+
+    // parse
+    QXmlStreamReader xmlParser(rcv);
+
+    while (!xmlParser.atEnd()) {
+        if (xmlParser.readNextStartElement()) {
+            if (xmlParser.name() == "email-address") {
+                m_linkedinUser->setEmail(xmlParser.readElementText());
+            }
+        }
+    }
+
+//     qDebug() << "\n\n\nUSER EMAIL: " << m_linkedinUser->email();
 }
 
 
