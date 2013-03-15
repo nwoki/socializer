@@ -65,6 +65,10 @@ int main(int argc, char *argv[])
 
     // LINKEDIN
     Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "1tTwdCxMuiycme2R", "http://www.2s2h.com");
+
+    link->setFullProfileScope(true);
+    link->setEmailProfileScope(true);
+
     link->obtainAuthPageUrl();          // TODO test this after setting context property
     link->setContextProperty(view);
     view->setSource(QUrl("/home/nwoki/GitProjects/Ispirata/R&D/socializer/qmlcomponents/LinkedinQML.qml"));

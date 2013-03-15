@@ -24,6 +24,12 @@ class LinkedIn : public OAuth
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool basicProfileScope   READ basicProfileScope  WRITE setBasicProfileScope)
+    Q_PROPERTY(bool fullProfileScope    READ fullProfileScope   WRITE setFullProfileScope)
+    Q_PROPERTY(bool emailProfileScope   READ emailProfileScope  WRITE setEmailProfileScope)
+    Q_PROPERTY(bool networkScope        READ networkScope       WRITE setNetworkScope)
+    Q_PROPERTY(bool contactInfoScope    READ contactInfoScope   WRITE setContactInfoScope)
+
 public:
     /**
      * Creates the Facebook class already with an auth token. Useful for when using Socializer
@@ -42,6 +48,18 @@ public:
     LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject *parent = 0);
     ~LinkedIn();
 
+    bool basicProfileScope() const;
+    bool fullProfileScope() const;
+    bool emailProfileScope() const;
+    bool networkScope() const;
+    bool contactInfoScope() const;
+
+    void setBasicProfileScope(bool enable);
+    void setFullProfileScope(bool enable);
+    void setEmailProfileScope(bool enable);
+    void setNetworkScope(bool enable);
+    void setContactInfoScope(bool enable);
+
     Q_INVOKABLE void obtainAuthPageUrl();
     Q_INVOKABLE void parseNewUrl(const QString &url);
 
@@ -54,13 +72,23 @@ public:
 
 private Q_SLOTS:
     QString createScope();              /** generates the scopes to add to the request url */
+    void onAccessTokenChanged();
     void onAccessTokenReceived();       /** parses json to extract access token */
     void onNetReplyError(QNetworkReply::NetworkError error);
 
+    // profile info updates
+    void profileInfoReceived();
+    void emailInfoReceived();
+
 private:
     void onAuthTokenChanged();
+    void populateData();
     void prepareAuthPageUrl();
     void requestAuthToken(const QString &code);
+
+    // user update calls
+    void updateProfileInfo();
+    void updateEmailInfo();
 
     bool m_basicProfileScope;           // Name, photo, headline, and current positions
     bool m_fullProfileScope;            // Full profile including experience, education, skills, and recommendations

@@ -17,6 +17,7 @@
 
 #define AUTH_URL "https://www.linkedin.com/uas/oauth2/authorization?"
 #define ACCESS_TOKEN_URL "https://www.linkedin.com/uas/oauth2/accessToken?"
+#define UPDATE_INFO_URL "https://api.linkedin.com/v1/people/~"
 
 using namespace Socializer;
 
@@ -24,21 +25,101 @@ using namespace Socializer;
 LinkedIn::LinkedIn(const QByteArray& authToken, QObject* parent)
     : OAuth(authToken, parent)
 {
-    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAccessTokenChanged()));
 
-//     populateData();
+    populateData();
 }
 
 
 LinkedIn::LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
 {
-    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
+    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAccessTokenChanged()));
 }
 
 
 LinkedIn::~LinkedIn()
 {
+}
+
+
+bool LinkedIn::basicProfileScope() const
+{
+    qDebug("[LinkedIn::basicProfileScope]");
+
+    return m_basicProfileScope;
+}
+
+
+bool LinkedIn::contactInfoScope() const
+{
+    qDebug("[LinkedIn::contactInfoScope]");
+
+    return m_contactInfoScope;
+}
+
+
+bool LinkedIn::emailProfileScope() const
+{
+    qDebug("[LinkedIn::emailProfileScope]");
+
+    return m_emailAddressScope;
+}
+
+
+bool LinkedIn::fullProfileScope() const
+{
+    qDebug("[LinkedIn::fullProfileScope]");
+
+    return m_fullProfileScope;
+}
+
+
+bool LinkedIn::networkScope() const
+{
+    qDebug("[LinkedIn::networkScope]");
+
+    return m_networkScope;
+}
+
+
+void LinkedIn::setBasicProfileScope(bool enable)
+{
+    qDebug("[LinkedIn::setBasicProfileScope]");
+
+    m_basicProfileScope = enable;
+}
+
+
+void LinkedIn::setContactInfoScope(bool enable)
+{
+    qDebug("[LinkedIn::setContactInfoScope]");
+
+    m_contactInfoScope = enable;
+}
+
+
+void LinkedIn::setEmailProfileScope(bool enable)
+{
+    qDebug("[LinkedIn::setEmailProfileScope]");
+
+    m_emailAddressScope = enable;
+}
+
+
+void LinkedIn::setFullProfileScope(bool enable)
+{
+    qDebug("[LinkedIn::setFullProfileScope]");
+
+    m_fullProfileScope = enable;
+}
+
+
+void LinkedIn::setNetworkScope(bool enable)
+{
+    qDebug("[LinkedIn::setNetworkScope]");
+
+    m_networkScope = enable;
 }
 
 
@@ -106,6 +187,13 @@ void LinkedIn::obtainAuthPageUrl()
 }
 
 
+void LinkedIn::onAccessTokenChanged()
+{
+    qDebug("[LinkedIn::onAccessTokenChanged]");
+    populateData();
+}
+
+
 void LinkedIn::onAccessTokenReceived()
 {
     qDebug("[LinkedIn::onAccessTokenReceived]");
@@ -158,7 +246,7 @@ void LinkedIn::onAuthTokenChanged()
     qDebug("[LinkedIn::onAuthTokenChanged]");
     qDebug() << "[LinkedIn::onAuthTokenChanged] new token: " << m_authToken;
 
-//     populateData();
+    populateData();
 }
 
 
@@ -167,6 +255,21 @@ void LinkedIn::onNetReplyError(QNetworkReply::NetworkError error)
     qDebug("[LinkedIn::onNetReplyError]");
     // TODO
     Q_UNUSED(error);
+}
+
+
+void LinkedIn::populateData()
+{
+    qDebug("[LinkedIn::populateData]");
+
+    // for every scope, update use info
+    if (m_basicProfileScope || m_fullProfileScope) {
+        updateProfileInfo();
+    }
+
+    if (m_emailAddressScope) {
+        updateEmailInfo();
+    }
 }
 
 
@@ -206,6 +309,32 @@ void LinkedIn::prepareAuthPageUrl()
 }
 
 
+void LinkedIn::profileInfoReceived()
+{
+    qDebug("[LinkedIn::profileInfoReceived]");
+
+    QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
+    QByteArray rcv = rep->readAll();
+
+    qDebug() << "GOTCHA: " << rcv;
+
+    rep->deleteLater();
+}
+
+
+void LinkedIn::emailInfoReceived()
+{
+    qDebug("[LinkedIn::emailInfoReceived]");
+
+    QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
+    QByteArray rcv = rep->readAll();
+
+    qDebug() << "GOTCHA: " << rcv;
+
+    rep->deleteLater();
+}
+
+
 void LinkedIn::setContextProperty(QDeclarativeView *view)
 {
     qDebug("[LinkedIn::setContextProperty]");
@@ -213,6 +342,36 @@ void LinkedIn::setContextProperty(QDeclarativeView *view)
     view->rootContext()->setContextProperty("LinkedIn", this);
 }
 
+
+void LinkedIn::updateEmailInfo()
+{
+    qDebug("[LinkedIn::updateEmailInfo]");
+
+    QString reqUrl(UPDATE_INFO_URL);
+    reqUrl.append("/email-address?oauth2_access_token=" + authToken());
+
+    QNetworkRequest req(reqUrl);
+    QNetworkReply *netRep = m_networkAccessManager->get(req);
+
+    connect(netRep, SIGNAL(finished()), this, SLOT(emailInfoReceived()));
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
+}
+
+
+void LinkedIn::updateProfileInfo()
+{
+    qDebug("[LinkedIn::updateProfileInfo]");
+
+    QString reqUrl(UPDATE_INFO_URL);
+
+    reqUrl.append("?oauth2_access_token=" + authToken());
+
+    QNetworkRequest req(reqUrl);
+    QNetworkReply *netRep = m_networkAccessManager->get(req);
+
+    connect(netRep, SIGNAL(finished()), this, SLOT(profileInfoReceived()));
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
+}
 
 
 
