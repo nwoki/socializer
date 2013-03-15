@@ -73,6 +73,9 @@ public:
      */
     void setContextProperty(QDeclarativeView *view);
 
+Q_SIGNALS:
+    void profileUpdated();              /** emitted when new profile data has been parsed */
+
 private Q_SLOTS:
     QString createScope();              /** generates the scopes to add to the request url */
     void onAccessTokenChanged();

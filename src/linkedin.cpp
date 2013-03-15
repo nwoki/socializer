@@ -386,6 +386,7 @@ void LinkedIn::profileInfoReceived()
         }
     }
 
+    Q_EMIT profileUpdated();
 //     qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline();
 }
 
@@ -412,6 +413,7 @@ void LinkedIn::emailInfoReceived()
         }
     }
 
+    Q_EMIT profileUpdated();
 //     qDebug() << "\n\n\nUSER EMAIL: " << m_linkedinUser->email();
 }
 
