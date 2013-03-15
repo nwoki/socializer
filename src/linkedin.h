@@ -13,6 +13,7 @@
 #include "oauth.h"
 
 class QDeclarativeView;
+class LinkedInUser;
 
 namespace Socializer
 {
@@ -98,6 +99,8 @@ private:
     bool m_emailAddressScope;           // The primary email address you use for your LinkedIn account
     bool m_networkScope;                // Your 1st and 2nd degree connections
     bool m_contactInfoScope;            // Address, phone number, and bound accounts
+
+    LinkedInUser *m_linkedinUser;
 };
 
 };

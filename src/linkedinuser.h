@@ -19,6 +19,7 @@ class LinkedInUser : public QObject
 
     Q_PROPERTY(QString email            READ email      WRITE setEmail          NOTIFY infoChanged)
     Q_PROPERTY(QString firstName        READ firstName  WRITE setFirstName      NOTIFY infoChanged)
+    Q_PROPERTY(QString headline         READ headline   WRITE setHeadLine       NOTIFY infoChanged)
     Q_PROPERTY(QString lastName         READ lastName   WRITE setLastName       NOTIFY infoChanged)
 
 public:
@@ -27,19 +28,22 @@ public:
 
     QString email() const;
     QString firstName() const;
+    QString headline() const;
     QString lastName() const;
 
     void setEmail(const QString &data);
     void setFirstName(const QString &data);
+    void setHeadLine(const QString &data);
     void setLastName(const QString &data);
 
 Q_SIGNALS:
     void infoChanged();
 
 private:
-    QString m_firstName;
-    QString m_lastName;
     QString m_email;
+    QString m_firstName;
+    QString m_headline;
+    QString m_lastName;
 };
 
 #endif // LINKEDINUSER_H

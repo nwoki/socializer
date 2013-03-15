@@ -36,6 +36,14 @@ QString LinkedInUser::firstName() const
 }
 
 
+QString LinkedInUser::headline() const
+{
+    qDebug("[LinkedInUser::headline]");
+
+    return m_headline;
+}
+
+
 QString LinkedInUser::lastName() const
 {
     qDebug("[LinkedInUser::lastName]");
@@ -49,7 +57,7 @@ void LinkedInUser::setEmail(const QString &data)
     qDebug("[LinkedInUser::setEmail]");
 
     m_email = data;
-    Q_EMIT infoChanged();;
+    Q_EMIT infoChanged();
 }
 
 
@@ -58,7 +66,16 @@ void LinkedInUser::setFirstName(const QString &data)
     qDebug("[LinkedInUser::setFirstName]");
 
     m_firstName = data;
-    Q_EMIT infoChanged();;
+    Q_EMIT infoChanged();
+}
+
+
+void LinkedInUser::setHeadLine(const QString& data)
+{
+    qDebug("[LinkedInUser::setHeadLine]");
+
+    m_headline = data;
+    Q_EMIT infoChanged();
 }
 
 
@@ -67,7 +84,7 @@ void LinkedInUser::setLastName(const QString &data)
     qDebug("[LinkedInUser::setLastName]");
 
     m_lastName = data;
-    Q_EMIT infoChanged();;
+    Q_EMIT infoChanged();
 }
 
 

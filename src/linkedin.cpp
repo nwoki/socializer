@@ -8,6 +8,7 @@
  */
 
 #include "linkedin.h"
+#include "linkedinuser.h"
 
 #include <QtCore/QDebug>
 
@@ -27,6 +28,7 @@ using namespace Socializer;
 
 LinkedIn::LinkedIn(const QByteArray& authToken, QObject* parent)
     : OAuth(authToken, parent)
+    , m_linkedinUser(new LinkedInUser(this))
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAccessTokenChanged()));
 
@@ -36,6 +38,7 @@ LinkedIn::LinkedIn(const QByteArray& authToken, QObject* parent)
 
 LinkedIn::LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
+    , m_linkedinUser(new LinkedInUser(this))
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAccessTokenChanged()));
 }
@@ -175,12 +178,10 @@ bool LinkedIn::isResponseValid(const QByteArray &msg)
 {
     qDebug("[LinkedIn::isResponseValid]");
 
-    QByteArray asd("<error><script/><status>401</status><timestamp>1363338159749</timestamp><request-id>8EXBO8NC3I</request-id><error-code>0</error-code><message>Unable to verify access token</message></error>");
-    QXmlStreamReader xmlReader(asd);
+    QXmlStreamReader xmlReader(msg);
 
     while (!xmlReader.atEnd()) {
         if (xmlReader.readNextStartElement()) {
-            qDebug() << xmlReader.name() << " is da name";
 
             // TODO save error code and string
             if (xmlReader.name() == "error") {
@@ -349,7 +350,9 @@ void LinkedIn::profileInfoReceived()
     QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
     QByteArray rcv = rep->readAll();
 
-    qDebug() << "GOTCHA: " << rcv;
+    rep->deleteLater();
+
+    qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
 
     // check response
     if (!isResponseValid(rcv)) {
@@ -357,8 +360,25 @@ void LinkedIn::profileInfoReceived()
     }
 
     // parse
+    QXmlStreamReader xmlParser(rcv);
 
-    rep->deleteLater();
+    while (!xmlParser.atEnd()) {
+        if (xmlParser.readNextStartElement()) {
+            if (xmlParser.name() == "first-name") {
+                m_linkedinUser->setFirstName(xmlParser.readElementText());
+            }
+
+            if (xmlParser.name() == "last-name") {
+                m_linkedinUser->setLastName(xmlParser.readElementText());
+            }
+
+            if (xmlParser.name() == "headline") {
+                m_linkedinUser->setHeadLine(xmlParser.readElementText());
+            }
+        }
+    }
+
+//     qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline();
 }
 
 
