@@ -81,9 +81,9 @@ bool LinkedIn::fullProfileScope() const
 }
 
 
-LinkedInUser *LinkedIn::linkedinUser() const
+LinkedInUser *LinkedIn::userInfo() const
 {
-    qDebug("[LinkedIn::linkedinUser]");
+    qDebug("[LinkedIn::userInfo]");
 
     return m_linkedinUser;
 }
