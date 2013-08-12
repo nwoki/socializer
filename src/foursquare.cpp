@@ -26,6 +26,7 @@ using namespace Socializer;
 Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
     : OAuth(appId, redirectUrl, QByteArray(), parent)
     , m_fqUser(new FoursquareUser(this))
+    , m_networkReply(Q_NULLPTR)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -34,6 +35,7 @@ Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, Q
 Foursquare::Foursquare(const QByteArray& appId, const QByteArray& redirectUrl, const QByteArray& consumerSecret, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
     , m_fqUser(new FoursquareUser(this))
+    , m_networkReply(Q_NULLPTR)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -192,11 +194,11 @@ void Foursquare::parseAccessToken()
 {
     qDebug("[Foursquare::parseAccessToken]");
 
-    if (m_networkReply.isNull()) {
+    if (!m_networkReply) {
         return;
     }
 
-    QByteArray incoming = m_networkReply.data()->readAll();
+    QByteArray incoming = m_networkReply->readAll();
 
     qDebug() << "[Foursquare::parseAccessToken] incoming: " << incoming;
 
@@ -207,13 +209,13 @@ void Foursquare::parseAccessToken()
 
     if (!ok) {
         qDebug() << "[Foursquare::parseAccessToken] ERROR: " << parser.errorString();
-        m_networkReply.data()->deleteLater();
+        m_networkReply->deleteLater();
         return;
     }
 
     setAuthToken(result["access_token"].toByteArray());
 
-    m_networkReply.data()->deleteLater();
+    m_networkReply->deleteLater();
 }
 
 
@@ -250,13 +252,13 @@ void Foursquare::parseNewUrl(const QString& url)
             QNetworkRequest req;
             req.setUrl(accessTokenFromCodeUrl);
 
-            if (!m_networkReply.isNull()) {
-                m_networkReply.data()->deleteLater();
+            if (!m_networkReply) {
+                m_networkReply->deleteLater();
             }
 
             m_networkReply = m_networkAccessManager->get(req);
 
-            connect(m_networkReply.data(), SIGNAL(finished()), this, SLOT(parseAccessToken()));
+            connect(m_networkReply, SIGNAL(finished()), this, SLOT(parseAccessToken()));
         }
     }
 }

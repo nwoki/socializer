@@ -135,7 +135,7 @@ protected:
     QNetworkAccessManager *m_networkAccessManager;
 
 private:
-    QWeakPointer<QNetworkReply> m_networkReply;
+    QNetworkReply *m_networkReply;
 };
 
 };

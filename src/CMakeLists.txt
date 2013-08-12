@@ -1,5 +1,3 @@
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 set(socializer_SRCS
     facebook.cpp
     foursquare.cpp
@@ -14,7 +12,7 @@ set(socializer_SRCS
 add_library(Socializer STATIC ${socializer_SRCS})
 
  # link lib with Qt libs
-target_link_libraries(Socializer
-                      ${QT_QTCORE_LIBRARIES}
-                      ${QT_QTNETWORK_LIBRARIES}
-                      ${QJSON_LIBRARIES})
+target_link_libraries(Socializer)
+
+# qt5_use_modules(Socializer Core Gui Quick Qml Network Xml)
+qt5_use_modules(Socializer Core Network)
