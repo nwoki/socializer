@@ -58,6 +58,9 @@ public:
         QString picture;
         QString locale;
         QString username;
+        QString link;
+        QString relationshipStatus;
+        QString about;
     };
 
     struct Like {

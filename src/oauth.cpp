@@ -17,6 +17,8 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonParseError>
 
 #include <QtNetwork/QNetworkRequest>
 
@@ -191,6 +193,27 @@ QByteArray OAuth::hmacsha1Encode(const QByteArray &baseStr, QByteArray key)
     QByteArray hashed = QCryptographicHash::hash(total, QCryptographicHash::Sha1);
 
     return hashed.toBase64();
+}
+
+
+QJsonObject OAuth::jsonObject(const QByteArray &jsonData)
+{
+    qDebug("[OAuth::jsonObject]");
+
+    QJsonParseError jsonError;
+    QJsonDocument jsonParser = QJsonDocument::fromJson(jsonData, &jsonError);
+
+    if (jsonError.error != QJsonParseError::NoError) {
+        QString errStr("[OAuth::jsonObject] Invalid json!");
+        errStr += " - " + jsonError.errorString();
+
+        qDebug() << errStr;
+
+        return QJsonObject();
+    }
+
+    // extract json object
+    return jsonParser.object();
 }
 
 
