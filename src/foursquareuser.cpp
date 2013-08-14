@@ -19,16 +19,16 @@ FoursquareUser::FoursquareUser(const QString& id, const QString& firstName, cons
     , m_relationship(relationship)
     , m_homecity(homecity)
     , m_bio(bio)
-    , m_contact(0)
-    , m_lastCheckin(0)
+    , m_contact(new Contact)
+    , m_lastCheckin(new Venue)
 {
 }
 
 
 FoursquareUser::FoursquareUser(QObject *parent)
     : QObject(parent)
-    , m_contact(0)
-    , m_lastCheckin(0)
+    , m_contact(new Contact)
+    , m_lastCheckin(new Venue)
 {
 }
 
@@ -47,7 +47,6 @@ FoursquareUser::~FoursquareUser()
 void FoursquareUser::addCheckin(FoursquareUser::Venue *checkin)
 {
     qDebug("[FoursquareUser::addCheckin]");
-
     m_checkins.append(checkin);
 }
 
@@ -55,7 +54,6 @@ void FoursquareUser::addCheckin(FoursquareUser::Venue *checkin)
 QString FoursquareUser::bio() const
 {
     qDebug("[FoursquareUser::bio]");
-
     return m_bio;
 }
 
@@ -63,7 +61,6 @@ QString FoursquareUser::bio() const
 FoursquareUser::Contact *FoursquareUser::contact() const
 {
     qDebug("[FoursquareUser::contact]");
-
     return m_contact;
 }
 
@@ -71,7 +68,6 @@ FoursquareUser::Contact *FoursquareUser::contact() const
 QString FoursquareUser::firstName() const
 {
     qDebug("[FoursquareUser::firstName]");
-
     return m_firstName;
 }
 
@@ -79,7 +75,6 @@ QString FoursquareUser::firstName() const
 QString FoursquareUser::gender() const
 {
     qDebug("[FoursquareUser::gender]");
-
     return m_gender;
 }
 
@@ -87,7 +82,6 @@ QString FoursquareUser::gender() const
 QString FoursquareUser::homecity() const
 {
     qDebug("[FoursquareUser::homecity]");
-
     return m_homecity;
 }
 
@@ -95,7 +89,6 @@ QString FoursquareUser::homecity() const
 QString FoursquareUser::id() const
 {
     qDebug("[FoursquareUser::homecity]");
-
     return m_id;
 }
 
@@ -103,7 +96,6 @@ QString FoursquareUser::id() const
 FoursquareUser::Venue* FoursquareUser::lastCheckin() const
 {
     qDebug("[FoursquareUser::lastCheckin]");
-
     return m_lastCheckin;
 }
 
@@ -111,7 +103,6 @@ FoursquareUser::Venue* FoursquareUser::lastCheckin() const
 QString FoursquareUser::lastName() const
 {
     qDebug("[FoursquareUser::lastName]");
-
     return m_lastName;
 }
 
@@ -119,7 +110,6 @@ QString FoursquareUser::lastName() const
 QString FoursquareUser::photo() const
 {
     qDebug("[FoursquareUser::photo]");
-
     return m_photo;
 }
 
@@ -127,8 +117,14 @@ QString FoursquareUser::photo() const
 QString FoursquareUser::relationship() const
 {
     qDebug("[FoursquareUser::relationship]");
-
     return m_relationship;
+}
+
+
+quint16 FoursquareUser::totalCheckins() const
+{
+    qDebug("[FoursquareUser::totalCheckins]");
+    return m_totalCheckins;
 }
 
 
@@ -177,21 +173,6 @@ void FoursquareUser::setId(const QString &id)
 }
 
 
-void FoursquareUser::setLastCheckin(FoursquareUser::Venue* lastCheckin)
-{
-    qDebug("[FoursquareUser::setLastCheckin]");
-
-    if (m_lastCheckin != 0) {
-        Venue *toDel = m_lastCheckin;
-        delete toDel;
-    }
-
-    m_lastCheckin = lastCheckin;
-
-    Q_EMIT userInfoChanged();
-}
-
-
 void FoursquareUser::setLastName(const QString &lastName)
 {
     qDebug("[FoursquareUser::setLastName]");
@@ -217,6 +198,14 @@ void FoursquareUser::setRelationship(const QString &relationship)
     m_relationship = relationship;
     Q_EMIT userInfoChanged();
 }
+
+
+void FoursquareUser::setTotalCheckins(quint16 totalCheckins)
+{
+    qDebug("[FoursquareUser::setTotalCheckins]");
+    m_totalCheckins = totalCheckins;
+}
+
 
 
 

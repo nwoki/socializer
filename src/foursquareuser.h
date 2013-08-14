@@ -49,6 +49,9 @@ public:
         QString state;
         QString country;
         QString cc;
+        QString canonicalUrl;
+        bool verified;
+        bool isMayor;
     };
 
     FoursquareUser(const QString &id, const QString &firstName, const QString &lastName
@@ -66,6 +69,7 @@ public:
     QString homecity() const;
     QString bio() const;
     QString photo() const;
+    quint16 totalCheckins() const;
 
     Contact *contact() const;
     Venue *lastCheckin() const;
@@ -78,8 +82,8 @@ public:
     void setRelationship(const QString &relationship);
     void setHomeCity(const QString &homecity);
     void setBio(const QString &bio);
-    void setLastCheckin(Venue *lastCheckin);
     void setPhoto(const QString &photo);
+    void setTotalCheckins(quint16 totalCheckins);
 
 Q_SIGNALS:
     void userInfoChanged();
@@ -93,6 +97,7 @@ private:
     QString m_photo;
     QString m_homecity;
     QString m_bio;
+    qint16  m_totalCheckins;
 
     Contact* m_contact;
     Venue *m_lastCheckin;

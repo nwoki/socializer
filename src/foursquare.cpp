@@ -11,16 +11,26 @@
 #include "foursquareuser.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+
 #include <QtDeclarative/QDeclarativeContext>
 #include <QtDeclarative/QDeclarativeView>
-
-#include <qjson/parser.h>
 
 #define AUTH_URL "https://foursquare.com/oauth2/authenticate?"
 #define ACCESS_TOKEN_URL "https://foursquare.com/oauth2/access_token?"
 #define API_URL "https://api.foursquare.com/v2/"
 
 using namespace Socializer;
+
+Foursquare::Foursquare(const QByteArray &authToken, QObject *parent)
+    : OAuth(authToken, parent)
+    , m_fqUser(new FoursquareUser(this))
+    , m_networkReply(Q_NULLPTR)
+{
+    // already got access token, populate
+    populateData();
+}
 
 
 Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
@@ -118,70 +128,80 @@ void Foursquare::onPopulateDataReplyReceived()
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     QByteArray rcv = reply->readAll();
-    qDebug() << "RCV: " << rcv;
 
     reply->deleteLater();
 
-
-    // populate user info
-    QJson::Parser parser;
-    bool ok;
-
-    QVariantMap jsonMap = parser.parse(rcv, &ok).toMap();
-
-    if (!ok) {
-        qDebug("[Foursquare::onPopulateDataReplyReceived] ERROR parsing json");
+    QJsonObject jsonObj = jsonObject(rcv);
+    if (jsonObj.isEmpty()) {
+        // error occurred
         return;
     }
 
-    QVariantMap responseMap = jsonMap["response"].toMap();
-    QVariantMap userMap = responseMap["user"].toMap();
+    // check response code is valid (meta)
+    if (jsonObj.value("meta").toObject().value("code").toVariant().toInt() != 200) {
+        // error
+        return;
+    }
 
-    m_fqUser->setId(userMap["id"].toString());
-    m_fqUser->setFirstName(userMap["firstName"].toString());
-    m_fqUser->setLastName(userMap["lastName"].toString());
-    m_fqUser->setGender(userMap["gender"].toString());
-    m_fqUser->setRelationship(userMap["relationship"].toString());
-    m_fqUser->setHomeCity(userMap["homeCity"].toString());
-    m_fqUser->setBio(userMap["bio"].toString());
+    // main response obj
+    QJsonObject responseObj = jsonObj.value("response").toObject();
 
-    QVariantMap photoMap = userMap["photo"].toMap();
-    QString photoStr = photoMap["prefix"].toString();
-    m_fqUser->setPhoto(photoStr.left(photoStr.size()-1) + photoMap["suffix"].toString());
+    // security check (should never be empty)
+    if (responseObj.isEmpty()) {
+        return;
+    }
 
-    // DEBUG
-    qDebug("[Foursquare::onPopulateDataReplyReceived] user info");
-    qDebug() << m_fqUser->id() << " : " << m_fqUser->firstName() << " : " << m_fqUser->homecity() << " : " << m_fqUser->photo();
+    // user info
+    QJsonObject userObj = responseObj.value("user").toObject();
+    m_fqUser->setId(userObj.value("id").toString());
+    m_fqUser->setFirstName(userObj.value("firstName").toString());
+    m_fqUser->setLastName(userObj.value("lastName").toString());
+    m_fqUser->setGender(userObj.value("gender").toString());
+    m_fqUser->setRelationship(userObj.value("relationship").toString());
+    m_fqUser->setHomeCity(userObj.value("homeCity").toString());
+    m_fqUser->setBio(userObj.value("bio").toString());
 
-    QVariantMap lastCheckinMap = userMap["checkins"].toMap();
-    QList<QVariant> checkinList = lastCheckinMap["items"].toList();
+    qDebug() << m_fqUser->id() << " - " << m_fqUser->lastName() << " - " << m_fqUser->homecity();
 
-    // extract last checkin
-    if (checkinList.size() != 0) {
-        FoursquareUser::Venue *checkin = new FoursquareUser::Venue;
+    // user photo
+    QJsonObject photoObj = userObj.value("photo").toObject();
+    m_fqUser->setPhoto(photoObj.value("prefix").toString() + photoObj.value("suffix").toString());
 
-        QVariantMap checkingObj = checkinList.at(0).toMap();
-        QVariantMap venueObj = checkingObj["venue"].toMap();
+    // contact
+    QJsonObject contactObj = userObj.value("contact").toObject();
+    m_fqUser->contact()->email = contactObj.value("email").toString();
+    m_fqUser->contact()->facebook = contactObj.value("facebook").toString();
+    m_fqUser->contact()->phone = contactObj.value("phone").toString();
+    m_fqUser->contact()->twitter = contactObj.value("twitter").toString();
 
-        checkin->id = venueObj["id"].toString();
-        checkin->name = venueObj["name"].toString();
+    // last checkin
+    QJsonObject checkinsObj = userObj.value("checkins").toObject();
 
-        QVariantMap locationMap = venueObj["location"].toMap();
+    m_fqUser->setTotalCheckins(checkinsObj.value("count").toVariant().toInt());
+    qDebug() << "Tptl checkins: " << m_fqUser->totalCheckins() << checkinsObj.value("count").toVariant().toInt();
 
-        checkin->address = locationMap["address"].toString();
-        checkin->latitude = locationMap["lat"].toDouble();
-        checkin->longitude = locationMap["lng"].toDouble();
-        checkin->postalCode = locationMap["postalCode"].toString();
-        checkin->city = locationMap["city"].toString();
-        checkin->state = locationMap["state"].toString();
-        checkin->country = locationMap["country"].toString();
-        checkin->cc = locationMap["cc"].toString();
+    QJsonArray checkinsArray = checkinsObj.value("items").toArray();
 
-        m_fqUser->setLastCheckin(checkin);
+    // use last checkin
+    if (checkinsArray.size() != 0) {
+        QJsonObject lastCheckinObj = checkinsArray.at(0).toObject();
+        QJsonObject lastCheckingVenueObj = lastCheckinObj.value("venue").toObject();
+        FoursquareUser::Venue *lastCheckin = m_fqUser->lastCheckin();
 
-        // DEBUG
-        qDebug("LAST CHECKIN IS: ");
-        qDebug() << checkin->id << " : " << checkin->name << " : " << checkin->country;
+        lastCheckin->id = lastCheckingVenueObj.value("id").toString();
+        lastCheckin->name = lastCheckingVenueObj.value("name").toString();
+        lastCheckin->canonicalUrl = lastCheckingVenueObj.value("canonicalUrl").toString();
+        lastCheckin->verified = lastCheckingVenueObj.value("verified").toBool();
+        lastCheckin->isMayor = lastCheckingVenueObj.value("isMayor").toBool();
+
+        // location info
+        QJsonObject locationObj = lastCheckingVenueObj.value("location").toObject();
+        lastCheckin->cc = locationObj.value("cc").toString();
+        lastCheckin->country = locationObj.value("country").toString();
+        lastCheckin->latitude = locationObj.value("lat").toVariant().toDouble();
+        lastCheckin->longitude = locationObj.value("lng").toVariant().toDouble();
+
+        qDebug() << "VENUE : " << lastCheckin->country << " - " << lastCheckin->name << " - " << lastCheckin->latitude;
     }
 
     Q_EMIT profileUpdated();
@@ -194,28 +214,28 @@ void Foursquare::parseAccessToken()
 {
     qDebug("[Foursquare::parseAccessToken]");
 
-    if (!m_networkReply) {
-        return;
-    }
-
-    QByteArray incoming = m_networkReply->readAll();
-
-    qDebug() << "[Foursquare::parseAccessToken] incoming: " << incoming;
-
-    QJson::Parser parser;
-    bool ok;
-
-    QVariantMap result = parser.parse(incoming, &ok).toMap();
-
-    if (!ok) {
-        qDebug() << "[Foursquare::parseAccessToken] ERROR: " << parser.errorString();
-        m_networkReply->deleteLater();
-        return;
-    }
-
-    setAuthToken(result["access_token"].toByteArray());
-
-    m_networkReply->deleteLater();
+//     if (!m_networkReply) {
+//         return;
+//     }
+//
+//     QByteArray incoming = m_networkReply->readAll();
+//
+//     qDebug() << "[Foursquare::parseAccessToken] incoming: " << incoming;
+//
+//     QJson::Parser parser;
+//     bool ok;
+//
+//     QVariantMap result = parser.parse(incoming, &ok).toMap();
+//
+//     if (!ok) {
+//         qDebug() << "[Foursquare::parseAccessToken] ERROR: " << parser.errorString();
+//         m_networkReply->deleteLater();
+//         return;
+//     }
+//
+//     setAuthToken(result["access_token"].toByteArray());
+//
+//     m_networkReply->deleteLater();
 }
 
 

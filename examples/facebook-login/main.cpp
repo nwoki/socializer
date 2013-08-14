@@ -49,13 +49,6 @@ int main(int argc, char *argv[])
 //     twitter->setContextProperty(view);
 //     view->setSource(QUrl("qm/*l*/components/TwitterQML.qml"));
 
-    // FOURSQUARE
-//     Socializer::Foursquare *fq = new Socializer::Foursquare("T53ZTLQSG1CVGKHYRA3OPEUVDGQ5ICFXMMHB01XNEESMSJQP"
-//                                                             , "http://www.ispirata.com"
-//                                                             , "QOMLRRLTNM3L0CRLNGMBM1MZTCUFNKUFIFOKAU2QZBS3RPPR");
-//     fq->setContextProperty(view);
-//     view->setSource(QUrl("qmlcomponents/FoursquareQML.qml"));
-
     // LINKEDIN
 //     Socializer::LinkedIn *link = new Socializer::LinkedIn("1fx5y8590q6r", "1tTwdCxMuiycme2R", "http://www.2s2h.com");
 // 

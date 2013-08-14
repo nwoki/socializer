@@ -415,12 +415,13 @@ void LinkedIn::emailInfoReceived()
 }
 
 
-void LinkedIn::setContextProperty(QDeclarativeView *view)
-{
-    qDebug("[LinkedIn::setContextProperty]");
-
-    view->rootContext()->setContextProperty("LinkedIn", this);
-}
+// DEPRECATED
+// void LinkedIn::setContextProperty(QDeclarativeView *view)
+// {
+//     qDebug("[LinkedIn::setContextProperty]");
+// 
+//     view->rootContext()->setContextProperty("LinkedIn", this);
+// }
 
 
 void LinkedIn::updateEmailInfo()

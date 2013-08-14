@@ -1,8 +1,8 @@
 set(socializer_SRCS
     facebook.cpp
-#     foursquare.cpp
+    foursquare.cpp
     foursquareuser.cpp
-#     linkedin.cpp
+    linkedin.cpp
     linkedinuser.cpp
     oauth.cpp
     twitter.cpp
