@@ -11,13 +11,12 @@
 #include "linkedinuser.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QJsonObject>
 
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeContext>
 
 #include <QtCore/QXmlStreamReader>
-
-#include <qjson/parser.h>
 
 #define AUTH_URL "https://www.linkedin.com/uas/oauth2/authorization?"
 #define ACCESS_TOKEN_URL "https://www.linkedin.com/uas/oauth2/accessToken?"
@@ -247,17 +246,15 @@ void LinkedIn::onAccessTokenReceived()
 
     netReply->deleteLater();
 
-    // extract auth token
-    QJson::Parser parser;
-    bool ok;
-    QVariantMap jsonMap = parser.parse(rcv, &ok).toMap();
+    QJsonObject jsonObj = jsonObject(rcv);
 
-    if (!ok) {
-        qDebug("[LinkedIn::onAccessTokenReceived] ERROR in parsing json");
+    if (jsonObj.isEmpty()) {
+        // error occured
         return;
     }
 
-    setAuthToken(jsonMap.value("access_token").toString().toUtf8());
+    // extract auth token
+    setAuthToken(jsonObj.value("access_token").toString().toLatin1());
 }
 
 
