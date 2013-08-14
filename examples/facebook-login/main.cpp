@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 //     view->setSource(QUrl("qmlcomponents/FacebookQML.qml"));
 
     // with auth token
-    Socializer::Facebook *fb = new Socializer::Facebook("CAACEdEose0cBAABBvZBh3ef0BoFZBx8fq1GXszEmMECSONcWkNbKBmt3t0gXY1g67x4Kk9hmhRiJzmPHYt0VkfyUKmkeY7rYR0sevt9nMH5LpMcHf92hhwPMu6OOMv1VjQF2ZC1VTllpIpZBeWG586mYyEdkHKEZD");
+    Socializer::Facebook *fb = new Socializer::Facebook("CAACEdEose0cBAIW5kPJCF2r2hWFTOKM91vGqCFzf2IMKg7nCC4zx6OPVQRZCoKqq8IUqkwsx1qlaOGm3TrCaZB1FxoAKCWZAdMgNgniuQslLKdxtZA9pmlSk61gv3tGcZBh2NJdZCAvw8Weh4FZA3yqZC4s6eRQAXAkZD");
     fb->enableScopeUserInfo(true);
 
     // TWITTER

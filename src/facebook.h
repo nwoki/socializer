@@ -61,6 +61,7 @@ public:
         QString link;
         QString relationshipStatus;
         QString about;
+        QString birthday;
     };
 
     struct Like {
