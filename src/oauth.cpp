@@ -416,6 +416,7 @@ void OAuth::requestAccessToken(const QByteArray &url, const QByteArray &authVeri
 void OAuth::setAuthToken(const QByteArray &authToken)
 {
     qDebug("[OAuth::setAuthToken]");
+    qDebug() << "[OAuth::setAuthToken] auth token set is: " << authToken;
 
     m_authToken = authToken;
     Q_EMIT authTokenChanged();

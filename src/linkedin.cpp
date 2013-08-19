@@ -22,24 +22,30 @@
 #define ACCESS_TOKEN_URL "https://www.linkedin.com/uas/oauth2/accessToken?"
 #define UPDATE_INFO_URL "https://api.linkedin.com/v1/people/~"
 
-using namespace Socializer;
+namespace Socializer {
 
 
-LinkedIn::LinkedIn(const QByteArray& authToken, QObject* parent)
+LinkedIn::LinkedIn(const QByteArray &authToken, QObject *parent)
     : OAuth(authToken, parent)
     , m_linkedinUser(new LinkedInUser(this))
 {
-    connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAccessTokenChanged()));
-
     populateData();
 }
 
 
-LinkedIn::LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject* parent)
+LinkedIn::LinkedIn(const QByteArray &authCode, const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject *parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
     , m_linkedinUser(new LinkedInUser(this))
 {
+    // scopes TODO set in constructor
+
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAccessTokenChanged()));
+
+    if (authCode.isEmpty()) {
+        obtainAuthPageUrl();
+    } else {
+        requestAuthToken(authCode);
+    }
 }
 
 
@@ -141,7 +147,7 @@ QString LinkedIn::createScope()
     qDebug("[LinkedIn::createScope]");
 
     QList<QString> scopeList;
-    QString scopeLine("&scope=");
+    QString scopeLine;
     bool isFirst = true;
 
     if (m_basicProfileScope && !m_fullProfileScope) {
@@ -165,7 +171,7 @@ QString LinkedIn::createScope()
 
     Q_FOREACH (const QString &scope, scopeList) {
         if (!isFirst) {
-            scopeLine.append(',');
+            scopeLine.append(' ');
         } else {
             isFirst = false;
         }
@@ -174,7 +180,7 @@ QString LinkedIn::createScope()
     }
 
     if (!isFirst) {
-        return scopeLine;
+        return "&scope=" + QUrl::toPercentEncoding(scopeLine);
     } else {
         return QString();
     }
@@ -224,6 +230,7 @@ void LinkedIn::obtainAuthPageUrl()
     urlStr.append("&redirect_uri=");
     urlStr.append(m_redirectUrl);
 
+    qDebug() << "[LinkedIn::obtainAuthPageUrl] " << urlStr;
     Q_EMIT authPageUrlReady(urlStr);
 }
 
@@ -258,28 +265,6 @@ void LinkedIn::onAccessTokenReceived()
 }
 
 
-void LinkedIn::parseNewUrl(const QString &url)
-{
-    // TODO check state matches as well
-    // YOUR_REDIRECT_URI/?code=AUTHORIZATION_CODE&state=STATE
-
-    qDebug("[LinkedIn::parseNewUrl]");
-    qDebug() << "url: " << url;
-
-    if (url.contains("code")) {
-        QRegExp regex("code=?[^&]+");
-
-        if (regex.indexIn(url) > -1) {
-            QString access = regex.cap(0);
-
-
-            // got the code, now i need to exchange it for an access token
-            requestAuthToken(access.split('=').at(1));
-        }
-    }
-}
-
-
 void LinkedIn::onAuthTokenChanged()
 {
     qDebug("[LinkedIn::onAuthTokenChanged]");
@@ -294,6 +279,9 @@ void LinkedIn::onNetReplyError(QNetworkReply::NetworkError error)
     qDebug("[LinkedIn::onNetReplyError]");
     // TODO
     Q_UNUSED(error);
+
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    reply->deleteLater();
 }
 
 
@@ -302,13 +290,7 @@ void LinkedIn::populateData()
     qDebug("[LinkedIn::populateData]");
 
     // for every scope, update use info
-    if (m_basicProfileScope || m_fullProfileScope) {
-        updateProfileInfo();
-    }
-
-    if (m_emailAddressScope) {
-        updateEmailInfo();
-    }
+    updateProfileInfo();
 }
 
 
@@ -326,6 +308,8 @@ void LinkedIn::requestAuthToken(const QString &code)
     reqUrl.append("&redirect_uri=" + redirectUrl());
     reqUrl.append("&client_id=" + m_appId);
     reqUrl.append("&client_secret=" + m_consumerSecret);
+
+    qDebug() << reqUrl;
 
     req.setUrl(reqUrl);
 
@@ -359,59 +343,71 @@ void LinkedIn::profileInfoReceived()
 
     qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
 
-    // check response
-    if (!isResponseValid(rcv)) {
-        return;
-    }
+//     // check response
+//     if (!isResponseValid(rcv)) {
+//         return;
+//     }
 
     // parse
     QXmlStreamReader xmlParser(rcv);
 
     while (!xmlParser.atEnd()) {
         if (xmlParser.readNextStartElement()) {
-            if (xmlParser.name() == "first-name") {
+            QString startTag = xmlParser.name().toString();
+            qDebug() << "start elem: " << startTag;
+
+            if (startTag == "id") {
+                m_linkedinUser->setProfileId(xmlParser.readElementText());
+            }
+
+            if (startTag == "first-name") {
                 m_linkedinUser->setFirstName(xmlParser.readElementText());
             }
 
-            if (xmlParser.name() == "last-name") {
+            if (startTag == "last-name") {
                 m_linkedinUser->setLastName(xmlParser.readElementText());
             }
 
-            if (xmlParser.name() == "headline") {
-                m_linkedinUser->setHeadLine(xmlParser.readElementText());
-            }
-        }
-    }
-
-    Q_EMIT profileUpdated();
-//     qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline();
-}
-
-
-void LinkedIn::emailInfoReceived()
-{
-    qDebug("[LinkedIn::emailInfoReceived]");
-
-    QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
-    QByteArray rcv = rep->readAll();
-
-    rep->deleteLater();
-
-    qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
-
-    // parse
-    QXmlStreamReader xmlParser(rcv);
-
-    while (!xmlParser.atEnd()) {
-        if (xmlParser.readNextStartElement()) {
-            if (xmlParser.name() == "email-address") {
+            if (startTag == "email-address") {
                 m_linkedinUser->setEmail(xmlParser.readElementText());
             }
+
+            if (startTag == "num-recommenders") {
+                m_linkedinUser->setNumberOfRecommenders(xmlParser.readElementText().toInt());
+            }
+
+            if (startTag == "num-connections") {
+                m_linkedinUser->setNumberOfConnections(xmlParser.readElementText().toInt());
+            }
+
+            if (startTag == "headline") {
+                m_linkedinUser->setHeadLine(xmlParser.readElementText());
+            }
+
+            if (startTag == "industry") {
+                m_linkedinUser->setIndustry(xmlParser.readElementText());
+            }
+
+            if (startTag == "picture-url") {
+                m_linkedinUser->setProfilePictureUrl(xmlParser.readElementText());
+            }
+
+            // languages
+            // TODO
+
+            // skills
+            // TODO
+
+            // recommendations
+            // TODO
+
+            // positions
+            // TODO
         }
     }
 
     Q_EMIT profileUpdated();
-//     qDebug() << "\n\n\nUSER EMAIL: " << m_linkedinUser->email();
+    qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->profileId() <<  m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline();
 }
 
 
@@ -424,26 +420,28 @@ void LinkedIn::emailInfoReceived()
 // }
 
 
-void LinkedIn::updateEmailInfo()
-{
-    qDebug("[LinkedIn::updateEmailInfo]");
-
-    QString reqUrl(UPDATE_INFO_URL);
-    reqUrl.append("/email-address?oauth2_access_token=" + authToken());
-
-    QNetworkRequest req(reqUrl);
-    QNetworkReply *netRep = m_networkAccessManager->get(req);
-
-    connect(netRep, SIGNAL(finished()), this, SLOT(emailInfoReceived()));
-    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
-}
-
-
 void LinkedIn::updateProfileInfo()
 {
     qDebug("[LinkedIn::updateProfileInfo]");
 
     QString reqUrl(UPDATE_INFO_URL);
+
+    // INFO STRING
+    QString infoStr(":(");
+
+    // personal data
+    infoStr += "id,first-name,last-name,email-address";
+
+    // full profile info
+    infoStr += ",associations,interests,languages,skills,certifications,educations,num-recommenders,recommendations-received";
+
+    // linkedin gen data
+    infoStr += ",num-connections,headline,location:(name,country:(code)),industry,summary,picture-url,public-profile-url,positions";
+
+    // close
+    infoStr += ")";
+
+    reqUrl.append(infoStr);
 
     reqUrl.append("?oauth2_access_token=" + authToken());
 
@@ -453,6 +451,8 @@ void LinkedIn::updateProfileInfo()
     connect(netRep, SIGNAL(finished()), this, SLOT(profileInfoReceived()));
     connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
 }
+
+}       // Socializer
 
 
 
