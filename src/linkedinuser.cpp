@@ -77,6 +77,12 @@ QString LinkedInUser::industry() const
 }
 
 
+QHash<QString, LinkedInUser::Language> LinkedInUser::languages() const
+{
+    return d->languages;
+}
+
+
 QString LinkedInUser::lastName() const
 {
     return d->lastName;
@@ -116,6 +122,12 @@ QString LinkedInUser::profileId() const
 QString LinkedInUser::profilePictureUrl() const
 {
     return d->profilePictureUrl;
+}
+
+
+void LinkedInUser::addLanguage(const QString &id, const LinkedInUser::Language &lang)
+{
+    d->languages.insert(id, lang);
 }
 
 

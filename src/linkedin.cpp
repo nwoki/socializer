@@ -12,11 +12,10 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QJsonObject>
+#include <QtCore/QXmlStreamReader>
 
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeContext>
-
-#include <QtCore/QXmlStreamReader>
 
 #define AUTH_URL "https://www.linkedin.com/uas/oauth2/authorization?"
 #define ACCESS_TOKEN_URL "https://www.linkedin.com/uas/oauth2/accessToken?"
@@ -343,10 +342,36 @@ void LinkedIn::profileInfoReceived()
 
     qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
 
-//     // check response
-//     if (!isResponseValid(rcv)) {
-//         return;
-//     }
+    auto parseLanguageXml = [this] (QXmlStreamReader &xmlStrReader) {
+        bool flag = true;
+        QString id;
+        QString langName;
+
+        xmlStrReader.readNextStartElement();
+
+        while (xmlStrReader.name() != "languages") {
+            if (xmlStrReader.isStartElement()) {
+                if (xmlStrReader.name() == "id") {
+                    id = xmlStrReader.readElementText();
+                } else if (xmlStrReader.name() == "name") {
+                    langName = xmlStrReader.readElementText();
+                }
+            } else {
+                if (xmlStrReader.name() == "language" && !flag) {
+                    flag = true;
+                    LinkedInUser::Language lang;
+                    lang.language = langName;
+
+                    // add to hash
+                    m_linkedinUser->addLanguage(id, lang);
+                } else if (xmlStrReader.name() == "language" && flag) {
+                    flag = false;
+                }
+            }
+
+            xmlStrReader.readNext();
+        }
+    };
 
     // parse
     QXmlStreamReader xmlParser(rcv);
@@ -393,7 +418,9 @@ void LinkedIn::profileInfoReceived()
             }
 
             // languages
-            // TODO
+            if (startTag == "languages") {
+                parseLanguageXml(xmlParser);
+            }
 
             // skills
             // TODO

@@ -77,6 +77,7 @@ public:
     QString firstName() const;
     QString headline() const;
     QString industry() const;
+    QHash<QString, Language> languages() const;
     QString lastName() const;
     QString location() const;
     QString locationCountryCode() const;
@@ -85,6 +86,7 @@ public:
     QString profileId() const;
     QString profilePictureUrl() const;
 
+    void addLanguage(const QString &id, const Language &lang);
     void setEmail(const QString &data);
     void setFirstName(const QString &data);
     void setHeadLine(const QString &data);
