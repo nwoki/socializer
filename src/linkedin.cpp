@@ -374,6 +374,59 @@ void LinkedIn::profileInfoReceived()
         }
     };
 
+    auto parseRecommendationsXml = [this] (QXmlStreamReader &xmlStrReader) {
+        QString id;
+        QString recommendationText;
+        QString recommendationType;
+        QString recommenderId;
+        QString recommenderFirstName;
+        QString recommenderLastName;
+
+        xmlStrReader.readNextStartElement();
+
+        while (!xmlStrReader.isEndDocument() && xmlStrReader.name() != "recommendations-received") {
+            if (xmlStrReader.isStartElement()) {
+                if (xmlStrReader.name() == "id") {
+                    id = xmlStrReader.readElementText();
+                } else if (xmlStrReader.name() == "recommendation-text") {
+                    recommendationText = xmlStrReader.readElementText();
+                } else if (xmlStrReader.name() == "recommendation-type") {
+                    // move to next tag
+                    xmlStrReader.readNextStartElement();
+                    recommendationType = xmlStrReader.readElementText();
+                } else if (xmlStrReader.name() == "recommender") {
+                    // store recommender info
+                    xmlStrReader.readNextStartElement();
+                    recommenderId = xmlStrReader.readElementText();
+                    xmlStrReader.readNextStartElement();
+                    recommenderFirstName = xmlStrReader.readElementText();
+                    xmlStrReader.readNextStartElement();
+                    recommenderLastName = xmlStrReader.readElementText();
+                }
+            } else if (xmlStrReader.name() == "recommendation" && xmlStrReader.isEndElement()) {
+                // add to has
+                LinkedInUser::Recommendation recommendation;
+                recommendation.text = recommendationText;
+                recommendation.type = recommendationType;
+                recommendation.recommender.id = recommenderId;
+                recommendation.recommender.firstName = recommenderFirstName;
+                recommendation.recommender.lastName = recommenderLastName;
+
+                m_linkedinUser->addRecommendation(id, recommendation);
+
+                // clear data
+                id.clear();
+                recommendationText.clear();
+                recommendationType.clear();
+                recommenderId.clear();
+                recommenderFirstName.clear();
+                recommenderLastName.clear();
+            }
+
+            xmlStrReader.readNext();
+        }
+    };
+
     auto parseSkillsXml = [this] (QXmlStreamReader &xmlStrReader) {
         bool flag = true;
         QString id;
@@ -459,9 +512,14 @@ void LinkedIn::profileInfoReceived()
             }
 
             // recommendations
-            // TODO
+            if (startTag == "recommendations-received") {
+                parseRecommendationsXml(xmlParser);
+            }
 
             // positions
+            // TODO
+
+            // education
             // TODO
         }
     }

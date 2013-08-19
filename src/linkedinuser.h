@@ -64,10 +64,16 @@ public:
         QString notes;
     };
 
+    struct Recommender {
+        QString id;
+        QString firstName;
+        QString lastName;
+    };
+
     struct Recommendation {
         QString type;
         QString text;
-        QString recommender;
+        Recommender recommender;
     };
 
     LinkedInUser(QObject *parent = 0);
@@ -85,9 +91,11 @@ public:
     quint16 numberOfRecommenders() const;
     QString profileId() const;
     QString profilePictureUrl() const;
+    QHash<QString, Recommendation> recommendations() const;
     QHash<QString, QString> skills() const;
 
     void addLanguage(const QString &id, const Language &lang);
+    void addRecommendation(const QString &id, const Recommendation &recommendation);
     void addSkill(const QString &id, const QString &skill);
     void setEmail(const QString &data);
     void setFirstName(const QString &data);

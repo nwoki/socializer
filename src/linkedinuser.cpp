@@ -125,6 +125,12 @@ QString LinkedInUser::profilePictureUrl() const
 }
 
 
+QHash<QString, LinkedInUser::Recommendation> LinkedInUser::recommendations() const
+{
+    return d->recommendations;
+}
+
+
 QHash<QString, QString> LinkedInUser::skills() const
 {
     return d->skills;
@@ -134,6 +140,12 @@ QHash<QString, QString> LinkedInUser::skills() const
 void LinkedInUser::addLanguage(const QString &id, const LinkedInUser::Language &lang)
 {
     d->languages.insert(id, lang);
+}
+
+
+void LinkedInUser::addRecommendation(const QString &id, const LinkedInUser::Recommendation &recommendation)
+{
+    d->recommendations.insert(id, recommendation);
 }
 
 
