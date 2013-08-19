@@ -342,6 +342,7 @@ void LinkedIn::profileInfoReceived()
 
     qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
 
+
     auto parseLanguageXml = [this] (QXmlStreamReader &xmlStrReader) {
         bool flag = true;
         QString id;
@@ -372,6 +373,36 @@ void LinkedIn::profileInfoReceived()
             xmlStrReader.readNext();
         }
     };
+
+    auto parseSkillsXml = [this] (QXmlStreamReader &xmlStrReader) {
+        bool flag = true;
+        QString id;
+        QString skill;
+
+        xmlStrReader.readNextStartElement();
+
+        while (xmlStrReader.name() != "skills") {
+            if (xmlStrReader.isStartElement()) {
+                if (xmlStrReader.name() == "id") {
+                    id = xmlStrReader.readElementText();
+                } else if (xmlStrReader.name() == "name") {
+                    skill = xmlStrReader.readElementText();
+                }
+            } else {
+                if (xmlStrReader.name() == "skill" && !flag) {
+                    flag = true;
+
+                    // add to hash
+                    m_linkedinUser->addSkill(id, skill);
+                } else if (xmlStrReader.name() == "skill" && flag) {
+                    flag = false;
+                }
+            }
+
+            xmlStrReader.readNext();
+        }
+    };
+
 
     // parse
     QXmlStreamReader xmlParser(rcv);
@@ -423,7 +454,9 @@ void LinkedIn::profileInfoReceived()
             }
 
             // skills
-            // TODO
+            if (startTag == "skills") {
+                parseSkillsXml(xmlParser);
+            }
 
             // recommendations
             // TODO
