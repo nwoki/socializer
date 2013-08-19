@@ -31,7 +31,7 @@ public:
     QString industry;
     QString profilePictureUrl;
 
-    QHash<QString, Position> currentPositions;        // id:Position
+    QHash<QString, Position> positions;                // id:Position
     QHash<QString, Language> languages;               // id:Language
     QHash<QString, QString> skills;                   // id:name
     QHash<QString, Certification> certifications;     // id:certification
@@ -113,6 +113,12 @@ quint16 LinkedInUser::numberOfRecommenders() const
 }
 
 
+QHash< QString, LinkedInUser::Position > LinkedInUser::positions() const
+{
+    return d->positions;
+}
+
+
 QString LinkedInUser::profileId() const
 {
     return d->profileId;
@@ -140,6 +146,12 @@ QHash<QString, QString> LinkedInUser::skills() const
 void LinkedInUser::addLanguage(const QString &id, const LinkedInUser::Language &lang)
 {
     d->languages.insert(id, lang);
+}
+
+
+void LinkedInUser::addPosition(const QString &id, const LinkedInUser::Position &position)
+{
+    d->positions.insert(id, position);
 }
 
 

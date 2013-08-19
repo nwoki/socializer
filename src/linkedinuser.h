@@ -31,7 +31,7 @@ public:
         QString id;
         QString name;
         QString type;
-        quint16 size;
+        QString size;
         QString industry;
         QString ticker;
     };
@@ -89,12 +89,14 @@ public:
     QString locationCountryCode() const;
     quint16 numberOfConnections() const;
     quint16 numberOfRecommenders() const;
+    QHash<QString, Position> positions() const;
     QString profileId() const;
     QString profilePictureUrl() const;
     QHash<QString, Recommendation> recommendations() const;
     QHash<QString, QString> skills() const;
 
     void addLanguage(const QString &id, const Language &lang);
+    void addPosition(const QString &id, const Position &position);
     void addRecommendation(const QString &id, const Recommendation &recommendation);
     void addSkill(const QString &id, const QString &skill);
     void setEmail(const QString &data);

@@ -12,6 +12,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QJsonObject>
+#include <qabstractitemmodel.h>
 
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeContext>
@@ -353,6 +354,91 @@ void LinkedIn::parseLanguageXml(QXmlStreamReader &xmlStrReader)
 }
 
 
+void LinkedIn::parsePositionsXml(QXmlStreamReader &xmlStrReader)
+{
+    qDebug("[LinkedIn::parsePositionsXml]");
+
+    xmlStrReader.readNextStartElement();
+
+    QString id;
+    QString title;
+    QDate startDate;
+    QDate endDate;
+    bool isCurrent = false;
+    QString summary;
+
+    QString companyId;
+    QString companyName;
+    QString companySize;
+    QString companyType;
+    QString companyIndustry;
+
+    // TODO start/end date
+
+    while (xmlStrReader.name() != "positions") {
+        if (xmlStrReader.isStartElement()) {
+            if (xmlStrReader.name() == "id") {
+                id = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "title") {
+                title = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "is-current") {
+                isCurrent = xmlStrReader.readElementText() == "true" ? true : false;
+                qDebug() << "is current: " << isCurrent;
+            } else if (xmlStrReader.name() == "summary") {
+                summary = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "company") {
+                // save company data
+                xmlStrReader.readNextStartElement();    // move to id
+                companyId = xmlStrReader.readElementText();
+                xmlStrReader.readNextStartElement();
+                companyName = xmlStrReader.readElementText();
+                xmlStrReader.readNextStartElement();
+                companySize = xmlStrReader.readElementText();
+                xmlStrReader.readNextStartElement();
+                companyType = xmlStrReader.readElementText();
+                xmlStrReader.readNextStartElement();
+                companyIndustry = xmlStrReader.readElementText();
+            }
+        } else if (xmlStrReader.name() == "position") {
+            // add position
+            qDebug() << "adding pos with id: " << id << " and company name: " << companyName;
+
+            LinkedInUser::Position position;
+            position.isCurrent = isCurrent;
+            position.startDate = startDate;
+            position.endDate = endDate;
+            position.summary = summary;
+            position.title = title;
+
+            // company
+            position.company.id = companyId;
+            position.company.industry = companyIndustry;
+            position.company.name = companyName;
+            position.company.size = companySize;
+            position.company.type = companyType;
+
+            m_linkedinUser->addPosition(id, position);
+
+            // clear data
+            id.clear();
+            title.clear();
+            startDate;
+            endDate;
+            isCurrent = false;
+            summary.clear();
+
+            companyId.clear();
+            companyName.clear();
+            companySize.clear();
+            companyType.clear();
+            companyIndustry.clear();
+        }
+
+        xmlStrReader.readNext();
+    }
+}
+
+
 void LinkedIn::parseRecommendationsXml(QXmlStreamReader &xmlStrReader)
 {
     qDebug("[LinkedIn::parseRecommendationsXml]");
@@ -526,7 +612,9 @@ void LinkedIn::profileInfoReceived()
             }
 
             // positions
-            // TODO
+            if (startTag == "positions") {
+                parsePositionsXml(xmlParser);
+            }
 
             // education
             // TODO
