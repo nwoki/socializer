@@ -12,6 +12,8 @@
 
 #include "oauth.h"
 
+#include <QtCore/QXmlStreamReader>
+
 class QDeclarativeView;
 
 namespace Socializer
@@ -97,6 +99,11 @@ private:
 
     // user update calls
     void updateProfileInfo();
+
+    // parsers
+    void parseLanguageXml(QXmlStreamReader &xmlStrReader);
+    void parseRecommendationsXml(QXmlStreamReader &xmlStrReader);
+    void parseSkillsXml(QXmlStreamReader &xmlStrReader);
 
     /** checks to see if the response doesn't contain errors */
     bool isResponseValid(const QByteArray &msg);

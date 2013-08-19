@@ -12,7 +12,6 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QJsonObject>
-#include <QtCore/QXmlStreamReader>
 
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeContext>
@@ -319,6 +318,131 @@ void LinkedIn::requestAuthToken(const QString &code)
 }
 
 
+void LinkedIn::parseLanguageXml(QXmlStreamReader &xmlStrReader)
+{
+    qDebug("[LinkedIn::parseLanguageXml]");
+
+    bool flag = true;
+    QString id;
+    QString langName;
+
+    xmlStrReader.readNextStartElement();
+
+    while (xmlStrReader.name() != "languages") {
+        if (xmlStrReader.isStartElement()) {
+            if (xmlStrReader.name() == "id") {
+                id = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "name") {
+                langName = xmlStrReader.readElementText();
+            }
+        } else {
+            if (xmlStrReader.name() == "language" && !flag) {
+                flag = true;
+                LinkedInUser::Language lang;
+                lang.language = langName;
+
+                // add to hash
+                m_linkedinUser->addLanguage(id, lang);
+            } else if (xmlStrReader.name() == "language" && flag) {
+                flag = false;
+            }
+        }
+
+        xmlStrReader.readNext();
+    }
+}
+
+
+void LinkedIn::parseRecommendationsXml(QXmlStreamReader &xmlStrReader)
+{
+    qDebug("[LinkedIn::parseRecommendationsXml]");
+
+    QString id;
+    QString recommendationText;
+    QString recommendationType;
+    QString recommenderId;
+    QString recommenderFirstName;
+    QString recommenderLastName;
+
+    xmlStrReader.readNextStartElement();
+
+    while (!xmlStrReader.isEndDocument() && xmlStrReader.name() != "recommendations-received") {
+        if (xmlStrReader.isStartElement()) {
+            if (xmlStrReader.name() == "id") {
+                id = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "recommendation-text") {
+                recommendationText = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "recommendation-type") {
+                // move to next tag
+                xmlStrReader.readNextStartElement();
+                recommendationType = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "recommender") {
+                // store recommender info
+                xmlStrReader.readNextStartElement();
+                recommenderId = xmlStrReader.readElementText();
+                xmlStrReader.readNextStartElement();
+                recommenderFirstName = xmlStrReader.readElementText();
+                xmlStrReader.readNextStartElement();
+                recommenderLastName = xmlStrReader.readElementText();
+            }
+        } else if (xmlStrReader.name() == "recommendation" && xmlStrReader.isEndElement()) {
+            // add to has
+            LinkedInUser::Recommendation recommendation;
+            recommendation.text = recommendationText;
+            recommendation.type = recommendationType;
+            recommendation.recommender.id = recommenderId;
+            recommendation.recommender.firstName = recommenderFirstName;
+            recommendation.recommender.lastName = recommenderLastName;
+
+            m_linkedinUser->addRecommendation(id, recommendation);
+
+            // clear data
+            id.clear();
+            recommendationText.clear();
+            recommendationType.clear();
+            recommenderId.clear();
+            recommenderFirstName.clear();
+            recommenderLastName.clear();
+        }
+
+        xmlStrReader.readNext();
+    }
+}
+
+
+void LinkedIn::parseSkillsXml(QXmlStreamReader &xmlStrReader)
+{
+    qDebug("[LinkedIn::parseSkillsXml]");
+
+    bool flag = true;
+    QString id;
+    QString skill;
+
+    xmlStrReader.readNextStartElement();
+
+    while (xmlStrReader.name() != "skills") {
+        if (xmlStrReader.isStartElement()) {
+            if (xmlStrReader.name() == "id") {
+                id = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "name") {
+                skill = xmlStrReader.readElementText();
+            }
+        } else {
+            if (xmlStrReader.name() == "skill" && !flag) {
+                flag = true;
+
+                // add to hash
+                m_linkedinUser->addSkill(id, skill);
+            } else if (xmlStrReader.name() == "skill" && flag) {
+                flag = false;
+            }
+        }
+
+        xmlStrReader.readNext();
+    }
+}
+
+
 void LinkedIn::prepareAuthPageUrl()
 {
     // once i have the access token, return the authentication url
@@ -341,121 +465,6 @@ void LinkedIn::profileInfoReceived()
     rep->deleteLater();
 
     qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
-
-
-    auto parseLanguageXml = [this] (QXmlStreamReader &xmlStrReader) {
-        bool flag = true;
-        QString id;
-        QString langName;
-
-        xmlStrReader.readNextStartElement();
-
-        while (xmlStrReader.name() != "languages") {
-            if (xmlStrReader.isStartElement()) {
-                if (xmlStrReader.name() == "id") {
-                    id = xmlStrReader.readElementText();
-                } else if (xmlStrReader.name() == "name") {
-                    langName = xmlStrReader.readElementText();
-                }
-            } else {
-                if (xmlStrReader.name() == "language" && !flag) {
-                    flag = true;
-                    LinkedInUser::Language lang;
-                    lang.language = langName;
-
-                    // add to hash
-                    m_linkedinUser->addLanguage(id, lang);
-                } else if (xmlStrReader.name() == "language" && flag) {
-                    flag = false;
-                }
-            }
-
-            xmlStrReader.readNext();
-        }
-    };
-
-    auto parseRecommendationsXml = [this] (QXmlStreamReader &xmlStrReader) {
-        QString id;
-        QString recommendationText;
-        QString recommendationType;
-        QString recommenderId;
-        QString recommenderFirstName;
-        QString recommenderLastName;
-
-        xmlStrReader.readNextStartElement();
-
-        while (!xmlStrReader.isEndDocument() && xmlStrReader.name() != "recommendations-received") {
-            if (xmlStrReader.isStartElement()) {
-                if (xmlStrReader.name() == "id") {
-                    id = xmlStrReader.readElementText();
-                } else if (xmlStrReader.name() == "recommendation-text") {
-                    recommendationText = xmlStrReader.readElementText();
-                } else if (xmlStrReader.name() == "recommendation-type") {
-                    // move to next tag
-                    xmlStrReader.readNextStartElement();
-                    recommendationType = xmlStrReader.readElementText();
-                } else if (xmlStrReader.name() == "recommender") {
-                    // store recommender info
-                    xmlStrReader.readNextStartElement();
-                    recommenderId = xmlStrReader.readElementText();
-                    xmlStrReader.readNextStartElement();
-                    recommenderFirstName = xmlStrReader.readElementText();
-                    xmlStrReader.readNextStartElement();
-                    recommenderLastName = xmlStrReader.readElementText();
-                }
-            } else if (xmlStrReader.name() == "recommendation" && xmlStrReader.isEndElement()) {
-                // add to has
-                LinkedInUser::Recommendation recommendation;
-                recommendation.text = recommendationText;
-                recommendation.type = recommendationType;
-                recommendation.recommender.id = recommenderId;
-                recommendation.recommender.firstName = recommenderFirstName;
-                recommendation.recommender.lastName = recommenderLastName;
-
-                m_linkedinUser->addRecommendation(id, recommendation);
-
-                // clear data
-                id.clear();
-                recommendationText.clear();
-                recommendationType.clear();
-                recommenderId.clear();
-                recommenderFirstName.clear();
-                recommenderLastName.clear();
-            }
-
-            xmlStrReader.readNext();
-        }
-    };
-
-    auto parseSkillsXml = [this] (QXmlStreamReader &xmlStrReader) {
-        bool flag = true;
-        QString id;
-        QString skill;
-
-        xmlStrReader.readNextStartElement();
-
-        while (xmlStrReader.name() != "skills") {
-            if (xmlStrReader.isStartElement()) {
-                if (xmlStrReader.name() == "id") {
-                    id = xmlStrReader.readElementText();
-                } else if (xmlStrReader.name() == "name") {
-                    skill = xmlStrReader.readElementText();
-                }
-            } else {
-                if (xmlStrReader.name() == "skill" && !flag) {
-                    flag = true;
-
-                    // add to hash
-                    m_linkedinUser->addSkill(id, skill);
-                } else if (xmlStrReader.name() == "skill" && flag) {
-                    flag = false;
-                }
-            }
-
-            xmlStrReader.readNext();
-        }
-    };
-
 
     // parse
     QXmlStreamReader xmlParser(rcv);
