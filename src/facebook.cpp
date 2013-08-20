@@ -460,12 +460,7 @@ void Facebook::populateData()
 
     // connect
     connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
-
-#ifdef USING_QT5
     connect(netRep, SIGNAL(finished()), this, SLOT(onPopulateDataReplyReceived()));
-#else
-    connect(netRep, SIGNAL(finished()), this, SLOT(onPopulateDataReplyReceivedQt4()));
-#endif
 }
 
 
