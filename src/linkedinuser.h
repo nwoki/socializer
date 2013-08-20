@@ -40,8 +40,8 @@ public:
         // the key of the hash is the id
         QString title;
         QString summary;
-        QDate startDate;
-        QDate endDate;
+        QString startDate;
+        QString endDate;
         bool isCurrent;
         Company company;
     };

@@ -429,8 +429,8 @@ void LinkedIn::parsePositionsXml(QXmlStreamReader &xmlStrReader)
 
     QString id;
     QString title;
-    QDate startDate;
-    QDate endDate;
+    QString startDate;
+    QString endDate;
     bool isCurrent = false;
     QString summary;
 
@@ -439,6 +439,9 @@ void LinkedIn::parsePositionsXml(QXmlStreamReader &xmlStrReader)
     QString companySize;
     QString companyType;
     QString companyIndustry;
+
+    bool inStartDate = false;
+    bool inEndDate = false;
 
     // TODO start/end date
 
@@ -450,9 +453,12 @@ void LinkedIn::parsePositionsXml(QXmlStreamReader &xmlStrReader)
                 title = xmlStrReader.readElementText();
             } else if (xmlStrReader.name() == "is-current") {
                 isCurrent = xmlStrReader.readElementText() == "true" ? true : false;
-                qDebug() << "is current: " << isCurrent;
             } else if (xmlStrReader.name() == "summary") {
                 summary = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "start-date") {
+                inStartDate = true;
+            } else if (xmlStrReader.name() == "end-date") {
+                inEndDate = true;
             } else if (xmlStrReader.name() == "company") {
                 // save company data
                 xmlStrReader.readNextStartElement();    // move to id
@@ -465,40 +471,63 @@ void LinkedIn::parsePositionsXml(QXmlStreamReader &xmlStrReader)
                 companyType = xmlStrReader.readElementText();
                 xmlStrReader.readNextStartElement();
                 companyIndustry = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "year") {
+                if (inStartDate) {
+                    startDate += xmlStrReader.readElementText();
+                } else if (inEndDate) {
+                    endDate += xmlStrReader.readElementText();
+                }
+            } else if (xmlStrReader.name() == "month") {
+                if (inStartDate) {
+                    startDate.prepend(xmlStrReader.readElementText() + "-");
+                } else if (inEndDate) {
+                    endDate.prepend(xmlStrReader.readElementText() + "-");
+                }
+            } else if (xmlStrReader.name() == "day") {
+                if (inStartDate) {
+                    startDate.prepend(xmlStrReader.readElementText() + "-");
+                } else if (inEndDate) {
+                    endDate.prepend(xmlStrReader.readElementText() + "-");
+                }
             }
-        } else if (xmlStrReader.name() == "position") {
-            // add position
-            qDebug() << "adding pos with id: " << id << " and company name: " << companyName;
+        } else {
+            if (xmlStrReader.name() == "position") {
+                // add position
 
-            LinkedInUser::Position position;
-            position.isCurrent = isCurrent;
-            position.startDate = startDate;
-            position.endDate = endDate;
-            position.summary = summary;
-            position.title = title;
+                LinkedInUser::Position position;
+                position.isCurrent = isCurrent;
+                position.startDate = startDate;
+                position.endDate = endDate;
+                position.summary = summary;
+                position.title = title;
 
-            // company
-            position.company.id = companyId;
-            position.company.industry = companyIndustry;
-            position.company.name = companyName;
-            position.company.size = companySize;
-            position.company.type = companyType;
+                // company
+                position.company.id = companyId;
+                position.company.industry = companyIndustry;
+                position.company.name = companyName;
+                position.company.size = companySize;
+                position.company.type = companyType;
 
-            m_linkedinUser->addPosition(id, position);
+                m_linkedinUser->addPosition(id, position);
 
-            // clear data
-            id.clear();
-            title.clear();
-            startDate;
-            endDate;
-            isCurrent = false;
-            summary.clear();
+                // clear data
+                id.clear();
+                title.clear();
+                startDate.clear();
+                endDate.clear();
+                isCurrent = false;
+                summary.clear();
 
-            companyId.clear();
-            companyName.clear();
-            companySize.clear();
-            companyType.clear();
-            companyIndustry.clear();
+                companyId.clear();
+                companyName.clear();
+                companySize.clear();
+                companyType.clear();
+                companyIndustry.clear();
+            } else if (xmlStrReader.name() == "start-date") {
+                inStartDate = false;
+            } else if (xmlStrReader.name() == "end-date") {
+                inEndDate = false;
+            }
         }
 
         xmlStrReader.readNext();
