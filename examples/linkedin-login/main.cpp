@@ -7,7 +7,7 @@
  * Author Francesco Nwokeka <francesco.nwokeka@ispirata.com>
  */
 
-#include "../include/LinkedIn"
+#include "../../include/LinkedIn"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>

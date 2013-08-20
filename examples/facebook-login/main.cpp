@@ -7,10 +7,7 @@
  * Author Francesco Nwokeka <francesco@ispirata.com>
  */
 
-#include "../include/Foursquare"
-#include "../include/Facebook"
-#include "../include/Twitter"
-#include "../include/LinkedIn"
+#include "../../include/Facebook"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>

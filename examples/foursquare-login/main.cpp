@@ -7,7 +7,7 @@
  * Author Francesco Nwokeka <francesco.nwokeka@ispirata.com>
  */
 
-#include "../include/Foursquare"
+#include "../../include/Foursquare"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
