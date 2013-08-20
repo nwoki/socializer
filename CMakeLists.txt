@@ -15,7 +15,7 @@ include(EnableSlocCount)
 include(GenerateCppcheck)
 
 option(ENABLE_SOCIALIZER_EXAMPLES "Enable compilation of examples" ON)
-option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" ON)
+option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" OFF)
 option(ENABLE_SOCIALIZER_COVERAGE "Enable compiler coverage" OFF)
 
 # C++11
