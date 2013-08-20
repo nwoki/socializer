@@ -53,6 +53,12 @@ LinkedInUser::~LinkedInUser()
 }
 
 
+QHash<QString, LinkedInUser::Education> LinkedInUser::educaitons() const
+{
+    return d->education;
+}
+
+
 QString LinkedInUser::email() const
 {
     return d->email;
@@ -140,6 +146,12 @@ QHash<QString, LinkedInUser::Recommendation> LinkedInUser::recommendations() con
 QHash<QString, QString> LinkedInUser::skills() const
 {
     return d->skills;
+}
+
+
+void LinkedInUser::addEducation(const QString &id, const LinkedInUser::Education &education)
+{
+    d->education.insert(id, education);
 }
 
 

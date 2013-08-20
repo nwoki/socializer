@@ -57,8 +57,8 @@ public:
     struct Education {
         QString schoolName;
         QString fieldOfStudy;
-        QDate startDate;
-        QDate endDate;
+        QString startDate;
+        QString endDate;
         QString degree;
         QString activities;
         QString notes;
@@ -79,6 +79,7 @@ public:
     LinkedInUser(QObject *parent = 0);
     ~LinkedInUser();
 
+    QHash<QString, Education> educaitons() const;
     QString email() const;
     QString firstName() const;
     QString headline() const;
@@ -95,6 +96,7 @@ public:
     QHash<QString, Recommendation> recommendations() const;
     QHash<QString, QString> skills() const;
 
+    void addEducation(const QString &id, const Education &education);
     void addLanguage(const QString &id, const Language &lang);
     void addPosition(const QString &id, const Position &position);
     void addRecommendation(const QString &id, const Recommendation &recommendation);

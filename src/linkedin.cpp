@@ -319,6 +319,73 @@ void LinkedIn::requestAuthToken(const QString &code)
 }
 
 
+void LinkedIn::parseEducationXml(QXmlStreamReader &xmlStrReader)
+{
+    qDebug("[LinkedIn::parseEducationXml]");
+
+    xmlStrReader.readNextStartElement();
+
+    QString id;
+    QString schoolName;
+    QString notes;
+    QString activities;
+    QString degree;
+    QString fieldOfStudy;
+    QString startDate;
+    QString endDate;
+
+    while (xmlStrReader.name() != "educations") {
+        if (xmlStrReader.isStartElement()) {
+            if (xmlStrReader.name() == "id") {
+                id = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "school-name") {
+                schoolName = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "notes") {
+                notes = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "activities") {
+                activities = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "degree") {
+                degree = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "field-of-study") {
+                fieldOfStudy = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "start-date") {
+                // move to next tag
+                xmlStrReader.readNextStartElement();
+                startDate = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "end-date") {
+                // move to next tag
+                xmlStrReader.readNextStartElement();
+                endDate = xmlStrReader.readElementText();
+            }
+        } else if (xmlStrReader.name() == "education") {
+            // add to hash
+            LinkedInUser::Education education;
+            education.activities = activities;
+            education.degree = degree;
+            education.endDate = endDate;
+            education.fieldOfStudy = fieldOfStudy;
+            education.notes = notes;
+            education.schoolName = schoolName;
+            education.startDate = startDate;
+
+            m_linkedinUser->addEducation(id, education);
+
+            // clear
+            id.clear();
+            schoolName.clear();
+            notes.clear();
+            activities.clear();
+            degree.clear();
+            fieldOfStudy.clear();
+            startDate.clear();
+            endDate.clear();
+        }
+
+        xmlStrReader.readNext();
+    }
+}
+
+
 void LinkedIn::parseLanguageXml(QXmlStreamReader &xmlStrReader)
 {
     qDebug("[LinkedIn::parseLanguageXml]");
@@ -617,7 +684,9 @@ void LinkedIn::profileInfoReceived()
             }
 
             // education
-            // TODO
+            if (startTag == "educations") {
+                parseEducationXml(xmlParser);
+            }
         }
     }
 
