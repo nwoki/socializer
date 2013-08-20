@@ -31,11 +31,7 @@ using namespace Socializer;
 Foursquare::Foursquare(const QByteArray &authToken, QObject *parent)
     : OAuth(authToken, parent)
     , m_fqUser(new FoursquareUser(this))
-#ifdef USING_QT5
-    , m_networkReply(Q_NULLPTR)
-#else
-    , m_networkReply(0)
-#endif
+    , m_networkReply(nullptr)
 {
     // already got access token, populate
     populateData();
@@ -45,11 +41,7 @@ Foursquare::Foursquare(const QByteArray &authToken, QObject *parent)
 Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
     : OAuth(appId, redirectUrl, QByteArray(), parent)
     , m_fqUser(new FoursquareUser(this))
-#ifdef USING_QT5
-    , m_networkReply(Q_NULLPTR)
-#else
-    , m_networkReply(0)
-#endif
+    , m_networkReply(nullptr)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -58,11 +50,7 @@ Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, Q
 Foursquare::Foursquare(const QByteArray& appId, const QByteArray& redirectUrl, const QByteArray& consumerSecret, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
     , m_fqUser(new FoursquareUser(this))
-#ifdef USING_QT5
-    , m_networkReply(Q_NULLPTR)
-#else
-    , m_networkReply(0)
-#endif
+    , m_networkReply(nullptr)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
