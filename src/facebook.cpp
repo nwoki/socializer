@@ -10,12 +10,9 @@
 #include "facebook.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QJsonArray>
 #include <QtCore/QRegExp>
 #include <QtCore/QStringList>
-#include <QtDeclarative/QDeclarativeView>
-#include <QtDeclarative/QDeclarativeContext>
-
-#include <qjson/parser.h>
 
 #define AUTH_URL "https://m.facebook.com/dialog/oauth?"
 #define GRAPH_URL "https://graph.facebook.com/me/"
@@ -226,161 +223,180 @@ void Facebook::onPopulateDataReplyReceived()
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     QByteArray rcv = reply->readAll();
 
-    qDebug() << "[Facebook::onPopulateDataReplyReceived] rcv: " << rcv;
+    reply->deleteLater();
 
-    // parse incoming json
-    QJson::Parser parser;
-    bool ok;
+    // extract json object from data received
+    QJsonObject jsonObj = jsonObject(rcv);
 
-    QVariantMap result = parser.parse(rcv, &ok).toMap();
-
-    if (!ok) {
-        qDebug("[Facebook::onPopulateDataReplyReceived] ERROR: invalid json");
+    if (jsonObj.isEmpty()) {
+        // error occured
         return;
     }
 
     // populate user data
-    m_userInfo->birthday = result["birthday"].toDate();
-    m_userInfo->email = result["email"].toString();
-    m_userInfo->firstName = result["first_name"].toString();
-    m_userInfo->gender = result["gender"].toString();
-    m_userInfo->id = result["id"].toString();
-    m_userInfo->lastName = result["last_name"].toString();
-    m_userInfo->link = result["link"].toString();
-    m_userInfo->name = result["name"].toString();
-    m_userInfo->relationshipStatus = result["relationship_status"].toString();
-    m_userInfo->username = result["username"].toString();
-    m_userInfo->verified = result["verified"].toString();
-    m_userInfo->bio = result["bio"].toString();
-    m_userInfo->locale = result["locale"].toString();
+    m_userInfo->birthday = QDate::fromString(jsonObj.value("birthday").toString(), "MM/dd/yyyy");
+    m_userInfo->email = jsonObj.value("email").toString();
+    m_userInfo->firstName = jsonObj.value("first_name").toString();
+    m_userInfo->gender = jsonObj.value("gender").toString();
+    m_userInfo->id = jsonObj.value("id").toString();
+    m_userInfo->lastName = jsonObj.value("last_name").toString();
+    m_userInfo->link = jsonObj.value("link").toString();
+    m_userInfo->name = jsonObj.value("name").toString();
+    m_userInfo->relationshipStatus = jsonObj.value("relationship_status").toString();
+    m_userInfo->username = jsonObj.value("username").toString();
+    m_userInfo->verified = jsonObj.value("verified").toString();
+    m_userInfo->bio = jsonObj.value("bio").toString();
+    m_userInfo->locale = jsonObj.value("locale").toString();
+
+//     qDebug() << m_userInfo->id << m_userInfo->email << m_userInfo->birthday.toString() << m_userInfo->birthday << m_userInfo->locale;
+
 
     // hometown
-    QVariantMap hometownMap = result["hometown"].toMap();
-    m_userInfo->hometown.id = hometownMap["id"].toString();
-    m_userInfo->hometown.name = hometownMap["name"].toString();
-
-//     qDebug() << "HOME TOWN: " << m_userInfo->hometown.name;
+    qDebug() << jsonObj.value("hometown");
+    QJsonObject hometownObj = jsonObj.value("hometown").toObject();
+    if (!hometownObj.isEmpty()) {
+        m_userInfo->hometown.id = hometownObj.value("id").toString();
+        m_userInfo->hometown.name = hometownObj.value("name").toString();
+        qDebug() << "HOME TOWN: " << m_userInfo->hometown.name << m_userInfo->hometown.id;
+    }
 
     // location
-    QVariantMap locationMap = result["location"].toMap();
-    m_userInfo->location.id = locationMap["id"].toString();
-    m_userInfo->location.name = locationMap["name"].toString();
-
-//     qDebug() << "LOCATION NAME: " << m_userInfo->location.name << locationMap;
+    qDebug() << jsonObj.value("location");
+    QJsonObject locationObj = jsonObj.value("location").toObject();
+    if (!locationObj.isEmpty()) {
+        m_userInfo->location.id = locationObj.value("id").toString();
+        m_userInfo->location.name = locationObj.value("name").toString();
+        qDebug() << "LOCATION: " << m_userInfo->location.name << m_userInfo->location.id;
+    }
 
     // status (for now, just the last one)
-    QVariantMap statusesMap = result["statuses"].toMap();
-    QList<QVariant> statusesList = statusesMap["data"].toList();
-
-    if (statusesList.count() >= 1) {
-        // set the last status
-        QVariantMap status = statusesList.at(0).toMap();
-        m_userInfo->status = status["message"].toString();
+    QJsonObject  statusesObj = jsonObj.value("statuses").toObject();
+    if (!statusesObj.isEmpty()) {
+        QJsonArray statusArray = statusesObj.value("data").toArray();
+        m_userInfo->status = statusArray[0].toObject().value("message").toString();
     }
 
-    // extract picture
-    QVariantMap pictureMap = result["picture"].toMap();
-    QVariantMap pictureDataMap = pictureMap["data"].toMap();
-
-    m_userInfo->picture = pictureDataMap["url"].toString();
-
-//     qDebug() << "INFO: " << m_userInfo.firstName << " : " << m_userInfo.id << " : " << m_userInfo.email << " : " << m_userInfo.picture;
-    // populate LIKES data
-    QVariantMap likesMap = result["likes"].toMap();
-
-    Q_FOREACH (const QVariant &likeData, likesMap["data"].toList()) {
-        QVariantMap likeDataMap = likeData.toMap();
-        Like *newLike = new Like;
-
-        newLike->category = likeDataMap["category"].toString();
-        newLike->createdTime = likeDataMap["created_time"].toString();
-        newLike->id = likeDataMap["id"].toString();
-        newLike->name = likeDataMap["name"].toString();
-
-        // add to hash
-        m_likes.insert(newLike->id, newLike);
-
-//         qDebug() << "new like: " << newLike->id << ":" << newLike->name << ":" << newLike->category;
+    // user avatar
+    QJsonObject pictureObj = jsonObj.value("picture").toObject();
+    if (!pictureObj.isEmpty()) {
+        QJsonObject pictureDataObj = pictureObj.value("data").toObject();
+        m_userInfo->picture = pictureDataObj.value("url").toString();
     }
 
 
-    // populate FRIENDS data
-    QVariantMap friendsMap = result["friends"].toMap();
+    // user likes
+    QJsonObject likesObj = jsonObj.value("likes").toObject();
+    if (!likesObj.isEmpty()) {
+        QJsonArray likesArray = likesObj.value("data").toArray();
 
-    Q_FOREACH (const QVariant &friendData, friendsMap["data"].toList()) {
-        QVariantMap friendDataMap = friendData.toMap();
-        Friend *newFriend = new Friend;
+        for (int i = 0; i < likesArray.size(); ++i) {
+            QJsonObject likeDetail = likesArray.at(i).toObject();
 
-        newFriend->id = friendDataMap["id"].toString();
-        newFriend->firstName = friendDataMap["first_name"].toString();
-        newFriend->lastName = friendDataMap["last_name"].toString();
-        newFriend->name = friendDataMap["name"].toString();
-        newFriend->gender = friendDataMap["gender"].toString();
-        newFriend->locale = friendDataMap["locale"].toString();
-        newFriend->username = friendDataMap["username"].toString();
+            Like *like = new Like;
 
-        QVariantMap friendPictureMap = friendDataMap["picture"].toMap();
-        QVariantMap friendPictureDataMap = friendPictureMap["data"].toMap();
+            like->category = likeDetail.value("category").toString();
+            like->createdTime = likeDetail.value("created_time").toString();
+            like->id = likeDetail.value("id").toString();
+            like->name = likeDetail.value("name").toString();
 
-        newFriend->picture = friendPictureDataMap["url"].toString();
-
-        // add to hash
-        m_friends.insert(newFriend->id, newFriend);
-
-//         qDebug() << "new friend: " << newFriend->id << ":" << newFriend->name << ":" << newFriend->picture;
+            // add to hash
+            m_likes.insert(like->id, like);
+            qDebug() << "NEW LIKE: " << like->id << " - " << like->category << " - " << like->name;
+        }
     }
 
 
-    // populate WORK data
-    QList<QVariant> workList = result["work"].toList();
+    // friends
+    QJsonObject friendsObj = jsonObj.value("friends").toObject();
+    if (!friendsObj.isEmpty()) {
+        QJsonArray friendsArray = friendsObj.value("data").toArray();
 
-    Q_FOREACH (const QVariant &workData, workList) {
-        QVariantMap workDataMap = workData.toMap();
-        Work *newWork = new Work;
+        for (int i = 0; i < friendsArray.size(); ++i) {
+            QJsonObject friendDetail = friendsArray.at(i).toObject();
 
-        QVariantMap employerMap = workDataMap["employer"].toMap();
-        QVariantMap locationMap = workDataMap["location"].toMap();
-        QVariantMap positionMap = workDataMap["position"].toMap();
+            Friend *myFriend = new Friend;
 
-        newWork->employer.id = employerMap["id"].toString();
-        newWork->employer.name = employerMap["name"].toString();
-        newWork->location.id = locationMap["id"].toString();
-        newWork->location.name = locationMap["name"].toString();
-        newWork->position.id = positionMap["id"].toString();
-        newWork->position.name = positionMap["name"].toString();
-        newWork->description = workDataMap["description"].toString();
-        newWork->startDate = workDataMap["start_date"].toDate();
-        newWork->endDate = workDataMap["end_date"].toDate();
+            myFriend->about = friendDetail.value("about").toString();
+            myFriend->birthday = friendDetail.value("birthday").toString();
+            myFriend->firstName = friendDetail.value("first_name").toString();
+            myFriend->gender = friendDetail.value("gender").toString();
+            myFriend->id = friendDetail.value("id").toString();
+            myFriend->lastName = friendDetail.value("last_name").toString();
+            myFriend->link = friendDetail.value("").toString();
+            myFriend->locale = friendDetail.value("locale").toString();
+            myFriend->name = friendDetail.value("name").toString();
+            myFriend->picture = friendDetail.value("").toString();
+            myFriend->relationshipStatus = friendDetail.value("relationship_status").toString();
+            myFriend->username = friendDetail.value("username").toString();
 
-        m_work.append(newWork);
+            // picture
+            QJsonObject friendPictureObj = friendDetail.value("picture").toObject();
+            if (!friendPictureObj.isEmpty()) {
+                QJsonObject pictureDataObj = friendPictureObj.value("data").toObject();
+                myFriend->picture = friendPictureObj.value("url").toString();
+            }
 
-        qDebug() << "new work: " << newWork->description << " " << newWork->employer.name;
+            // TODO education/work
+
+            m_friends.insert(myFriend->id, myFriend);
+            qDebug() << "new friend: " << myFriend->picture << " - " << myFriend->firstName << " - " << myFriend->lastName << " - " << myFriend->id;
+        }
     }
 
 
-    // populate EDUCATION
-    QList<QVariant> educationList = result["education"].toList();
+    // work
+    QJsonArray workArray = jsonObj.value("work").toArray();
 
-    Q_FOREACH (const QVariant &educationData, educationList) {
-        QVariantMap educationMap = educationData.toMap();
-        Education *newEducation = new Education;
+    for (int i = 0; i < workArray.size(); ++i) {
+        Work *work = new Work;
+        QJsonObject workObj = workArray.at(i).toObject();
 
-        QVariantMap schoolMap = educationMap["school"].toMap();
-        newEducation->school.id = schoolMap["id"].toString();
-        newEducation->school.name = schoolMap["name"].toString();
+        work->description = workObj.value("description").toString();
+        work->endDate = QDate::fromString(workObj.value("end_date").toString(), "yyyy-MM-dd");
+        work->startDate = QDate::fromString(workObj.value("start_date").toString(), "yyyy-MM-dd");
 
-        newEducation->type = educationMap["type"].toString();
+        // employer
+        QJsonObject workEmployer = workObj.value("employer").toObject();
+        if (!workEmployer.isEmpty()) {
+            work->employer.id = workEmployer.value("id").toString();
+            work->employer.name = workEmployer.value("name").toString();
+        }
 
-        m_education.append(newEducation);
+        // location
+        QJsonObject workLocation = workObj.value("location").toObject();
+        if (!workLocation.isEmpty()) {
+            work->location.id = workLocation.value("id").toString();
+            work->location.name = workLocation.value("name").toString();
+        }
 
-        qDebug() << "EDUCATION: " << newEducation->type << " " << newEducation->school.name;
+        // position
+        QJsonObject workPosition = workObj.value("position").toObject();
+        if (!workPosition.isEmpty()) {
+            work->position.id = workPosition.value("id").toString();
+            work->position.name = workPosition.value("name").toString();
+        }
+
+        m_work.append(work);
+        qDebug() << "WORK - " << work->employer.name << " - " << work->description << " - " << work->startDate.toString();
     }
 
 
-    reply->deleteLater();
+    // education
+    QJsonArray educationArray = jsonObj.value("education").toArray();
 
-    // tell that the profile data has been updated
-    Q_EMIT profileUpdated();
+    for (int i = 0; i < educationArray.size(); ++i) {
+        Education *education = new Education;
+
+        QJsonObject educationObj = educationArray.at(i).toObject();
+        education->type = educationObj.value("type").toString();
+
+        QJsonObject educationSchool = educationObj.value("school").toObject();
+        education->school.id = educationSchool.value("id").toString();;
+        education->school.name = educationSchool.value("name").toString();
+
+        m_education.append(education);
+        qDebug() << "EDUCATION: " << education->type << " - " << education->school.id << " - " << education->school.name;
+    }
 }
 
 

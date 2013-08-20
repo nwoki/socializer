@@ -34,6 +34,7 @@ class Foursquare : public OAuth
 
 public:
     /// TODO should redirectUrl be a needed param?
+    Foursquare(const QByteArray &authToken, QObject *parent = 0);
     Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
     Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret, QObject *parent = 0);
     ~Foursquare();
@@ -56,7 +57,9 @@ private Q_SLOTS:
     void onAuthTokenChanged();
     void onNetReplyError(QNetworkReply::NetworkError error);
     void onPopulateDataReplyReceived();
-    void parseAccessToken();
+
+    // DEPRECATED don't actually need this anymore as the declarative part has been deprecated
+    void parseAccessToken() {};
 
 Q_SIGNALS:
     void profileUpdated();      /** emitted when profile data has been populated */
@@ -66,7 +69,7 @@ private:
     void populateData();                /** retreives user info from the social network */
 
     FoursquareUser *m_fqUser;           /** the account of the user authed with fq */
-    QWeakPointer<QNetworkReply> m_networkReply;
+    QNetworkReply *m_networkReply;
 };
 
 };

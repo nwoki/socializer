@@ -12,11 +12,14 @@
 
 #include "oauth.h"
 
+#include <QtCore/QXmlStreamReader>
+
 class QDeclarativeView;
-class LinkedInUser;
 
 namespace Socializer
 {
+
+class LinkedInUser;
 
 /**
  * LinkedIn interface
@@ -33,7 +36,7 @@ class LinkedIn : public OAuth
 
 public:
     /**
-     * Creates the Facebook class already with an auth token. Useful for when using Socializer
+     * Creates the Linkedin class already with an auth token. Useful for when using Socializer
      * with a web interface delegating the authentication to a web page.
      *
      * @param authToken auth token for the facebook account
@@ -41,15 +44,15 @@ public:
     LinkedIn(const QByteArray &authToken, QObject *parent = 0);
 
     /**
-     * Creates the Facebook class ready to obtain the auth token. To use this method you must first set
-     * the required permissions and then call "LinkedIn::obtainAuthPageUrl"
+     * Creates the Linkedin class with the auth code, and obtains the auth token by itself
      *
-     * @param authToken auth token for the facebook account
+     * @param authCode auth code to request the auth token with
      */
-    LinkedIn(const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject *parent = 0);
+    LinkedIn(const QByteArray &authCode, const QByteArray &appId, const QByteArray &consumerSecret, const QByteArray &redirectUrl, QObject *parent = 0);
+
     ~LinkedIn();
 
-    LinkedInUser *userInfo() const;
+    Socializer::LinkedInUser *userInfo() const;
 
     bool basicProfileScope() const;
     bool fullProfileScope() const;
@@ -63,15 +66,19 @@ public:
     void setNetworkScope(bool enable);
     void setContactInfoScope(bool enable);
 
+    // used only for dev to get auth code
     Q_INVOKABLE void obtainAuthPageUrl();
-    Q_INVOKABLE void parseNewUrl(const QString &url);
 
-    /**
-     * Use this to set the correct context property in order to use the
-     * Socializer::Facebook object with the included FacebookQML component
-     * @param view pointer to the Declarative view used in the application
-     */
-    void setContextProperty(QDeclarativeView *view);
+    // DEPRECATED 
+    Q_INVOKABLE void parseNewUrl(const QString &url) {};
+
+    // DEPRECATED
+//     /**
+//      * Use this to set the correct context property in order to use the
+//      * Socializer::Facebook object with the included FacebookQML component
+//      * @param view pointer to the Declarative view used in the application
+//      */
+//     void setContextProperty(QDeclarativeView *view);
 
 Q_SIGNALS:
     void profileUpdated();              /** emitted when new profile data has been parsed */
@@ -82,9 +89,7 @@ private Q_SLOTS:
     void onAccessTokenReceived();       /** parses json to extract access token */
     void onNetReplyError(QNetworkReply::NetworkError error);
 
-    // profile info updates
     void profileInfoReceived();
-    void emailInfoReceived();
 
 private:
     void onAuthTokenChanged();
@@ -94,7 +99,13 @@ private:
 
     // user update calls
     void updateProfileInfo();
-    void updateEmailInfo();
+
+    // parsers
+    void parseEducationXml(QXmlStreamReader &xmlStrReader);
+    void parseLanguageXml(QXmlStreamReader &xmlStrReader);
+    void parsePositionsXml(QXmlStreamReader &xmlStrReader);
+    void parseRecommendationsXml(QXmlStreamReader &xmlStrReader);
+    void parseSkillsXml(QXmlStreamReader &xmlStrReader);
 
     /** checks to see if the response doesn't contain errors */
     bool isResponseValid(const QByteArray &msg);
@@ -105,7 +116,7 @@ private:
     bool m_networkScope;                // Your 1st and 2nd degree connections
     bool m_contactInfoScope;            // Address, phone number, and bound accounts
 
-    LinkedInUser *m_linkedinUser;
+    Socializer::LinkedInUser *m_linkedinUser;
 };
 
 };
