@@ -12,6 +12,7 @@
 #define LINKEDINUSER_H
 
 #include <QtCore/QDate>
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 
 namespace Socializer {

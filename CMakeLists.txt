@@ -2,13 +2,25 @@ project(socializer)
 
 cmake_minimum_required(VERSION 2.8.9)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/common-modules/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
+option(QT5_BUILD "Enable compilation with Qt5" FALSE)
 
-find_package(Qt5 COMPONENTS Core Network REQUIRED)
-find_package(CommonModules 3 REQUIRED)
+# Qt version
+if (QT5_BUILD)
+    message("--- Building for Qt5 ---")
+    find_package(Qt5 COMPONENTS Core Network REQUIRED)
+    add_definitions(-DUSING_QT5)
+else ()
+    message("--- Building for Qt4 ---")
+    find_package(Qt4 REQUIRED QtCore QtNetwork QtXml)
+    include(${QT_USE_FILE})
+    add_definitions(${QT_DEFINITIONS})
+endif(QT5_BUILD)
+
+find_package(CommonModules 4 REQUIRED)
 
 set(CMAKE_AUTOMOC TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/common-modules/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
 include(EnableCoverageReport)
 include(EnableSlocCount)

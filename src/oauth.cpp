@@ -17,8 +17,13 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
+
+#ifdef USING_QT5
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonParseError>
+#else
+
+#endif
 
 #include <QtNetwork/QNetworkRequest>
 
@@ -32,7 +37,11 @@ OAuth::OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByte
     , m_consumerSecret(consumerSecret)
     , m_redirectUrl(redirectUrl)
     , m_networkAccessManager(new QNetworkAccessManager(this))
+#ifdef USING_QT5
     , m_networkReply(Q_NULLPTR)
+#else
+    , m_networkReply(0)
+#endif
 {
 }
 
@@ -44,7 +53,11 @@ OAuth::OAuth(const QByteArray& authToken, QObject *parent)
     , m_consumerSecret(QByteArray())
     , m_redirectUrl(QByteArray())
     , m_networkAccessManager(new QNetworkAccessManager(this))
+#ifdef USING_QT5
     , m_networkReply(Q_NULLPTR)
+#else
+    , m_networkReply(0)
+#endif
 {
 }
 
@@ -52,14 +65,8 @@ OAuth::OAuth(const QByteArray& authToken, QObject *parent)
 OAuth::~OAuth()
 {
 }
-//
-//
-// QByteArray OAuth::appId() const
-// {
-//     return m_appId;
-// }
-//
-//
+
+
 QByteArray OAuth::authToken() const
 {
     return m_authToken;
@@ -196,6 +203,7 @@ QByteArray OAuth::hmacsha1Encode(const QByteArray &baseStr, QByteArray key)
 }
 
 
+#ifdef USING_QT5
 QJsonObject OAuth::jsonObject(const QByteArray &jsonData)
 {
     qDebug("[OAuth::jsonObject]");
@@ -215,6 +223,7 @@ QJsonObject OAuth::jsonObject(const QByteArray &jsonData)
     // extract json object
     return jsonParser.object();
 }
+#endif
 
 
 QByteArray OAuth::timeStamp()

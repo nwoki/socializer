@@ -56,7 +56,12 @@ public:
 private Q_SLOTS:
     void onAuthTokenChanged();
     void onNetReplyError(QNetworkReply::NetworkError error);
+
+#ifdef USING_QT5
     void onPopulateDataReplyReceived();
+#else
+    void onPopulateDataReplyReceivedQt4();
+#endif
 
     // DEPRECATED don't actually need this anymore as the declarative part has been deprecated
     void parseAccessToken() {};
