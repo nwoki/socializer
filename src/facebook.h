@@ -163,13 +163,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void onAuthTokenChanged();
-
-#ifdef USING_QT5
     void onPopulateDataReplyReceived();
-#else
-    void onPopulateDataReplyReceivedQt4();
-#endif
-
     void onNetReplyError(QNetworkReply::NetworkError error);
 
 private:
