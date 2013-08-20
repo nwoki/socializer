@@ -270,8 +270,17 @@ void LinkedIn::onAccessTokenReceived()
     setAuthToken(jsonObj.value("access_token").toString().toLatin1());
 #else
     QJson::Parser parser;
+    bool ok;
 
-    
+    QVariantMap jsonMap = parser.parse(rcv, &ok).toMap();
+
+    if (!ok) {
+        // error occored
+        return;
+    }
+
+    // extract auth token
+    setAuthToken(jsonMap.value("access_token").toString().toLatin1());
 #endif
 }
 

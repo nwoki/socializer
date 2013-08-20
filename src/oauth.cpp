@@ -416,12 +416,6 @@ void OAuth::requestAccessToken(const QByteArray &url, const QByteArray &authVeri
 }
 
 
-// void OAuth::setAppId(const QByteArray &appId)
-// {
-//     m_appId = appId;
-// }
-
-
 void OAuth::setAuthToken(const QByteArray &authToken)
 {
     qDebug("[OAuth::setAuthToken]");
@@ -430,13 +424,3 @@ void OAuth::setAuthToken(const QByteArray &authToken)
     m_authToken = authToken;
     Q_EMIT authTokenChanged();
 }
-
-
-// void OAuth::setRedirectUrl(const QByteArray &redirectUrl)
-// {
-//     m_redirectUrl = redirectUrl;
-// }
-//
-//
-//
-//

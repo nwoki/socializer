@@ -111,10 +111,7 @@ public:
      */
     void requestAccessToken(const QByteArray &url ,const QByteArray &authVerifier);
 
-
-//     void setAppId(const QByteArray &appId);
     void setAuthToken(const QByteArray &authToken);
-//     void setRedirectUrl(const QByteArray &redirectUrl);
 
 Q_SIGNALS:
     void authPageUrlReady(const QString &authPageUrl);
