@@ -27,4 +27,3 @@ mkdir build
 cd build
 cmake .. -DQt5_DIR=/opt/Qt5.1.0/5.1.0/gcc_64/lib/cmake/Qt5 -DCommonModules_DIR=$MAIN_DIR/deps/install/lib/cmake/CommonModules || return 1
 make -j3 || return 1
-make check || return 1
