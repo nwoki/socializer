@@ -59,7 +59,7 @@ private Q_SLOTS:
     void onPopulateDataReplyReceived();
 
     // DEPRECATED don't actually need this anymore as the declarative part has been deprecated
-    void parseAccessToken();
+    void parseAccessToken() {};
 
 Q_SIGNALS:
     void profileUpdated();      /** emitted when profile data has been populated */

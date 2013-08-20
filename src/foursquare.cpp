@@ -210,10 +210,10 @@ void Foursquare::onPopulateDataReplyReceived()
 }
 
 
-void Foursquare::parseAccessToken()
-{
-    qDebug("[Foursquare::parseAccessToken]");
-
+// void Foursquare::parseAccessToken()
+// {
+//     qDebug("[Foursquare::parseAccessToken]");
+// 
 //     if (!m_networkReply) {
 //         return;
 //     }
@@ -236,7 +236,7 @@ void Foursquare::parseAccessToken()
 //     setAuthToken(result["access_token"].toByteArray());
 //
 //     m_networkReply->deleteLater();
-}
+// }
 
 
 void Foursquare::parseNewUrl(const QString& url)
