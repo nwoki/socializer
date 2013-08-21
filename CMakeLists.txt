@@ -46,6 +46,22 @@ else (CMAKE_COMPILER_IS_GNUCXX)
    add_definitions("-std=c++0x")
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
+
+# build type
+if (NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Build type not specified. Defaulting to DEBUG")
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL Release)
+    message(STATUS "Building RELEASE version")
+    set(CMAKE_CSS_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
+    add_definitions(-DQT_NO_DEBUG_OUTPUT)
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
+    message(STATUS "Building DEBUG version")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+endif()
+
+
 # sources
 add_subdirectory(src)
 

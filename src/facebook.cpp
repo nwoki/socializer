@@ -230,8 +230,6 @@ void Facebook::onPopulateDataReplyReceived()
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     QByteArray rcv = reply->readAll();
 
-//     qDebug() << rcv;
-
     reply->deleteLater();
 
 #ifdef USING_QT5
@@ -268,7 +266,7 @@ void Facebook::onPopulateDataReplyReceived()
     m_userInfo->bio = jsonObj.value("bio").toString();
     m_userInfo->locale = jsonObj.value("locale").toString();
 
-//     qDebug() << m_userInfo->id << m_userInfo->email << m_userInfo->birthday.toString() << m_userInfo->birthday << m_userInfo->locale;
+    qDebug() << m_userInfo->id << m_userInfo->email << m_userInfo->birthday.toString() << m_userInfo->birthday << m_userInfo->locale;
 
 
     // hometown
@@ -281,7 +279,7 @@ void Facebook::onPopulateDataReplyReceived()
     if (!hometownObj.isEmpty()) {
         m_userInfo->hometown.id = hometownObj.value("id").toString();
         m_userInfo->hometown.name = hometownObj.value("name").toString();
-//         qDebug() << "HOME TOWN: " << m_userInfo->hometown.name << m_userInfo->hometown.id;
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] HOME TOWN: " << m_userInfo->hometown.name << m_userInfo->hometown.id;
     }
 
     // location
@@ -294,7 +292,7 @@ void Facebook::onPopulateDataReplyReceived()
     if (!locationObj.isEmpty()) {
         m_userInfo->location.id = locationObj.value("id").toString();
         m_userInfo->location.name = locationObj.value("name").toString();
-//         qDebug() << "LOCATION: " << m_userInfo->location.name << m_userInfo->location.id;
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] LOCATION: " << m_userInfo->location.name << m_userInfo->location.id;
     }
 
     // status (for now, just the last one)
@@ -311,9 +309,10 @@ void Facebook::onPopulateDataReplyReceived()
     if (!statusesObj.isEmpty()) {
         QList<QVariant> statusArray = statusesObj.value("data").toList();
         m_userInfo->status = statusArray[0].toMap().value("message").toString();
-//         qDebug() << "user status: " << m_userInfo->status;
     }
 #endif
+
+    qDebug() << "[Facebook::onPopulateDataReplyReceived] user status: " << m_userInfo->status;
 
     // user avatar
 #ifdef USING_QT5
@@ -329,10 +328,10 @@ void Facebook::onPopulateDataReplyReceived()
     if (!pictureObj.isEmpty()) {
         QVariantMap pictureDataObj = pictureObj.value("data").toMap();
         m_userInfo->picture = pictureDataObj.value("url").toString();
-
-//         qDebug() << "Picture: " << m_userInfo->picture;
     }
 #endif
+
+    qDebug() << "[Facebook::onPopulateDataReplyReceived] Picture: " << m_userInfo->picture;
 
 
     // user likes
@@ -361,7 +360,7 @@ void Facebook::onPopulateDataReplyReceived()
 
             // add to hash
             m_likes.insert(like->id, like);
-//             qDebug() << "NEW LIKE: " << like->id << " - " << like->category << " - " << like->name;
+            qDebug() << "[Facebook::onPopulateDataReplyReceived] NEW LIKE: " << like->id << " - " << like->category << " - " << like->name;
         }
     }
 
@@ -413,7 +412,7 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
             m_friends.insert(myFriend->id, myFriend);
-//             qDebug() << "new friend: " << myFriend->picture << " - " << myFriend->firstName << " - " << myFriend->lastName << " - " << myFriend->id;
+            qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend: " << myFriend->picture << " - " << myFriend->firstName << " - " << myFriend->lastName << " - " << myFriend->id;
         }
     }
 
@@ -471,7 +470,7 @@ void Facebook::onPopulateDataReplyReceived()
         }
 
         m_work.append(work);
-//         qDebug() << "WORK - " << work->employer.name << " - " << work->description << " - " << work->startDate.toString();
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] WORK - " << work->employer.name << " - " << work->description << " - " << work->startDate.toString();
     }
 
 
@@ -501,7 +500,7 @@ void Facebook::onPopulateDataReplyReceived()
         education->school.name = educationSchool.value("name").toString();
 
         m_education.append(education);
-//         qDebug() << "EDUCATION: " << education->type << " - " << education->school.id << " - " << education->school.name;
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] EDUCATION: " << education->type << " - " << education->school.id << " - " << education->school.name;
     }
 }
 
