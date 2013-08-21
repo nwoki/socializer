@@ -3,7 +3,7 @@ export MAIN_DIR=$(pwd)
 
 # Cleanup previous builds
 rm -rf deps
-rm -rf build
+rm -rf build*
 
 # Dependencies
 mkdir deps
