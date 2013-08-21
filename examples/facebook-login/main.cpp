@@ -16,8 +16,11 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
-    Socializer::Facebook *fb = new Socializer::Facebook("CAACEdEose0cBAIW5kPJCF2r2hWFTOKM91vGqCFzf2IMKg7nCC4zx6OPVQRZCoKqq8IUqkwsx1qlaOGm3TrCaZB1FxoAKCWZAdMgNgniuQslLKdxtZA9pmlSk61gv3tGcZBh2NJdZCAvw8Weh4FZA3yqZC4s6eRQAXAkZD");
-    fb->enableScopeUserInfo(true);
+    if (argc == 2) {
+        Socializer::Facebook *fb = new Socializer::Facebook(argv[1]);
+    } else {
+        Socializer::Facebook *fb = new Socializer::Facebook("CAACEdEose0cBAIW5kPJCF2r2hWFTOKM91vGqCFzf2IMKg7nCC4zx6OPVQRZCoKqq8IUqkwsx1qlaOGm3TrCaZB1FxoAKCWZAdMgNgniuQslLKdxtZA9pmlSk61gv3tGcZBh2NJdZCAvw8Weh4FZA3yqZC4s6eRQAXAkZD");
+    }
 
     return app.exec();
 }
