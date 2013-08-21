@@ -2,13 +2,25 @@ project(socializer)
 
 cmake_minimum_required(VERSION 2.8.9)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/common-modules/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
+option(QT5_BUILD "Enable compilation with Qt5" FALSE)
 
-find_package(Qt5 COMPONENTS Core Network REQUIRED)
-find_package(CommonModules 3 REQUIRED)
+# Qt version
+if (QT5_BUILD)
+    message(STATUS "Building for Qt5")
+    find_package(Qt5 COMPONENTS Core Network REQUIRED)
+    add_definitions(-DUSING_QT5)
+else ()
+    message(STATUS "Building for Qt4")
+    find_package(Qt4 REQUIRED QtCore QtNetwork QtXml)
+    include(${QT_USE_FILE})
+    add_definitions(${QT_DEFINITIONS})
+endif(QT5_BUILD)
 
 set(CMAKE_AUTOMOC TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
+
+find_package(CommonModules 4 REQUIRED)
 
 include(EnableCoverageReport)
 include(EnableSlocCount)
@@ -33,6 +45,22 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 else (CMAKE_COMPILER_IS_GNUCXX)
    add_definitions("-std=c++0x")
 endif (CMAKE_COMPILER_IS_GNUCXX)
+
+
+# build type
+if (NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Build type not specified. Defaulting to DEBUG")
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL Release)
+    message(STATUS "Building RELEASE version")
+    set(CMAKE_CSS_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
+    add_definitions(-DQT_NO_DEBUG_OUTPUT)
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
+    message(STATUS "Building DEBUG version")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+endif()
+
 
 # sources
 add_subdirectory(src)

@@ -11,8 +11,8 @@ set(socializer_SRCS
 # final lib
 add_library(Socializer STATIC ${socializer_SRCS})
 
- # link lib with Qt libs
-target_link_libraries(Socializer)
-
-# qt5_use_modules(Socializer Core Gui Quick Qml Network Xml)
-qt5_use_modules(Socializer Core Network)
+if (QT5_BUILD)
+    qt5_use_modules(Socializer Core Network)
+else()
+    target_link_libraries(Socializer ${QT_LIBRARIES} qjson)
+endif(QT5_BUILD)

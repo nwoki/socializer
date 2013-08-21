@@ -11,7 +11,13 @@
 #include "linkedinuser.h"
 
 #include <QtCore/QDebug>
+
+#ifdef USING_QT5
 #include <QtCore/QJsonObject>
+#else
+#include <qjson/parser.h>
+#endif
+
 #include <qabstractitemmodel.h>
 
 #include <QtDeclarative/QDeclarativeView>
@@ -252,6 +258,7 @@ void LinkedIn::onAccessTokenReceived()
 
     netReply->deleteLater();
 
+#ifdef USING_QT5
     QJsonObject jsonObj = jsonObject(rcv);
 
     if (jsonObj.isEmpty()) {
@@ -261,6 +268,20 @@ void LinkedIn::onAccessTokenReceived()
 
     // extract auth token
     setAuthToken(jsonObj.value("access_token").toString().toLatin1());
+#else
+    QJson::Parser parser;
+    bool ok;
+
+    QVariantMap jsonMap = parser.parse(rcv, &ok).toMap();
+
+    if (!ok) {
+        // error occored
+        return;
+    }
+
+    // extract auth token
+    setAuthToken(jsonMap.value("access_token").toString().toLatin1());
+#endif
 }
 
 

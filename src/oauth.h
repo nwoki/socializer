@@ -11,7 +11,13 @@
 #define OAUTH_H
 
 #include <QtCore/QByteArray>
+
+#ifdef USING_QT5
 #include <QtCore/QJsonObject>
+#else
+
+#endif
+
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 
@@ -29,7 +35,6 @@ class OAuth : public QObject
 {
     Q_OBJECT
 
-//     Q_PROPERTY(QByteArray appId         READ appId          WRITE setAppId)
     Q_PROPERTY(QByteArray authToken     READ authToken      NOTIFY authTokenChanged)
     Q_PROPERTY(QByteArray redirectUrl   READ redirectUrl)
 
@@ -39,7 +44,6 @@ public:
     OAuth(const QByteArray &authToken, QObject *parent = 0);
     ~OAuth();
 
-//     QByteArray appId() const;
     QByteArray authToken() const;
 
     /**
@@ -107,10 +111,7 @@ public:
      */
     void requestAccessToken(const QByteArray &url ,const QByteArray &authVerifier);
 
-
-//     void setAppId(const QByteArray &appId);
     void setAuthToken(const QByteArray &authToken);
-//     void setRedirectUrl(const QByteArray &redirectUrl);
 
 Q_SIGNALS:
     void authPageUrlReady(const QString &authPageUrl);
@@ -135,8 +136,10 @@ protected:
     // network
     QNetworkAccessManager *m_networkAccessManager;
 
+#ifdef USING_QT5
     /** extracts a QJsonObject from given json data */
     QJsonObject jsonObject(const QByteArray &jsonData);
+#endif
 
 private:
     QNetworkReply *m_networkReply;

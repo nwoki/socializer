@@ -17,8 +17,13 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
+
+#ifdef USING_QT5
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonParseError>
+#else
+
+#endif
 
 #include <QtNetwork/QNetworkRequest>
 
@@ -32,7 +37,7 @@ OAuth::OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByte
     , m_consumerSecret(consumerSecret)
     , m_redirectUrl(redirectUrl)
     , m_networkAccessManager(new QNetworkAccessManager(this))
-    , m_networkReply(Q_NULLPTR)
+    , m_networkReply(nullptr)
 {
 }
 
@@ -44,7 +49,7 @@ OAuth::OAuth(const QByteArray& authToken, QObject *parent)
     , m_consumerSecret(QByteArray())
     , m_redirectUrl(QByteArray())
     , m_networkAccessManager(new QNetworkAccessManager(this))
-    , m_networkReply(Q_NULLPTR)
+    , m_networkReply(nullptr)
 {
 }
 
@@ -52,14 +57,8 @@ OAuth::OAuth(const QByteArray& authToken, QObject *parent)
 OAuth::~OAuth()
 {
 }
-//
-//
-// QByteArray OAuth::appId() const
-// {
-//     return m_appId;
-// }
-//
-//
+
+
 QByteArray OAuth::authToken() const
 {
     return m_authToken;
@@ -196,6 +195,7 @@ QByteArray OAuth::hmacsha1Encode(const QByteArray &baseStr, QByteArray key)
 }
 
 
+#ifdef USING_QT5
 QJsonObject OAuth::jsonObject(const QByteArray &jsonData)
 {
     qDebug("[OAuth::jsonObject]");
@@ -215,6 +215,7 @@ QJsonObject OAuth::jsonObject(const QByteArray &jsonData)
     // extract json object
     return jsonParser.object();
 }
+#endif
 
 
 QByteArray OAuth::timeStamp()
@@ -407,12 +408,6 @@ void OAuth::requestAccessToken(const QByteArray &url, const QByteArray &authVeri
 }
 
 
-// void OAuth::setAppId(const QByteArray &appId)
-// {
-//     m_appId = appId;
-// }
-
-
 void OAuth::setAuthToken(const QByteArray &authToken)
 {
     qDebug("[OAuth::setAuthToken]");
@@ -421,13 +416,3 @@ void OAuth::setAuthToken(const QByteArray &authToken)
     m_authToken = authToken;
     Q_EMIT authTokenChanged();
 }
-
-
-// void OAuth::setRedirectUrl(const QByteArray &redirectUrl)
-// {
-//     m_redirectUrl = redirectUrl;
-// }
-//
-//
-//
-//
