@@ -18,15 +18,6 @@ class FoursquareUser : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY (QString id              READ id                 NOTIFY userInfoChanged)
-    Q_PROPERTY (QString firstName       READ firstName          NOTIFY userInfoChanged)
-    Q_PROPERTY (QString lastName        READ lastName           NOTIFY userInfoChanged)
-    Q_PROPERTY (QString gender          READ gender             NOTIFY userInfoChanged)
-    Q_PROPERTY (QString relationship    READ relationship       NOTIFY userInfoChanged)
-    Q_PROPERTY (QString homecity        READ homecity           NOTIFY userInfoChanged)
-    Q_PROPERTY (QString bio             READ bio                NOTIFY userInfoChanged)
-//     Q_PROPERTY (Contact*contact         READ contact            NOTIFY userInfoChanged)
-
 public:
 
     struct Contact {
@@ -37,7 +28,6 @@ public:
     };
 
 
-    // TODO make this a class
     struct Venue {
         QString id;
         QString name;
@@ -71,10 +61,10 @@ public:
     QString photo() const;
     quint16 totalCheckins() const;
 
-    Contact *contact() const;
-    Venue *lastCheckin() const;
+    Contact &contact() const;
+    Venue &lastCheckin() const;
 
-    void addCheckin(Venue *checkin);
+    void addCheckin(const Venue &checkin);
     void setId(const QString &id);
     void setFirstName(const QString &firstName);
     void setLastName(const QString &lastName);
@@ -89,19 +79,8 @@ Q_SIGNALS:
     void userInfoChanged();
 
 private:
-    QString m_id;
-    QString m_firstName;
-    QString m_lastName;
-    QString m_gender;
-    QString m_relationship;
-    QString m_photo;
-    QString m_homecity;
-    QString m_bio;
-    qint16  m_totalCheckins;
-
-    Contact* m_contact;
-    Venue *m_lastCheckin;
-    QList<Venue*> m_checkins;
+    class Private;
+    Private * const d;
 };
 
 };
