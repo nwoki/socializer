@@ -7,7 +7,7 @@
  * Author Francesco Nwokeka <francesco.nwokeka@ispirata.com>
  */
 
-#include "../../include/Foursquare"
+#include <Foursquare>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
@@ -16,5 +16,6 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
     Socializer::Foursquare *fq  =new Socializer::Foursquare("0RLFOCFCQZE3PDXNBG4I3GK4O43OZKI3B4IWFAD3SFUQAEPR");
+    Q_UNUSED(fq)
     return app.exec();
 }
