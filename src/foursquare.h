@@ -41,7 +41,8 @@ public:
     /** returns url to access for authentication */
     Q_INVOKABLE void obtainAuthPageUrl();
 
-    Q_INVOKABLE void parseNewUrl(const QString &url);
+    // DEPRECATED
+    Q_INVOKABLE void parseNewUrl(const QString &url) {};
 
     /**
      * Use this to set the correct context property in order to use the
@@ -66,7 +67,6 @@ private:
     void populateData();                /** retreives user info from the social network */
 
     FoursquareUser *m_fqUser;           /** the account of the user authed with fq */
-    QNetworkReply *m_networkReply;
 };
 
 };

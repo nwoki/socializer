@@ -31,7 +31,6 @@ using namespace Socializer;
 Foursquare::Foursquare(const QByteArray &authToken, QObject *parent)
     : OAuth(authToken, parent)
     , m_fqUser(new FoursquareUser(this))
-    , m_networkReply(nullptr)
 {
     // already got access token, populate
     populateData();
@@ -41,7 +40,6 @@ Foursquare::Foursquare(const QByteArray &authToken, QObject *parent)
 Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent)
     : OAuth(appId, redirectUrl, QByteArray(), parent)
     , m_fqUser(new FoursquareUser(this))
-    , m_networkReply(nullptr)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -50,7 +48,6 @@ Foursquare::Foursquare(const QByteArray &appId, const QByteArray &redirectUrl, Q
 Foursquare::Foursquare(const QByteArray& appId, const QByteArray& redirectUrl, const QByteArray& consumerSecret, QObject* parent)
     : OAuth(appId, redirectUrl, consumerSecret, parent)
     , m_fqUser(new FoursquareUser(this))
-    , m_networkReply(nullptr)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -298,49 +295,49 @@ void Foursquare::onPopulateDataReplyReceived()
 // }
 
 
-void Foursquare::parseNewUrl(const QString& url)
-{
-    qDebug("[Foursquare::parseNewUrl]");
-    qDebug() << "[Foursquare::parseNewUrl] got url: " << url;
-
-    if (url.contains("access_token")) {
-        QRegExp regex("access_token=?[^&]+");
-
-        if (regex.indexIn(url) > -1) {
-            QString access = regex.cap(0);
-
-            // extract access token
-            setAuthToken(access.split("=").at(1).toUtf8());
-
-            qDebug() << "[Foursquare::parseNewUrl] Auth token is: " << m_authToken;
-        }
-    } else if (url.contains("?code=")) {
-        QStringList split = url.split("?code=");
-
-        if (split.size() == 2) {
-            // request access token via code
-            QString accessTokenFromCodeUrl(ACCESS_TOKEN_URL);
-            accessTokenFromCodeUrl += "client_id=" + m_appId;
-            accessTokenFromCodeUrl += "&client_secret=" + m_consumerSecret;
-            accessTokenFromCodeUrl += "&grant_type=authorization_code";
-            accessTokenFromCodeUrl += "&redirect_uri=" + m_redirectUrl;
-            accessTokenFromCodeUrl += "&code=" + split.at(1);
-
-            qDebug() << "[Foursquare::parseNewUrl] token request url: " << accessTokenFromCodeUrl;
-
-            QNetworkRequest req;
-            req.setUrl(accessTokenFromCodeUrl);
-
-            if (!m_networkReply) {
-                m_networkReply->deleteLater();
-            }
-
-            m_networkReply = m_networkAccessManager->get(req);
-
-            connect(m_networkReply, SIGNAL(finished()), this, SLOT(parseAccessToken()));
-        }
-    }
-}
+// void Foursquare::parseNewUrl(const QString& url)
+// {
+//     qDebug("[Foursquare::parseNewUrl]");
+//     qDebug() << "[Foursquare::parseNewUrl] got url: " << url;
+// 
+//     if (url.contains("access_token")) {
+//         QRegExp regex("access_token=?[^&]+");
+// 
+//         if (regex.indexIn(url) > -1) {
+//             QString access = regex.cap(0);
+// 
+//             // extract access token
+//             setAuthToken(access.split("=").at(1).toUtf8());
+// 
+//             qDebug() << "[Foursquare::parseNewUrl] Auth token is: " << m_authToken;
+//         }
+//     } else if (url.contains("?code=")) {
+//         QStringList split = url.split("?code=");
+// 
+//         if (split.size() == 2) {
+//             // request access token via code
+//             QString accessTokenFromCodeUrl(ACCESS_TOKEN_URL);
+//             accessTokenFromCodeUrl += "client_id=" + m_appId;
+//             accessTokenFromCodeUrl += "&client_secret=" + m_consumerSecret;
+//             accessTokenFromCodeUrl += "&grant_type=authorization_code";
+//             accessTokenFromCodeUrl += "&redirect_uri=" + m_redirectUrl;
+//             accessTokenFromCodeUrl += "&code=" + split.at(1);
+// 
+//             qDebug() << "[Foursquare::parseNewUrl] token request url: " << accessTokenFromCodeUrl;
+// 
+//             QNetworkRequest req;
+//             req.setUrl(accessTokenFromCodeUrl);
+// 
+//             if (!m_networkReply) {
+//                 m_networkReply->deleteLater();
+//             }
+// 
+//             m_networkReply = m_networkAccessManager->get(req);
+// 
+//             connect(m_networkReply, SIGNAL(finished()), this, SLOT(parseAccessToken()));
+//         }
+//     }
+// }
 
 
 void Foursquare::populateData()
