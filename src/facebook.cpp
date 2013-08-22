@@ -8,6 +8,7 @@
  */
 
 #include "facebook.h"
+#include "facebookuser.h"
 
 #include <QtCore/QDebug>
 
@@ -35,7 +36,7 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
     , m_scopePublishStream(false)
     , m_scopeReadStream(false)
     , m_scopeUserInfo(false)
-    , m_userInfo(new Me)
+    , m_fbUser(new FacebookUser(this))
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
@@ -49,7 +50,7 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
     , m_scopePublishStream(false)
     , m_scopeReadStream(false)
     , m_scopeUserInfo(false)
-    , m_userInfo(new Me)
+    , m_fbUser(new FacebookUser(this))
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 
@@ -60,8 +61,6 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 
 Facebook::~Facebook()
 {
-    delete m_userInfo;
-
     qDeleteAll(m_friends);
     qDeleteAll(m_likes);
     qDeleteAll(m_work);
@@ -252,21 +251,21 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
     // populate user data
-    m_userInfo->birthday = QDate::fromString(jsonObj.value("birthday").toString(), "MM/dd/yyyy");
-    m_userInfo->email = jsonObj.value("email").toString();
-    m_userInfo->firstName = jsonObj.value("first_name").toString();
-    m_userInfo->gender = jsonObj.value("gender").toString();
-    m_userInfo->id = jsonObj.value("id").toString();
-    m_userInfo->lastName = jsonObj.value("last_name").toString();
-    m_userInfo->link = jsonObj.value("link").toString();
-    m_userInfo->name = jsonObj.value("name").toString();
-    m_userInfo->relationshipStatus = jsonObj.value("relationship_status").toString();
-    m_userInfo->username = jsonObj.value("username").toString();
-    m_userInfo->verified = jsonObj.value("verified").toString();
-    m_userInfo->bio = jsonObj.value("bio").toString();
-    m_userInfo->locale = jsonObj.value("locale").toString();
+    m_fbUser->setBirthday(QDate::fromString(jsonObj.value("birthday").toString(), "MM/dd/yyyy"));
+    m_fbUser->setEmail(jsonObj.value("email").toString());
+    m_fbUser->setFirstName(jsonObj.value("first_name").toString());
+    m_fbUser->setGender(jsonObj.value("gender").toString());
+    m_fbUser->setId(jsonObj.value("id").toString());
+    m_fbUser->setLastName(jsonObj.value("last_name").toString());
+    m_fbUser->setLink(jsonObj.value("link").toString());
+    m_fbUser->setName(jsonObj.value("name").toString());
+    m_fbUser->setRelationshipStatus(jsonObj.value("relationship_status").toString());
+    m_fbUser->setUsername(jsonObj.value("username").toString());
+    m_fbUser->setVerified(jsonObj.value("verified").toString());
+    m_fbUser->setBio(jsonObj.value("bio").toString());
+    m_fbUser->setLocale(jsonObj.value("locale").toString());
 
-    qDebug() << m_userInfo->id << m_userInfo->email << m_userInfo->birthday.toString() << m_userInfo->birthday << m_userInfo->locale;
+    qDebug() << m_fbUser->id() << m_fbUser->email() << m_fbUser->birthday().toString() << m_fbUser->birthday() << m_fbUser->locale();
 
 
     // hometown
@@ -277,9 +276,9 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
     if (!hometownObj.isEmpty()) {
-        m_userInfo->hometown.id = hometownObj.value("id").toString();
-        m_userInfo->hometown.name = hometownObj.value("name").toString();
-        qDebug() << "[Facebook::onPopulateDataReplyReceived] HOME TOWN: " << m_userInfo->hometown.name << m_userInfo->hometown.id;
+        m_fbUser->hometown().first = hometownObj.value("id").toString();
+        m_fbUser->hometown().second = hometownObj.value("name").toString();
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] HOME TOWN: " << m_fbUser->hometown().first << m_fbUser->hometown().second;
     }
 
     // location
@@ -290,9 +289,9 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
     if (!locationObj.isEmpty()) {
-        m_userInfo->location.id = locationObj.value("id").toString();
-        m_userInfo->location.name = locationObj.value("name").toString();
-        qDebug() << "[Facebook::onPopulateDataReplyReceived] LOCATION: " << m_userInfo->location.name << m_userInfo->location.id;
+        m_fbUser->location().first = locationObj.value("id").toString();
+        m_fbUser->location().second = locationObj.value("name").toString();
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] LOCATION: " << m_fbUser->location().first << m_fbUser->location().second;
     }
 
     // status (for now, just the last one)
@@ -301,18 +300,18 @@ void Facebook::onPopulateDataReplyReceived()
 
     if (!statusesObj.isEmpty()) {
         QJsonArray statusArray = statusesObj.value("data").toArray();
-        m_userInfo->status = statusArray[0].toObject().value("message").toString();
+        m_fbUser->setStatus(statusArray[0].toObject().value("message").toString());
     }
 #else
     QVariantMap  statusesObj = jsonObj.value("statuses").toMap();
 
     if (!statusesObj.isEmpty()) {
         QList<QVariant> statusArray = statusesObj.value("data").toList();
-        m_userInfo->status = statusArray[0].toMap().value("message").toString();
+        m_fbUser->setStatus(statusArray[0].toMap().value("message").toString());
     }
 #endif
 
-    qDebug() << "[Facebook::onPopulateDataReplyReceived] user status: " << m_userInfo->status;
+    qDebug() << "[Facebook::onPopulateDataReplyReceived] user status: " << m_fbUser->status();
 
     // user avatar
 #ifdef USING_QT5
@@ -320,18 +319,18 @@ void Facebook::onPopulateDataReplyReceived()
 
     if (!pictureObj.isEmpty()) {
         QJsonObject pictureDataObj = pictureObj.value("data").toObject();
-        m_userInfo->picture = pictureDataObj.value("url").toString();
+        m_fbUser->setPicture(pictureDataObj.value("url").toString());
     }
 #else
     QVariantMap pictureObj = jsonObj.value("picture").toMap();
 
     if (!pictureObj.isEmpty()) {
         QVariantMap pictureDataObj = pictureObj.value("data").toMap();
-        m_userInfo->picture = pictureDataObj.value("url").toString();
+        m_fbUser->setPicture(pictureDataObj.value("url").toString());
     }
 #endif
 
-    qDebug() << "[Facebook::onPopulateDataReplyReceived] Picture: " << m_userInfo->picture;
+    qDebug() << "[Facebook::onPopulateDataReplyReceived] Picture: " << m_fbUser->picture();
 
 
     // user likes
@@ -601,11 +600,10 @@ bool Facebook::scopeUserInfo() const
 }
 
 
-Facebook::Me *Facebook::userInfo() const
+FacebookUser *Facebook::facebookUser() const
 {
     qDebug("[Facebook::userInfo]");
-
-    return m_userInfo;
+    return m_fbUser;
 }
 
 

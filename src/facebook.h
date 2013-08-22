@@ -19,6 +19,8 @@ class QDeclarativeView;
 namespace Socializer
 {
 
+class FacebookUser;
+
 /**
  * Facebook interface
  */
@@ -86,27 +88,6 @@ public:
 // 
 //     };
 
-    // user
-    struct Me {
-        QString id;
-        QString bio;
-        QString name;
-        QString firstName;
-        QString lastName;
-        QString email;
-        QString link;
-        QString username;
-        QDate birthday;
-        QString gender;
-        QString relationshipStatus;
-        QString picture;
-        QString verified;
-        QString status;         // last status message displayed by user
-        QString locale;
-        Pair location;
-        Pair hometown;
-    };
-
     struct Work {
         Pair employer;
         Pair location;
@@ -152,7 +133,9 @@ public:
     bool scopeReadStream() const;
     bool scopeUserInfo() const;
 
-    Me *userInfo() const;                       /** returns facebook profile data stored */
+    FacebookUser *facebookUser() const;             /** returns facebook profile data stored */
+
+    // TODO all this will go in facebookuser
     QList<Friend*> friends() const;             /** returns a list of the user's friends */
     QList<Like*> userLikes() const;             /** returns the user's list of likes */
     QList<Work*> work() const;                  /** returns the user's list of work experiences */
@@ -178,7 +161,9 @@ private:
     bool m_scopeReadStream;             /** Provides access to all the posts in the user's News Feed and enables your application to perform searches against the user's News Feed */
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
-    Me *m_userInfo;                     /** User info */
+    FacebookUser *m_fbUser;                     /** User info */
+
+    // TODO all this will go in facebookuser
     QHash<QString, Friend*>m_friends;   /** List of users friends */            // key is ID
     QHash<QString, Like*>m_likes;       /** List of the users "likes" */        // key is ID
     QList<Work*>m_work;                 /** List of the users job history */
