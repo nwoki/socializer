@@ -41,6 +41,11 @@ FoursquareUser::FoursquareUser(const QString& id, const QString& firstName, cons
     d->homecity = homecity;
     d->bio = bio;
     d->totalCheckins = 0;
+
+    d->lastCheckin.latitude = 0.0;
+    d->lastCheckin.longitude = 0.0;
+    d->lastCheckin.isMayor = false;
+    d->lastCheckin.verified = false;
 }
 
 
@@ -49,6 +54,11 @@ FoursquareUser::FoursquareUser(QObject *parent)
     , d(new Private)
 {
     d->totalCheckins = 0;
+
+    d->lastCheckin.latitude = 0.0;
+    d->lastCheckin.longitude = 0.0;
+    d->lastCheckin.isMayor = false;
+    d->lastCheckin.verified = false;
 }
 
 

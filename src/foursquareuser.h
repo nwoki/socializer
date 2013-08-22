@@ -75,9 +75,6 @@ public:
     void setPhoto(const QString &photo);
     void setTotalCheckins(quint16 totalCheckins);
 
-Q_SIGNALS:
-    void userInfoChanged();
-
 private:
     class Private;
     Private * const d;
