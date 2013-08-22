@@ -207,10 +207,12 @@ void Foursquare::onPopulateDataReplyReceived()
     QVariantMap contactObj = userObj.value("contact").toMap();
 #endif
 
-    m_fqUser->contact()->email = contactObj.value("email").toString();
-    m_fqUser->contact()->facebook = contactObj.value("facebook").toString();
-    m_fqUser->contact()->phone = contactObj.value("phone").toString();
-    m_fqUser->contact()->twitter = contactObj.value("twitter").toString();
+    m_fqUser->contact().email = contactObj.value("email").toString();
+    m_fqUser->contact().facebook = contactObj.value("facebook").toString();
+    m_fqUser->contact().phone = contactObj.value("phone").toString();
+    m_fqUser->contact().twitter = contactObj.value("twitter").toString();
+
+//     qDebug() << "CONTACTS : " << m_fqUser->contact().email << m_fqUser->contact().facebook << m_fqUser->contact().twitter;
 
     // last checkin
 #ifdef USING_QT5
@@ -239,30 +241,28 @@ void Foursquare::onPopulateDataReplyReceived()
         QVariantMap lastCheckingVenueObj = lastCheckinObj.value("venue").toMap();
 #endif
 
-        FoursquareUser::Venue *lastCheckin = m_fqUser->lastCheckin();
-
-        lastCheckin->id = lastCheckingVenueObj.value("id").toString();
-        lastCheckin->name = lastCheckingVenueObj.value("name").toString();
-        lastCheckin->canonicalUrl = lastCheckingVenueObj.value("canonicalUrl").toString();
-        lastCheckin->verified = lastCheckingVenueObj.value("verified").toBool();
-        lastCheckin->isMayor = lastCheckingVenueObj.value("isMayor").toBool();
+        m_fqUser->lastCheckin().id = lastCheckingVenueObj.value("id").toString();
+        m_fqUser->lastCheckin().name = lastCheckingVenueObj.value("name").toString();
+        m_fqUser->lastCheckin().canonicalUrl = lastCheckingVenueObj.value("canonicalUrl").toString();
+        m_fqUser->lastCheckin().verified = lastCheckingVenueObj.value("verified").toBool();
+        m_fqUser->lastCheckin().isMayor = lastCheckingVenueObj.value("isMayor").toBool();
 
         // location info
 #ifdef USING_QT5
         QJsonObject locationObj = lastCheckingVenueObj.value("location").toObject();
 
-        lastCheckin->latitude = locationObj.value("lat").toVariant().toDouble();
-        lastCheckin->longitude = locationObj.value("lng").toVariant().toDouble();
+        m_fqUser->lastCheckin().latitude = locationObj.value("lat").toVariant().toDouble();
+        m_fqUser->lastCheckin().longitude = locationObj.value("lng").toVariant().toDouble();
 #else
         QVariantMap locationObj = lastCheckingVenueObj.value("location").toMap();
 
-        lastCheckin->latitude = locationObj.value("lat").toDouble();
-        lastCheckin->longitude = locationObj.value("lng").toDouble();
+        m_fqUser->lastCheckin().latitude = locationObj.value("lat").toDouble();
+        m_fqUser->lastCheckin().longitude = locationObj.value("lng").toDouble();
 #endif
-        lastCheckin->cc = locationObj.value("cc").toString();
-        lastCheckin->country = locationObj.value("country").toString();
+        m_fqUser->lastCheckin().cc = locationObj.value("cc").toString();
+        m_fqUser->lastCheckin().country = locationObj.value("country").toString();
 
-//         qDebug() << "VENUE : " << lastCheckin->country << " - " << lastCheckin->name << " - " << lastCheckin->latitude;
+//         qDebug() << "VENUE : " << m_fqUser->lastCheckin().country << " - " << m_fqUser->lastCheckin().name << " - " << m_fqUser->lastCheckin().latitude;
     }
 
     Q_EMIT profileUpdated();
