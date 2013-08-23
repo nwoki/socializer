@@ -29,13 +29,6 @@ class Facebook : public OAuth
 {
     Q_OBJECT
 
-    Q_PROPERTY (bool scopeEmail             READ scopeEmail             WRITE enableScopeEmail)
-    Q_PROPERTY (bool scopePublishActions    READ scopePublishActions    WRITE enableScopePublishActions)
-    Q_PROPERTY (bool scopePublishCheckins   READ scopePublishCheckins   WRITE enableScopePublishCheckins)
-    Q_PROPERTY (bool scopePublishStream     READ scopePublishStream     WRITE enableScopePublishStream)
-    Q_PROPERTY (bool scopeReadStream        READ scopeReadStream        WRITE enableScopeReadStream)
-    Q_PROPERTY (bool scopeUserInfo          READ scopeUserInfo          WRITE enableScopeUserInfo)
-
 public:
 
     // common struct for all pairs (id/name)
@@ -168,7 +161,6 @@ private:
     QHash<QString, Like*>m_likes;       /** List of the users "likes" */        // key is ID
     QList<Work*>m_work;                 /** List of the users job history */
     QList<Education*>m_education;       /** List of the users education history */
-//     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
 };
 
 };
