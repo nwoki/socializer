@@ -22,6 +22,22 @@ class FacebookUser : public QObject
     Q_OBJECT
 
 public:
+    // TODO
+    // game
+    //     struct Game {
+    //
+    //     };
+    //
+    //     // movie
+    //     struct Movie {
+    //
+    //     };
+    //
+    //     // music
+    //     struct Music {
+    //
+    //     };
+
     struct Education {
         QPair<QString, QString> school;
         QString type;

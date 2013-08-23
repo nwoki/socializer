@@ -30,21 +30,6 @@ class Facebook : public OAuth
     Q_OBJECT
 
 public:
-    // game
-//     struct Game {
-// 
-//     };
-// 
-//     // movie
-//     struct Movie {
-// 
-//     };
-// 
-//     // music
-//     struct Music {
-// 
-//     };
-
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
 
     /**
