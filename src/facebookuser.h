@@ -10,6 +10,7 @@
 
 #include <QtCore/QDate>
 #include <QtCore/QObject>
+#include <QtCore/QHash>
 #include <QtCore/QPair>
 #include <QtCore/QString>
 
@@ -21,8 +22,17 @@ class FacebookUser : public QObject
     Q_OBJECT
 
 public:
+    struct Like {
+        QString category;
+        QString name;
+        QString id;
+        QString createdTime;
+    };
+
     FacebookUser(QObject *parent = 0);
     virtual ~FacebookUser();
+
+    void addLike(const QString &id, const Like &like);
 
     QString id() const;
     QString bio() const;
@@ -30,6 +40,7 @@ public:
     QString firstName() const;
     QString lastName() const;
     QString email() const;
+    QHash<QString, Like> likes() const;
     QString link() const;
     QString username() const;
     QDate birthday() const;

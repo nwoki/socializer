@@ -30,6 +30,8 @@ public:
     QString locale;
     QPair<QString, QString> location;
     QPair<QString, QString> hometown;
+
+    QHash<QString, Like> likes;       /** List of the users "likes" */        // key is ID
 };
 
 
@@ -43,6 +45,12 @@ FacebookUser::FacebookUser(QObject *parent)
 
 FacebookUser::~FacebookUser()
 {
+}
+
+
+void FacebookUser::addLike(const QString &id, const FacebookUser::Like &like)
+{
+    d->likes.insert(id, like);
 }
 
 
@@ -91,6 +99,12 @@ QString FacebookUser::id() const
 QString FacebookUser::lastName() const
 {
     return d->lastName;
+}
+
+
+QHash<QString, FacebookUser::Like> FacebookUser::likes() const
+{
+    return d->likes;
 }
 
 

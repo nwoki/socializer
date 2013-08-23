@@ -62,12 +62,10 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 Facebook::~Facebook()
 {
     qDeleteAll(m_friends);
-    qDeleteAll(m_likes);
     qDeleteAll(m_work);
     qDeleteAll(m_education);
 
     m_friends.clear();
-    m_likes.clear();
     m_work.clear();
     m_education.clear();
 }
@@ -350,16 +348,16 @@ void Facebook::onPopulateDataReplyReceived()
             QVariantMap likeDetail = likesArray.at(i).toMap();
 #endif
 
-            Like *like = new Like;
+            FacebookUser::Like like;
 
-            like->category = likeDetail.value("category").toString();
-            like->createdTime = likeDetail.value("created_time").toString();
-            like->id = likeDetail.value("id").toString();
-            like->name = likeDetail.value("name").toString();
+            like.category = likeDetail.value("category").toString();
+            like.createdTime = likeDetail.value("created_time").toString();
+            like.id = likeDetail.value("id").toString();
+            like.name = likeDetail.value("name").toString();
 
             // add to hash
-            m_likes.insert(like->id, like);
-            qDebug() << "[Facebook::onPopulateDataReplyReceived] NEW LIKE: " << like->id << " - " << like->category << " - " << like->name;
+            m_fbUser->addLike(like.id, like);
+            qDebug() << "[Facebook::onPopulateDataReplyReceived] NEW LIKE: " << like.id << " - " << like.category << " - " << like.name;
         }
     }
 
@@ -628,12 +626,4 @@ QList<Facebook::Education*> Facebook::education() const
     qDebug("[Facebook::education]");
 
     return m_education;
-}
-
-
-QList<Facebook::Like*> Facebook::userLikes() const
-{
-    qDebug("[Facebook::userLikes]");
-
-    return m_likes.values();
 }

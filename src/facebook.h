@@ -59,13 +59,6 @@ public:
         QString birthday;
     };
 
-    struct Like {
-        QString category;
-        QString name;
-        QString id;
-        QString createdTime;
-    };
-
     // game
 //     struct Game {
 // 
@@ -130,7 +123,6 @@ public:
 
     // TODO all this will go in facebookuser
     QList<Friend*> friends() const;             /** returns a list of the user's friends */
-    QList<Like*> userLikes() const;             /** returns the user's list of likes */
     QList<Work*> work() const;                  /** returns the user's list of work experiences */
     QList<Education*> education() const;        /** returns the user's list of education history */
 
@@ -158,7 +150,6 @@ private:
 
     // TODO all this will go in facebookuser
     QHash<QString, Friend*>m_friends;   /** List of users friends */            // key is ID
-    QHash<QString, Like*>m_likes;       /** List of the users "likes" */        // key is ID
     QList<Work*>m_work;                 /** List of the users job history */
     QList<Education*>m_education;       /** List of the users education history */
 };
