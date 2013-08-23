@@ -33,6 +33,7 @@ public:
     QPair<QString, QString> location;
     QPair<QString, QString> hometown;
 
+    QList<Education> education;       /** List of the users education history */
     QHash<QString, Like> likes;       /** List of the users "likes" */        // key is ID
     QHash<QString, Friend> friends;   /** List of users friends */            // key is ID
     QList<Work> work;                 /** List of the users job history */
@@ -49,6 +50,16 @@ FacebookUser::FacebookUser(QObject *parent)
 
 FacebookUser::~FacebookUser()
 {
+}
+
+
+void FacebookUser::addEducation(const FacebookUser::Education &education)
+{
+    if (d->education.contains(education)) {
+        return;
+    } else {
+        d->education.append(education);
+    }
 }
 
 
@@ -83,6 +94,12 @@ QString FacebookUser::bio() const
 QDate FacebookUser::birthday() const
 {
     return d->birthday;
+}
+
+
+QList<FacebookUser::Education> FacebookUser::education() const
+{
+    return d->education;
 }
 
 
@@ -185,6 +202,12 @@ QString FacebookUser::username() const
 QString FacebookUser::verified() const
 {
     return d->verified;
+}
+
+
+QList<FacebookUser::Work> FacebookUser::work() const
+{
+    return d->work;
 }
 
 

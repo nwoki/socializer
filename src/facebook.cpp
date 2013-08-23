@@ -61,9 +61,6 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 
 Facebook::~Facebook()
 {
-    qDeleteAll(m_education);
-
-    m_education.clear();
 }
 
 
@@ -475,25 +472,25 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
     for (int i = 0; i < educationArray.size(); ++i) {
-        Education *education = new Education;
+        FacebookUser::Education education;
 
 #ifdef USING_QT5
         QJsonObject educationObj = educationArray.at(i).toObject();
 #else
         QVariantMap educationObj = educationArray.at(i).toMap();
 #endif
-        education->type = educationObj.value("type").toString();
+        education.type = educationObj.value("type").toString();
 
 #ifdef USING_QT5
         QJsonObject educationSchool = educationObj.value("school").toObject();
 #else
         QVariantMap educationSchool = educationObj.value("school").toMap();
 #endif
-        education->school.id = educationSchool.value("id").toString();;
-        education->school.name = educationSchool.value("name").toString();
+        education.school.first = educationSchool.value("id").toString();;
+        education.school.second = educationSchool.value("name").toString();
 
-        m_education.append(education);
-        qDebug() << "[Facebook::onPopulateDataReplyReceived] EDUCATION: " << education->type << " - " << education->school.id << " - " << education->school.name;
+        m_fbUser->addEducation(education);
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] EDUCATION: " << education.type << " - " << education.school.first << " - " << education.school.second;
     }
 }
 
@@ -596,14 +593,5 @@ bool Facebook::scopeUserInfo() const
 
 FacebookUser *Facebook::facebookUser() const
 {
-    qDebug("[Facebook::userInfo]");
     return m_fbUser;
-}
-
-
-QList<Facebook::Education*> Facebook::education() const
-{
-    qDebug("[Facebook::education]");
-
-    return m_education;
 }

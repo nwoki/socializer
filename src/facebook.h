@@ -30,19 +30,6 @@ class Facebook : public OAuth
     Q_OBJECT
 
 public:
-
-    // common struct for all pairs (id/name)
-    struct Pair {
-        QString id;
-        QString name;
-    };
-
-    // education
-    struct Education {
-        Pair school;
-        QString type;
-    };
-
     // game
 //     struct Game {
 // 
@@ -96,9 +83,6 @@ public:
 
     FacebookUser *facebookUser() const;             /** returns facebook profile data stored */
 
-    // TODO all this will go in facebookuser
-    QList<Education*> education() const;        /** returns the user's list of education history */
-
 Q_SIGNALS:
     void profileUpdated();      /** emitted when new profile data has been parsed */
 
@@ -120,9 +104,6 @@ private:
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
     FacebookUser *m_fbUser;                     /** User info */
-
-    // TODO all this will go in facebookuser
-    QList<Education*>m_education;       /** List of the users education history */
 };
 
 };

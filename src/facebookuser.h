@@ -22,6 +22,21 @@ class FacebookUser : public QObject
     Q_OBJECT
 
 public:
+    struct Education {
+        QPair<QString, QString> school;
+        QString type;
+
+        bool operator== (const Education &other) {
+            if (school.first != other.school.first || school.second != other.school.second) {
+                return false;
+            } else if (type != other.type) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    };
+
     struct Like {
         QString category;
         QString name;
@@ -71,12 +86,14 @@ public:
     FacebookUser(QObject *parent = 0);
     virtual ~FacebookUser();
 
+    void addEducation(const Education &education);
     void addLike(const QString &id, const Like &like);
     void addFriend(const QString &id, const Friend &fbFriend);
     void addWork(const Work &work);
 
     QString bio() const;
     QDate birthday() const;
+    QList<Education> education() const;
     QString email() const;
     QString id() const;
     QString firstName() const;
@@ -91,9 +108,9 @@ public:
     QString name() const;
     QString picture() const;
     QString relationshipStatus() const;
-    QString status() const;         // last status message displayed by user
+    QString status() const;                     // last status message displayed by user
     QString verified() const;
-    QList<Work> work() const;                  /** returns the user's list of work experiences */
+    QList<Work> work() const;                   /** returns the user's list of work experiences */
     QString username() const;
 
     void setBio(const QString &bio);
