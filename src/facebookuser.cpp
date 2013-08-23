@@ -303,5 +303,4 @@ void FacebookUser::setVerified(const QString &verified)
 }
 
 
-
 };
