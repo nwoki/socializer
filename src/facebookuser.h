@@ -44,48 +44,73 @@ public:
         QString birthday;
     };
 
+    struct Work {
+        QPair<QString, QString> employer;
+        QPair<QString, QString> location;
+        QPair<QString, QString> position;
+        QString description;
+        QDate startDate;
+        QDate endDate;
+
+        bool operator== (const Work &other) const {
+            // gen values check
+            if (description != other.description || startDate != other.startDate || endDate != other.endDate) {
+                return false;
+            } else if (employer.first != other.employer.first || employer.second != other.employer.second) {
+                return false;
+            } else if (location.first != other.location.first || location.second != other.location.second) {
+                return false;
+            } else if (position.first != other.position.first || position.second != other.position.second) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    };
+
     FacebookUser(QObject *parent = 0);
     virtual ~FacebookUser();
 
     void addLike(const QString &id, const Like &like);
     void addFriend(const QString &id, const Friend &fbFriend);
+    void addWork(const Work &work);
 
-    QString id() const;
     QString bio() const;
-    QString name() const;
-    QString firstName() const;
-    QString lastName() const;
+    QDate birthday() const;
     QString email() const;
+    QString id() const;
+    QString firstName() const;
+    QHash<QString, Friend> friends() const;
+    QString gender() const;
+    QPair<QString, QString> &hometown() const;
+    QString lastName() const;
     QHash<QString, Like> likes() const;
     QString link() const;
-    QHash<QString, Friend> friends() const;
-    QString username() const;
-    QDate birthday() const;
-    QString gender() const;
-    QString relationshipStatus() const;
-    QString picture() const;
-    QString verified() const;
-    QString status() const;         // last status message displayed by user
     QString locale() const;
-
     QPair<QString, QString> &location() const;
-    QPair<QString, QString> &hometown() const;
+    QString name() const;
+    QString picture() const;
+    QString relationshipStatus() const;
+    QString status() const;         // last status message displayed by user
+    QString verified() const;
+    QList<Work> work() const;                  /** returns the user's list of work experiences */
+    QString username() const;
 
-    void setId(const QString &id);
     void setBio(const QString &bio);
-    void setName(const QString &name);
-    void setFirstName(const QString &firstName);
-    void setLastName(const QString &lastName);
-    void setEmail(const QString &email);
-    void setLink(const QString &link);
-    void setUsername(const QString &username);
     void setBirthday(const QDate &birthday);
+    void setEmail(const QString &email);
+    void setId(const QString &id);
+    void setFirstName(const QString &firstName);
     void setGender(const QString &gender);
-    void setRelationshipStatus(const QString &relationshipStatus);
-    void setPicture(const QString &picture);
-    void setVerified(const QString &verified);
-    void setStatus(const QString &status);         // last status message displayed by user
+    void setLastName(const QString &lastName);
+    void setLink(const QString &link);
     void setLocale(const QString &locale);
+    void setName(const QString &name);
+    void setPicture(const QString &picture);
+    void setRelationshipStatus(const QString &relationshipStatus);
+    void setStatus(const QString &status);         // last status message displayed by user
+    void setVerified(const QString &verified);
+    void setUsername(const QString &username);
 
 private:
     class Private;

@@ -61,10 +61,8 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 
 Facebook::~Facebook()
 {
-    qDeleteAll(m_work);
     qDeleteAll(m_education);
 
-    m_work.clear();
     m_education.clear();
 }
 
@@ -329,7 +327,7 @@ void Facebook::onPopulateDataReplyReceived()
     qDebug() << "[Facebook::onPopulateDataReplyReceived] Picture: " << m_fbUser->picture();
 
 
-    // user likes
+    // LIKES
 #ifdef USING_QT5
     QJsonObject likesObj = jsonObj.value("likes").toObject();
     if (!likesObj.isEmpty()) {
@@ -359,7 +357,7 @@ void Facebook::onPopulateDataReplyReceived()
         }
     }
 
-    // friends
+    // FRIENDS
 #ifdef USING_QT5
     QJsonObject friendsObj = jsonObj.value("friends").toObject();
     if (!friendsObj.isEmpty()) {
@@ -412,7 +410,7 @@ void Facebook::onPopulateDataReplyReceived()
     }
 
 
-    // work
+    // WORK
 #ifdef USING_QT5
     QJsonArray workArray = jsonObj.value("work").toArray();
 #else
@@ -420,16 +418,16 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
     for (int i = 0; i < workArray.size(); ++i) {
-        Work *work = new Work;
+        FacebookUser::Work work;
 #ifdef USING_QT5
         QJsonObject workObj = workArray.at(i).toObject();
 #else
         QVariantMap workObj = workArray.at(i).toMap();
 #endif
 
-        work->description = workObj.value("description").toString();
-        work->endDate = QDate::fromString(workObj.value("end_date").toString(), "yyyy-MM-dd");
-        work->startDate = QDate::fromString(workObj.value("start_date").toString(), "yyyy-MM-dd");
+        work.description = workObj.value("description").toString();
+        work.endDate = QDate::fromString(workObj.value("end_date").toString(), "yyyy-MM-dd");
+        work.startDate = QDate::fromString(workObj.value("start_date").toString(), "yyyy-MM-dd");
 
         // employer
 #ifdef USING_QT5
@@ -438,8 +436,8 @@ void Facebook::onPopulateDataReplyReceived()
         QVariantMap workEmployer = workObj.value("employer").toMap();
 #endif
         if (!workEmployer.isEmpty()) {
-            work->employer.id = workEmployer.value("id").toString();
-            work->employer.name = workEmployer.value("name").toString();
+            work.employer.first = workEmployer.value("id").toString();
+            work.employer.second = workEmployer.value("name").toString();
         }
 
         // location
@@ -449,8 +447,8 @@ void Facebook::onPopulateDataReplyReceived()
         QVariantMap workLocation = workObj.value("location").toMap();
 #endif
         if (!workLocation.isEmpty()) {
-            work->location.id = workLocation.value("id").toString();
-            work->location.name = workLocation.value("name").toString();
+            work.location.first = workLocation.value("id").toString();
+            work.location.second = workLocation.value("name").toString();
         }
 
         // position
@@ -460,12 +458,12 @@ void Facebook::onPopulateDataReplyReceived()
         QVariantMap workPosition = workObj.value("position").toMap();
 #endif
         if (!workPosition.isEmpty()) {
-            work->position.id = workPosition.value("id").toString();
-            work->position.name = workPosition.value("name").toString();
+            work.position.first = workPosition.value("id").toString();
+            work.position.second = workPosition.value("name").toString();
         }
 
-        m_work.append(work);
-        qDebug() << "[Facebook::onPopulateDataReplyReceived] WORK - " << work->employer.name << " - " << work->description << " - " << work->startDate.toString();
+        m_fbUser->addWork(work);
+        qDebug() << "[Facebook::onPopulateDataReplyReceived] WORK - " << work.employer.second << " - " << work.description << " - " << work.startDate.toString();
     }
 
 
@@ -600,14 +598,6 @@ FacebookUser *Facebook::facebookUser() const
 {
     qDebug("[Facebook::userInfo]");
     return m_fbUser;
-}
-
-
-QList<Facebook::Work*> Facebook::work() const
-{
-    qDebug("[Facebook::work]");
-
-    return m_work;
 }
 
 

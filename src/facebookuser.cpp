@@ -7,6 +7,8 @@
 
 #include "facebookuser.h"
 
+#include <QtCore/QDebug>
+
 namespace Socializer {
 
 class FacebookUser::Private {
@@ -33,6 +35,7 @@ public:
 
     QHash<QString, Like> likes;       /** List of the users "likes" */        // key is ID
     QHash<QString, Friend> friends;   /** List of users friends */            // key is ID
+    QList<Work> work;                 /** List of the users job history */
 };
 
 
@@ -58,6 +61,16 @@ void FacebookUser::addLike(const QString &id, const FacebookUser::Like &like)
 void FacebookUser::addFriend(const QString &id, const FacebookUser::Friend &fbFriend)
 {
     d->friends.insert(id, fbFriend);
+}
+
+
+void FacebookUser::addWork(const FacebookUser::Work &work)
+{
+    if (d->work.contains(work)) {
+        return;
+    } else {
+        d->work.append(work);
+    }
 }
 
 

@@ -58,15 +58,6 @@ public:
 // 
 //     };
 
-    struct Work {
-        Pair employer;
-        Pair location;
-        Pair position;
-        QString description;
-        QDate startDate;
-        QDate endDate;
-    };
-
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
 
     /**
@@ -106,7 +97,6 @@ public:
     FacebookUser *facebookUser() const;             /** returns facebook profile data stored */
 
     // TODO all this will go in facebookuser
-    QList<Work*> work() const;                  /** returns the user's list of work experiences */
     QList<Education*> education() const;        /** returns the user's list of education history */
 
 Q_SIGNALS:
@@ -132,7 +122,6 @@ private:
     FacebookUser *m_fbUser;                     /** User info */
 
     // TODO all this will go in facebookuser
-    QList<Work*>m_work;                 /** List of the users job history */
     QList<Education*>m_education;       /** List of the users education history */
 };
 
