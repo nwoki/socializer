@@ -43,22 +43,6 @@ public:
         QString type;
     };
 
-    // friends
-    struct Friend {
-        QString id;
-        QString name;
-        QString firstName;
-        QString lastName;
-        QString gender;
-        QString picture;
-        QString locale;
-        QString username;
-        QString link;
-        QString relationshipStatus;
-        QString about;
-        QString birthday;
-    };
-
     // game
 //     struct Game {
 // 
@@ -122,7 +106,6 @@ public:
     FacebookUser *facebookUser() const;             /** returns facebook profile data stored */
 
     // TODO all this will go in facebookuser
-    QList<Friend*> friends() const;             /** returns a list of the user's friends */
     QList<Work*> work() const;                  /** returns the user's list of work experiences */
     QList<Education*> education() const;        /** returns the user's list of education history */
 
@@ -149,7 +132,6 @@ private:
     FacebookUser *m_fbUser;                     /** User info */
 
     // TODO all this will go in facebookuser
-    QHash<QString, Friend*>m_friends;   /** List of users friends */            // key is ID
     QList<Work*>m_work;                 /** List of the users job history */
     QList<Education*>m_education;       /** List of the users education history */
 };

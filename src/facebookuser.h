@@ -29,10 +29,26 @@ public:
         QString createdTime;
     };
 
+    struct Friend {
+        QString id;
+        QString name;
+        QString firstName;
+        QString lastName;
+        QString gender;
+        QString picture;
+        QString locale;
+        QString username;
+        QString link;
+        QString relationshipStatus;
+        QString about;
+        QString birthday;
+    };
+
     FacebookUser(QObject *parent = 0);
     virtual ~FacebookUser();
 
     void addLike(const QString &id, const Like &like);
+    void addFriend(const QString &id, const Friend &fbFriend);
 
     QString id() const;
     QString bio() const;
@@ -42,6 +58,7 @@ public:
     QString email() const;
     QHash<QString, Like> likes() const;
     QString link() const;
+    QHash<QString, Friend> friends() const;
     QString username() const;
     QDate birthday() const;
     QString gender() const;

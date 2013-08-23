@@ -61,11 +61,9 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 
 Facebook::~Facebook()
 {
-    qDeleteAll(m_friends);
     qDeleteAll(m_work);
     qDeleteAll(m_education);
 
-    m_friends.clear();
     m_work.clear();
     m_education.clear();
 }
@@ -378,38 +376,38 @@ void Facebook::onPopulateDataReplyReceived()
             QVariantMap friendDetail = friendsArray.at(i).toMap();
 #endif
 
-            Friend *myFriend = new Friend;
+            FacebookUser::Friend myFriend;
 
-            myFriend->about = friendDetail.value("about").toString();
-            myFriend->birthday = friendDetail.value("birthday").toString();
-            myFriend->firstName = friendDetail.value("first_name").toString();
-            myFriend->gender = friendDetail.value("gender").toString();
-            myFriend->id = friendDetail.value("id").toString();
-            myFriend->lastName = friendDetail.value("last_name").toString();
-            myFriend->link = friendDetail.value("").toString();
-            myFriend->locale = friendDetail.value("locale").toString();
-            myFriend->name = friendDetail.value("name").toString();
-            myFriend->picture = friendDetail.value("").toString();
-            myFriend->relationshipStatus = friendDetail.value("relationship_status").toString();
-            myFriend->username = friendDetail.value("username").toString();
+            myFriend.about = friendDetail.value("about").toString();
+            myFriend.birthday = friendDetail.value("birthday").toString();
+            myFriend.firstName = friendDetail.value("first_name").toString();
+            myFriend.gender = friendDetail.value("gender").toString();
+            myFriend.id = friendDetail.value("id").toString();
+            myFriend.lastName = friendDetail.value("last_name").toString();
+            myFriend.link = friendDetail.value("").toString();
+            myFriend.locale = friendDetail.value("locale").toString();
+            myFriend.name = friendDetail.value("name").toString();
+            myFriend.picture = friendDetail.value("").toString();
+            myFriend.relationshipStatus = friendDetail.value("relationship_status").toString();
+            myFriend.username = friendDetail.value("username").toString();
 
             // picture
 #ifdef USING_QT5
             QJsonObject friendPictureObj = friendDetail.value("picture").toObject();
             if (!friendPictureObj.isEmpty()) {
                 QJsonObject pictureDataObj = friendPictureObj.value("data").toObject();
-                myFriend->picture = friendPictureObj.value("url").toString();
+                myFriend.picture = friendPictureObj.value("url").toString();
             }
 #else
             QVariantMap friendPictureObj = friendDetail.value("picture").toMap();
             if (!friendPictureObj.isEmpty()) {
                 QVariantMap pictureDataObj = friendPictureObj.value("data").toMap();
-                myFriend->picture = friendPictureObj.value("url").toString();
+                myFriend.picture = friendPictureObj.value("url").toString();
             }
 #endif
 
-            m_friends.insert(myFriend->id, myFriend);
-            qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend: " << myFriend->picture << " - " << myFriend->firstName << " - " << myFriend->lastName << " - " << myFriend->id;
+            m_fbUser->addFriend(myFriend.id, myFriend);
+            qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend: " << myFriend.picture << " - " << myFriend.firstName << " - " << myFriend.lastName << " - " << myFriend.id;
         }
     }
 
@@ -602,14 +600,6 @@ FacebookUser *Facebook::facebookUser() const
 {
     qDebug("[Facebook::userInfo]");
     return m_fbUser;
-}
-
-
-QList<Facebook::Friend*> Facebook::friends() const
-{
-    qDebug("[Facebook::friends]");
-
-    return m_friends.values();
 }
 
 
