@@ -19,6 +19,8 @@ class QDeclarativeView;
 namespace Socializer
 {
 
+class FacebookUser;
+
 /**
  * Facebook interface
  */
@@ -27,95 +29,7 @@ class Facebook : public OAuth
 {
     Q_OBJECT
 
-    Q_PROPERTY (bool scopeEmail             READ scopeEmail             WRITE enableScopeEmail)
-    Q_PROPERTY (bool scopePublishActions    READ scopePublishActions    WRITE enableScopePublishActions)
-    Q_PROPERTY (bool scopePublishCheckins   READ scopePublishCheckins   WRITE enableScopePublishCheckins)
-    Q_PROPERTY (bool scopePublishStream     READ scopePublishStream     WRITE enableScopePublishStream)
-    Q_PROPERTY (bool scopeReadStream        READ scopeReadStream        WRITE enableScopeReadStream)
-    Q_PROPERTY (bool scopeUserInfo          READ scopeUserInfo          WRITE enableScopeUserInfo)
-
 public:
-
-    // common struct for all pairs (id/name)
-    struct Pair {
-        QString id;
-        QString name;
-    };
-
-    // education
-    struct Education {
-        Pair school;
-        QString type;
-    };
-
-    // friends
-    struct Friend {
-        QString id;
-        QString name;
-        QString firstName;
-        QString lastName;
-        QString gender;
-        QString picture;
-        QString locale;
-        QString username;
-        QString link;
-        QString relationshipStatus;
-        QString about;
-        QString birthday;
-    };
-
-    struct Like {
-        QString category;
-        QString name;
-        QString id;
-        QString createdTime;
-    };
-
-    // game
-//     struct Game {
-// 
-//     };
-// 
-//     // movie
-//     struct Movie {
-// 
-//     };
-// 
-//     // music
-//     struct Music {
-// 
-//     };
-
-    // user
-    struct Me {
-        QString id;
-        QString bio;
-        QString name;
-        QString firstName;
-        QString lastName;
-        QString email;
-        QString link;
-        QString username;
-        QDate birthday;
-        QString gender;
-        QString relationshipStatus;
-        QString picture;
-        QString verified;
-        QString status;         // last status message displayed by user
-        QString locale;
-        Pair location;
-        Pair hometown;
-    };
-
-    struct Work {
-        Pair employer;
-        Pair location;
-        Pair position;
-        QString description;
-        QDate startDate;
-        QDate endDate;
-    };
-
     Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObject *parent = 0);
 
     /**
@@ -152,11 +66,7 @@ public:
     bool scopeReadStream() const;
     bool scopeUserInfo() const;
 
-    Me *userInfo() const;                       /** returns facebook profile data stored */
-    QList<Friend*> friends() const;             /** returns a list of the user's friends */
-    QList<Like*> userLikes() const;             /** returns the user's list of likes */
-    QList<Work*> work() const;                  /** returns the user's list of work experiences */
-    QList<Education*> education() const;        /** returns the user's list of education history */
+    FacebookUser *facebookUser() const;             /** returns facebook profile data stored */
 
 Q_SIGNALS:
     void profileUpdated();      /** emitted when new profile data has been parsed */
@@ -178,12 +88,7 @@ private:
     bool m_scopeReadStream;             /** Provides access to all the posts in the user's News Feed and enables your application to perform searches against the user's News Feed */
     bool m_scopeUserInfo;               /** Provides info about the user (about, birthday... )*/
 
-    Me *m_userInfo;                     /** User info */
-    QHash<QString, Friend*>m_friends;   /** List of users friends */            // key is ID
-    QHash<QString, Like*>m_likes;       /** List of the users "likes" */        // key is ID
-    QList<Work*>m_work;                 /** List of the users job history */
-    QList<Education*>m_education;       /** List of the users education history */
-//     QList<QNetworkReply*>m_fbNetReplies;        /** Network reply class for the facebook class */
+    FacebookUser *m_fbUser;                     /** User info */
 };
 
 };

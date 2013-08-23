@@ -1,5 +1,6 @@
 set(socializer_SRCS
     facebook.cpp
+    facebookuser.cpp
     foursquare.cpp
     foursquareuser.cpp
     linkedin.cpp
