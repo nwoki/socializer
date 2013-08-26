@@ -3,6 +3,11 @@ project(socializer)
 cmake_minimum_required(VERSION 2.8.9)
 
 option(QT5_BUILD "Enable compilation with Qt5" FALSE)
+option(ENABLE_DYNAMIC "Enable dynamic library build" FALSE)
+option(ENABLE_SOCIALIZER_EXAMPLES "Enable compilation of examples" ON)
+option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" OFF)
+option(ENABLE_SOCIALIZER_COVERAGE "Enable compiler coverage" OFF)
+option(ENABLE_WERROR "Enables WError. Always enable when developing, and disable when releasing." ON)
 
 # Qt version
 if (QT5_BUILD)
@@ -20,15 +25,27 @@ set(CMAKE_AUTOMOC TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
+option(SOCIALIZER_DEVELOPMENT_RELEASE "Must be ON unless we're releasing" ON)
+
+set(SOCIALIZER_ABI_VERSION 0)
+set(SOCIALIZER_MINOR_VERSION 1)
+set(SOCIALIZER_RELEASE_VERSION 0)
+
 find_package(CommonModules 4 REQUIRED)
 
 include(EnableCoverageReport)
 include(EnableSlocCount)
 include(GenerateCppcheck)
 
-option(ENABLE_SOCIALIZER_EXAMPLES "Enable compilation of examples" ON)
-option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" OFF)
-option(ENABLE_SOCIALIZER_COVERAGE "Enable compiler coverage" OFF)
+# Warnings. Enable WError, this component is critical.
+if(${ENABLE_WERROR})
+    set(RET_W 1)
+else(${ENABLE_WERROR})
+    set(RET_W 0)
+endif(${ENABLE_WERROR})
+
+# VERSIONING
+set(SOCIALIZER_VERSION ${SOCIALIZER_ABI_VERSION}.${SOCIALIZER_MINOR_VERSION}.${SOCIALIZER_RELEASE_VERSION})
 
 # C++11
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -74,20 +91,21 @@ if (ENABLE_SOCIALIZER_TESTS)
     #add_subdirectory(tests)
 endif (ENABLE_SOCIALIZER_TESTS)
 
+
 # # Add these targets only if we are in the root dir
 # if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
 #     # --- sloccount ---
-# 
+#
 #     enable_sloccount(FOLDERS src testApp)
-# 
+#
 #     # --- cppcheck ---
-# 
+#
 #     generate_cppcheck(SOURCES src testApp
 #                       ENABLE_IDS all
 #                       INLINE_SUPPRESSION)
-# 
+#
 #     # --- coverage ---
-# 
+#
 #     if (ENABLE_SOCIALIZER_COVERAGE)
 #         #enable_coverage_report(TARGETS Socializer
 #         #                       TESTS   socializer-test
