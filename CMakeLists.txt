@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 2.8.9)
 
 option(QT5_BUILD "Enable compilation with Qt5" FALSE)
 option(ENABLE_DYNAMIC "Enable dynamic library build" FALSE)
+option(ENABLE_SOCIALIZER_EXAMPLES "Enable compilation of examples" ON)
+option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" OFF)
+option(ENABLE_SOCIALIZER_COVERAGE "Enable compiler coverage" OFF)
+option(ENABLE_WERROR "Enables WError. Always enable when developing, and disable when releasing." ON)
 
 # Qt version
 if (QT5_BUILD)
@@ -33,9 +37,12 @@ include(EnableCoverageReport)
 include(EnableSlocCount)
 include(GenerateCppcheck)
 
-option(ENABLE_SOCIALIZER_EXAMPLES "Enable compilation of examples" ON)
-option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" OFF)
-option(ENABLE_SOCIALIZER_COVERAGE "Enable compiler coverage" OFF)
+# Warnings. Enable WError, this component is critical.
+if(${ENABLE_WERROR})
+    set(RET_W 1)
+else(${ENABLE_WERROR})
+    set(RET_W 0)
+endif(${ENABLE_WERROR})
 
 # VERSIONING
 set(SOCIALIZER_VERSION ${SOCIALIZER_ABI_VERSION}.${SOCIALIZER_MINOR_VERSION}.${SOCIALIZER_RELEASE_VERSION})
