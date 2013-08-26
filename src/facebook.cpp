@@ -492,6 +492,9 @@ void Facebook::onPopulateDataReplyReceived()
         m_fbUser->addEducation(education);
         qDebug() << "[Facebook::onPopulateDataReplyReceived] EDUCATION: " << education.type << " - " << education.school.first << " - " << education.school.second;
     }
+
+    // notify that the profile has been updated
+    Q_EMIT profileUpdated();
 }
 
 
