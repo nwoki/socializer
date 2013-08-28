@@ -379,10 +379,9 @@ void Facebook::onPopulateDataReplyReceived()
             myFriend.gender = friendDetail.value("gender").toString();
             myFriend.id = friendDetail.value("id").toString();
             myFriend.lastName = friendDetail.value("last_name").toString();
-            myFriend.link = friendDetail.value("").toString();
+            myFriend.link = friendDetail.value("link").toString();
             myFriend.locale = friendDetail.value("locale").toString();
             myFriend.name = friendDetail.value("name").toString();
-            myFriend.picture = friendDetail.value("").toString();
             myFriend.relationshipStatus = friendDetail.value("relationship_status").toString();
             myFriend.username = friendDetail.value("username").toString();
 
@@ -402,7 +401,7 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
             m_fbUser->addFriend(myFriend.id, myFriend);
-            qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend: " << myFriend.picture << " - " << myFriend.firstName << " - " << myFriend.lastName << " - " << myFriend.id;
+            qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend: " << myFriend.picture << " - " << myFriend.firstName << " - " << myFriend.lastName << " - " << myFriend.id << myFriend.link;
         }
     }
 
@@ -536,7 +535,7 @@ void Facebook::populateData()
     QString reqStr(GRAPH_URL);
 
     reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,education,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
-    reqStr += ",friends.fields(id,name,username,first_name,last_name,locale,gender,picture.type(large))";                  // friends
+    reqStr += ",friends.fields(id,name,username,first_name,birthday,last_name,locale,gender,link,picture.type(large))";                  // friends
 //                 ",games.fields(id,link,website,name,picture.type(large))";                           // games
 //                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";  // music
     reqStr += "&access_token=" + m_authToken;

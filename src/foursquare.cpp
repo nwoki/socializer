@@ -49,6 +49,7 @@ Foursquare::Foursquare(const QByteArray& appId, const QByteArray& redirectUrl, c
     : OAuth(appId, redirectUrl, consumerSecret, parent)
     , m_fqUser(new FoursquareUser(this))
 {
+    obtainAuthPageUrl();
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 }
 
@@ -92,6 +93,8 @@ void Foursquare::obtainAuthPageUrl()
     urlStr.append(m_redirectUrl);
 
     Q_EMIT authPageUrlReady(urlStr);
+
+    qDebug() << "[Foursquare::obtainAuthPageUrl] " << urlStr;
 }
 
 
@@ -269,7 +272,7 @@ void Foursquare::onPopulateDataReplyReceived()
 // void Foursquare::parseAccessToken()
 // {
 //     qDebug("[Foursquare::parseAccessToken]");
-// 
+//
 //     if (!m_networkReply) {
 //         return;
 //     }
@@ -299,21 +302,21 @@ void Foursquare::onPopulateDataReplyReceived()
 // {
 //     qDebug("[Foursquare::parseNewUrl]");
 //     qDebug() << "[Foursquare::parseNewUrl] got url: " << url;
-// 
+//
 //     if (url.contains("access_token")) {
 //         QRegExp regex("access_token=?[^&]+");
-// 
+//
 //         if (regex.indexIn(url) > -1) {
 //             QString access = regex.cap(0);
-// 
+//
 //             // extract access token
 //             setAuthToken(access.split("=").at(1).toUtf8());
-// 
+//
 //             qDebug() << "[Foursquare::parseNewUrl] Auth token is: " << m_authToken;
 //         }
 //     } else if (url.contains("?code=")) {
 //         QStringList split = url.split("?code=");
-// 
+//
 //         if (split.size() == 2) {
 //             // request access token via code
 //             QString accessTokenFromCodeUrl(ACCESS_TOKEN_URL);
@@ -322,18 +325,18 @@ void Foursquare::onPopulateDataReplyReceived()
 //             accessTokenFromCodeUrl += "&grant_type=authorization_code";
 //             accessTokenFromCodeUrl += "&redirect_uri=" + m_redirectUrl;
 //             accessTokenFromCodeUrl += "&code=" + split.at(1);
-// 
+//
 //             qDebug() << "[Foursquare::parseNewUrl] token request url: " << accessTokenFromCodeUrl;
-// 
+//
 //             QNetworkRequest req;
 //             req.setUrl(accessTokenFromCodeUrl);
-// 
+//
 //             if (!m_networkReply) {
 //                 m_networkReply->deleteLater();
 //             }
-// 
+//
 //             m_networkReply = m_networkAccessManager->get(req);
-// 
+//
 //             connect(m_networkReply, SIGNAL(finished()), this, SLOT(parseAccessToken()));
 //         }
 //     }

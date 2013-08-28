@@ -15,7 +15,16 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    Socializer::Foursquare *fq  =new Socializer::Foursquare("0RLFOCFCQZE3PDXNBG4I3GK4O43OZKI3B4IWFAD3SFUQAEPR");
-    Q_UNUSED(fq)
+
+    if (argc == 2) {
+        Socializer::Foursquare *fq = new Socializer::Foursquare(argv[1]);
+        Q_UNUSED(fq);
+    } else {
+        Socializer::Foursquare *fq = new Socializer::Foursquare("T53ZTLQSG1CVGKHYRA3OPEUVDGQ5ICFXMMHB01XNEESMSJQP"
+                                                            , "http://www.ispirata.com"
+                                                            , "QOMLRRLTNM3L0CRLNGMBM1MZTCUFNKUFIFOKAU2QZBS3RPPR");
+        Q_UNUSED(fq);
+    }
+
     return app.exec();
 }
