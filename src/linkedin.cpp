@@ -522,6 +522,7 @@ void LinkedIn::parsePositionsXml(QXmlStreamReader &xmlStrReader)
                 position.endDate = endDate;
                 position.summary = summary;
                 position.title = title;
+                position.id = id;
 
                 // company
                 position.company.id = companyId;

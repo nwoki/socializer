@@ -39,6 +39,7 @@ public:
 
     struct Position {
         // the key of the hash is the id
+        QString id;
         QString title;
         QString summary;
         QString startDate;
