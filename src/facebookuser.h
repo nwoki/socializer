@@ -54,10 +54,12 @@ public:
     };
 
     struct Like {
+        QString description;
         QString category;
         QString name;
         QString id;
         QString createdTime;
+        QString link;
     };
 
     struct Friend {

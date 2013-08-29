@@ -343,14 +343,16 @@ void Facebook::onPopulateDataReplyReceived()
 
             FacebookUser::Like like;
 
-            like.category = likeDetail.value("category").toString();
+            like.description = likeDetail.value("description").toString();
             like.createdTime = likeDetail.value("created_time").toString();
             like.id = likeDetail.value("id").toString();
             like.name = likeDetail.value("name").toString();
+            like.link = likeDetail.value("link").toString();
+            like.category = likeDetail.value("category").toString();
 
             // add to hash
             m_fbUser->addLike(like.id, like);
-            qDebug() << "[Facebook::onPopulateDataReplyReceived] NEW LIKE: " << like.id << " - " << like.category << " - " << like.name;
+            qDebug() << "[Facebook::onPopulateDataReplyReceived] NEW LIKE: " << like.id << " - " << like.description << " - " << like.name;
         }
     }
 
@@ -534,7 +536,8 @@ void Facebook::populateData()
     // statuses.limit(1) -> keep last status the user posted
     QString reqStr(GRAPH_URL);
 
-    reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,education,sports,username,verified,work,likes,website,statuses.limit(1),picture.type(large)";
+    reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,education,sports,username,verified,work,website,statuses.limit(1),picture.type(large)";
+    reqStr += ",likes.fields(id,description,name,created_time,link,category)";
     reqStr += ",friends.fields(id,name,username,first_name,birthday,last_name,locale,gender,link,picture.type(large))";                  // friends
 //                 ",games.fields(id,link,website,name,picture.type(large))";                           // games
 //                 ",music.fields(id,bio,description,hometown,link,name,picture.type(large),website)";  // music
