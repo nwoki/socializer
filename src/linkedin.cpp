@@ -430,6 +430,7 @@ void LinkedIn::parseLanguageXml(QXmlStreamReader &xmlStrReader)
                 flag = true;
                 LinkedInUser::Language lang;
                 lang.language = langName;
+                lang.id = id;
 
                 // add to hash
                 m_linkedinUser->addLanguage(id, lang);

@@ -23,6 +23,7 @@ class LinkedInUser : public QObject
 
 public:
     struct Language {
+        QString id;
         QString language;
         QString proficiencyLevel;
         QString proficiencyName;
