@@ -56,6 +56,7 @@ public:
     };
 
     struct Education {
+        QString id;
         QString schoolName;
         QString fieldOfStudy;
         QString startDate;

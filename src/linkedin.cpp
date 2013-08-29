@@ -388,6 +388,7 @@ void LinkedIn::parseEducationXml(QXmlStreamReader &xmlStrReader)
             education.notes = notes;
             education.schoolName = schoolName;
             education.startDate = startDate;
+            education.id = id;
 
             m_linkedinUser->addEducation(id, education);
 
@@ -749,7 +750,7 @@ void LinkedIn::profileInfoReceived()
 // void LinkedIn::setContextProperty(QDeclarativeView *view)
 // {
 //     qDebug("[LinkedIn::setContextProperty]");
-// 
+//
 //     view->rootContext()->setContextProperty("LinkedIn", this);
 // }
 
