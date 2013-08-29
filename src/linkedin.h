@@ -69,7 +69,7 @@ public:
     // used only for dev to get auth code
     Q_INVOKABLE void obtainAuthPageUrl();
 
-    // DEPRECATED 
+    // DEPRECATED
     Q_INVOKABLE void parseNewUrl(const QString &url) {};
 
     // DEPRECATED
@@ -122,3 +122,4 @@ private:
 };
 
 #endif  // LINKEDIN_H
+

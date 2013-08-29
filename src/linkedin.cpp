@@ -721,6 +721,21 @@ void LinkedIn::profileInfoReceived()
                 parseLanguageXml(xmlParser);
             }
 
+            // location
+            if (startTag == "location") {
+                xmlParser.readNextStartElement();
+
+                // get location name
+                m_linkedinUser->setLocation(xmlParser.readElementText());
+
+                // move to country
+                xmlParser.readNextStartElement();
+
+                // move to code
+                xmlParser.readNextStartElement();
+                m_linkedinUser->setLocationCountryCode(xmlParser.readElementText());
+            }
+
             // skills
             if (startTag == "skills") {
                 parseSkillsXml(xmlParser);
@@ -744,7 +759,9 @@ void LinkedIn::profileInfoReceived()
     }
 
     Q_EMIT profileUpdated();
-    qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->profileId() <<  m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline();
+
+    qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->profileId() <<  m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline()
+            << " " << m_linkedinUser->location() << " " << m_linkedinUser->locationCountryCode();
 }
 
 
