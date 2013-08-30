@@ -340,6 +340,37 @@ void LinkedIn::requestAuthToken(const QString &code)
 }
 
 
+void LinkedIn::parseDateOfBirth(QXmlStreamReader &xmlStrReader)
+{
+    qDebug("[LinkedIn::parseDateOfBirth]");
+
+    QString year("0000");
+    QString month("01");
+    QString day("01");
+
+    // move on
+    xmlStrReader.readNextStartElement();
+
+    while (xmlStrReader.name() != "date-of-birth") {
+        QString name = xmlStrReader.name().toString();
+        qDebug() << "NAME IS: " << xmlStrReader.name();
+
+        if (name == "year") {
+            year = xmlStrReader.readElementText();
+        } else if (name == "month") {
+            month = xmlStrReader.readElementText();
+        } else if (name == "day") {
+            day = xmlStrReader.readElementText();
+        }
+
+        xmlStrReader.readNext();
+    }
+
+    QString bdayStr = year + "/" + month + "/" + day;
+    m_linkedinUser->setBirthday(QDate::fromString(bdayStr, "yyyy/MM/dd"));
+}
+
+
 void LinkedIn::parseEducationXml(QXmlStreamReader &xmlStrReader)
 {
     qDebug("[LinkedIn::parseEducationXml]");
@@ -755,6 +786,11 @@ void LinkedIn::profileInfoReceived()
             if (startTag == "educations") {
                 parseEducationXml(xmlParser);
             }
+
+            // date of birth
+            if (startTag == "date-of-birth") {
+                parseDateOfBirth(xmlParser);
+            }
         }
     }
 
@@ -784,7 +820,7 @@ void LinkedIn::updateProfileInfo()
     QString infoStr(":(");
 
     // personal data
-    infoStr += "id,first-name,last-name,email-address";
+    infoStr += "id,first-name,last-name,email-address,date-of-birth";
 
     // full profile info
     infoStr += ",associations,interests,languages,skills,certifications,educations,num-recommenders,recommendations-received";

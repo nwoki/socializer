@@ -83,6 +83,7 @@ public:
     LinkedInUser(QObject *parent = 0);
     ~LinkedInUser();
 
+    QDate birthday() const;
     QHash<QString, Education> educaitons() const;
     QString email() const;
     QString firstName() const;
@@ -105,6 +106,7 @@ public:
     void addPosition(const QString &id, const Position &position);
     void addRecommendation(const QString &id, const Recommendation &recommendation);
     void addSkill(const QString &id, const QString &skill);
+    void setBirthday(const QDate &birthday);
     void setEmail(const QString &data);
     void setFirstName(const QString &data);
     void setHeadLine(const QString &data);

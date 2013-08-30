@@ -30,6 +30,7 @@ public:
     QString locationCountryCode;
     QString industry;
     QString profilePictureUrl;
+    QDate birthday;
 
     QHash<QString, Position> positions;                // id:Position
     QHash<QString, Language> languages;               // id:Language
@@ -50,6 +51,12 @@ LinkedInUser::LinkedInUser(QObject *parent)
 
 LinkedInUser::~LinkedInUser()
 {
+}
+
+
+QDate LinkedInUser::birthday() const
+{
+    return d->birthday;
 }
 
 
@@ -176,6 +183,12 @@ void LinkedInUser::addRecommendation(const QString &id, const LinkedInUser::Reco
 void LinkedInUser::addSkill(const QString &id, const QString &skill)
 {
     d->skills.insert(id, skill);
+}
+
+
+void LinkedInUser::setBirthday(const QDate &birthday)
+{
+    d->birthday = birthday;
 }
 
 

@@ -101,6 +101,7 @@ private:
     void updateProfileInfo();
 
     // parsers
+    void parseDateOfBirth(QXmlStreamReader &xmlStrReader);
     void parseEducationXml(QXmlStreamReader &xmlStrReader);
     void parseLanguageXml(QXmlStreamReader &xmlStrReader);
     void parsePositionsXml(QXmlStreamReader &xmlStrReader);
