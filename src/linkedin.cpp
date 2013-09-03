@@ -461,7 +461,6 @@ void LinkedIn::parseGroupsXml(QXmlStreamReader &xmlStrReader)
             }
         } else {
             if (xmlStrReader.name() == "group-membership") {
-                flag = true;
                 LinkedInUser::Group group;
                 group.id = id;
                 group.name = groupName;
