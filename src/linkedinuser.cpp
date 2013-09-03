@@ -32,13 +32,15 @@ public:
     QString profilePictureUrl;
     QDate birthday;
 
-    QHash<QString, Position> positions;                // id:Position
-    QHash<QString, Language> languages;               // id:Language
-    QHash<QString, QString> skills;                   // id:name
-    QHash<QString, Certification> certifications;     // id:certification
-    QHash<QString, Education> education;              // id:education
-    QHash<QString, Recommendation> recommendations;   // id:recommendation
+    QHash<QString, Position> positions;                 // id:Position
+    QHash<QString, Language> languages;                 // id:Language
+    QHash<QString, QString> skills;                     // id:name
+    QHash<QString, Certification> certifications;       // id:certification
+    QHash<QString, Education> education;                // id:education
+    QHash<QString, Recommendation> recommendations;     // id:recommendation
+    QHash<QString, Group> groups;                       // id:group
 };
+
 
 LinkedInUser::LinkedInUser(QObject *parent)
     : QObject(parent)
@@ -75,6 +77,12 @@ QString LinkedInUser::email() const
 QString LinkedInUser::firstName() const
 {
     return d->firstName;
+}
+
+
+QHash<QString, LinkedInUser::Group> LinkedInUser::groups() const
+{
+    return d->groups;
 }
 
 
@@ -159,6 +167,12 @@ QHash<QString, QString> LinkedInUser::skills() const
 void LinkedInUser::addEducation(const QString &id, const LinkedInUser::Education &education)
 {
     d->education.insert(id, education);
+}
+
+
+void LinkedInUser::addGroup(const QString &id, const LinkedInUser::Group &group)
+{
+    d->groups.insert(id, group);
 }
 
 

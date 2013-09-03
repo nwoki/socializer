@@ -22,6 +22,12 @@ class LinkedInUser : public QObject
     Q_OBJECT
 
 public:
+    struct Group {
+        QString id;
+        QString name;
+        QString membershipState;
+    };
+
     struct Language {
         QString id;
         QString language;
@@ -87,6 +93,7 @@ public:
     QHash<QString, Education> educaitons() const;
     QString email() const;
     QString firstName() const;
+    QHash<QString, Group> groups() const;
     QString headline() const;
     QString industry() const;
     QHash<QString, Language> languages() const;
@@ -102,6 +109,7 @@ public:
     QHash<QString, QString> skills() const;
 
     void addEducation(const QString &id, const Education &education);
+    void addGroup(const QString &id, const Group &group);
     void addLanguage(const QString &id, const Language &lang);
     void addPosition(const QString &id, const Position &position);
     void addRecommendation(const QString &id, const Recommendation &recommendation);

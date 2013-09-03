@@ -21,10 +21,9 @@ int main(int argc, char *argv[])
         Socializer::LinkedIn *link = new Socializer::LinkedIn(argv[1], "1fx5y8590q6r", "1tTwdCxMuiycme2R", "http://www.2s2h.com");
         Q_UNUSED(link)
     } else {
-        Socializer::LinkedIn *link = new Socializer::LinkedIn("AQUkEMYehs5HFfh-3A6x9s6vEgD_Oh9I6_DIYm_yClbFF9cbgpLk7jDkRwMa-jwjRgfN3UO_9suywnwF_-yEMgET3MtB8z6pExBf5gFAQunD_rdxIAA9YkQqquVq5XjbPxzZR5ckS3SQd2-FDH0-C7SCIKNObzUKnbifqqpPGZM1juZvhcY");
+        Socializer::LinkedIn *link = new Socializer::LinkedIn("AQVaxUFW7YypexPx7tSxWig-NjUHCffYyAEA57VXuF1wePH7y3s6BKRxw0VLN4T_9BVUuR82s09yI27IyFNsEs9mRp7NNqfzJBRZPU_bHEbnd6lZZupVRB7zmFMGsrCkJ20c4gLocSk6qBQVe9fkglwZQDGHKLgrOuMHlRIVEKhOpxuOddk");
         Q_UNUSED(link)
     }
-
 
     return app.exec();
 }

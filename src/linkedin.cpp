@@ -439,6 +439,44 @@ void LinkedIn::parseEducationXml(QXmlStreamReader &xmlStrReader)
 }
 
 
+void LinkedIn::parseGroupsXml(QXmlStreamReader &xmlStrReader)
+{
+    qDebug("[LinkedIn::parseGroupsXml]");
+
+    QString id;
+    QString groupName;
+    QString groupMembershipState;
+
+    xmlStrReader.readNextStartElement();
+
+    while (xmlStrReader.name() != "group-memberships") {
+        qDebug() << "start element: " << xmlStrReader.name();
+        if (xmlStrReader.isStartElement()) {
+            if (xmlStrReader.name() == "id") {
+                id = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "name") {
+                groupName = xmlStrReader.readElementText();
+            } else if (xmlStrReader.name() == "code") {
+                groupMembershipState = xmlStrReader.readElementText();
+            }
+        } else {
+            if (xmlStrReader.name() == "group-membership") {
+                flag = true;
+                LinkedInUser::Group group;
+                group.id = id;
+                group.name = groupName;
+                group.membershipState = groupMembershipState;
+
+                // add to hash
+                m_linkedinUser->addGroup(id, group);
+            }
+        }
+
+        xmlStrReader.readNext();
+    }
+}
+
+
 void LinkedIn::parseLanguageXml(QXmlStreamReader &xmlStrReader)
 {
     qDebug("[LinkedIn::parseLanguageXml]");
@@ -791,6 +829,11 @@ void LinkedIn::profileInfoReceived()
             if (startTag == "date-of-birth") {
                 parseDateOfBirth(xmlParser);
             }
+
+            // groups
+            if (startTag == "group-memberships") {
+                parseGroupsXml(xmlParser);
+            }
         }
     }
 
@@ -820,7 +863,7 @@ void LinkedIn::updateProfileInfo()
     QString infoStr(":(");
 
     // personal data
-    infoStr += "id,first-name,last-name,email-address,date-of-birth";
+    infoStr += "id,first-name,last-name,email-address,date-of-birth,group-memberships";
 
     // full profile info
     infoStr += ",associations,interests,languages,skills,certifications,educations,num-recommenders,recommendations-received";

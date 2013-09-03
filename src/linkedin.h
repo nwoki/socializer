@@ -103,6 +103,7 @@ private:
     // parsers
     void parseDateOfBirth(QXmlStreamReader &xmlStrReader);
     void parseEducationXml(QXmlStreamReader &xmlStrReader);
+    void parseGroupsXml(QXmlStreamReader &xmlStrReader);
     void parseLanguageXml(QXmlStreamReader &xmlStrReader);
     void parsePositionsXml(QXmlStreamReader &xmlStrReader);
     void parseRecommendationsXml(QXmlStreamReader &xmlStrReader);
