@@ -213,6 +213,27 @@ void Facebook::onAuthTokenChanged()
 }
 
 
+void Facebook::onLikeDataReceived()
+{
+    qDebug("[Facebook::onLikeDataReceived]");
+
+    QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
+    QByteArray data;
+
+    if (rep == 0) {
+        return;
+    }
+
+    while  (rep->bytesAvailable()) {
+        data += rep->readAll();
+    }
+
+    rep->deleteLater();
+
+    parseLikeData(data);
+}
+
+
 void Facebook::onPopulateDataReplyReceived()
 {
     qDebug("[Facebook::onPopulateDataReplyReceived]");
@@ -323,38 +344,8 @@ void Facebook::onPopulateDataReplyReceived()
 
     qDebug() << "[Facebook::onPopulateDataReplyReceived] Picture: " << m_fbUser->picture();
 
-
     // LIKES
-#ifdef USING_QT5
-    QJsonObject likesObj = jsonObj.value("likes").toObject();
-    if (!likesObj.isEmpty()) {
-        QJsonArray likesArray = likesObj.value("data").toArray();
-
-        for (int i = 0; i < likesArray.size(); ++i) {
-            QJsonObject likeDetail = likesArray.at(i).toObject();
-#else
-    QVariantMap likesObj = jsonObj.value("likes").toMap();
-    if (!likesObj.isEmpty()) {
-        QList<QVariant> likesArray = likesObj.value("data").toList();
-
-        for (int i = 0; i < likesArray.size(); ++i) {
-            QVariantMap likeDetail = likesArray.at(i).toMap();
-#endif
-
-            FacebookUser::Like like;
-
-            like.description = likeDetail.value("description").toString();
-            like.createdTime = likeDetail.value("created_time").toString();
-            like.id = likeDetail.value("id").toString();
-            like.name = likeDetail.value("name").toString();
-            like.link = likeDetail.value("link").toString();
-            like.category = likeDetail.value("category").toString();
-
-            // add to hash
-            m_fbUser->addLike(like.id, like);
-            qDebug() << "[Facebook::onPopulateDataReplyReceived] NEW LIKE: " << like.id << " - " << like.description << " - " << like.name;
-        }
-    }
+    parseLikeData(jsonObj);
 
     // FRIENDS
 #ifdef USING_QT5
@@ -403,7 +394,7 @@ void Facebook::onPopulateDataReplyReceived()
 #endif
 
             m_fbUser->addFriend(myFriend.id, myFriend);
-            qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend: " << myFriend.picture << " - " << myFriend.firstName << " - " << myFriend.lastName << " - " << myFriend.id << myFriend.link;
+            qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend id: " << myFriend.id;
         }
     }
 
@@ -499,7 +490,99 @@ void Facebook::onPopulateDataReplyReceived()
 }
 
 
-void Facebook::parseNewUrl(const QString& url)
+void Facebook::parseLikeData(const QByteArray &data)
+{
+    qDebug("[Facebook::parseLikeData]");
+
+#ifdef USING_QT5
+    // extract json object from data received
+    QJsonObject jsonObj = jsonObject(data);
+
+    if (jsonObj.isEmpty()) {
+        // error occured
+        return;
+    }
+#else
+    QJson::Parser parser;
+    bool ok;
+
+    QVariantMap jsonObj = parser.parse(data, &ok).toMap();
+
+    if (jsonObj.isEmpty()) {
+        return;
+    }
+#endif
+
+    parseLikeData(jsonObj);
+}
+
+#ifdef USING_QT5
+void Facebook::parseLikeData(const QJsonObject &jsonObj)
+#else
+void Facebook::parseLikeData(const QVariantMap &jsonObj)
+#endif
+{
+    qDebug("[Facebook::parseLikeData]");
+
+#ifdef USING_QT5
+    QJsonObject likesObj = jsonObj.value("likes").toObject();
+    QJsonArray likesArray;
+
+    likesObj.isEmpty() ? likesArray = jsonObj.value("data").toArray() : likesArray = likesObj.value("data").toArray();
+#else
+    QVariantMap likesObj = jsonObj.value("likes").toMap();
+    QList<QVariant> likesArray;
+
+    likesObj.isEmpty() ? likesArray = jsonObj.value("data").toList() : likesArray = likesObj.value("data").toList();
+#endif
+
+
+    for (int i = 0; i < likesArray.size(); ++i) {
+#ifdef USING_QT5
+        QJsonObject likeDetail = likesArray.at(i).toObject();
+#else
+        QVariantMap likeDetail = likesArray.at(i).toMap();
+#endif
+        FacebookUser::Like like;
+
+        like.description = likeDetail.value("description").toString();
+        like.createdTime = likeDetail.value("created_time").toString();
+        like.id = likeDetail.value("id").toString();
+        like.name = likeDetail.value("name").toString();
+        like.link = likeDetail.value("link").toString();
+        like.category = likeDetail.value("category").toString();
+
+        // add to hash
+        m_fbUser->addLike(like.id, like);
+        qDebug() << "[Facebook::parseLikeData] new like id: " << like.id;
+    }
+
+    // now check for next page
+#ifdef USING_QT5
+    QJsonObject likesPaging;
+    likesObj.isEmpty() ? likesPaging = jsonObj.value("paging").toObject() : likesPaging = likesObj.value("paging").toObject();
+
+    if (!likesPaging.isEmpty() && !likesPaging.value("next").toString().isEmpty()) {
+#else
+    QVariantMap likesPaging;
+    likesObj.isEmpty() ? likesPaging = jsonObj.value("paging").toMap() : likesPaging = likesObj.value("paging").toMap();
+
+    if (!likesPaging.isEmpty() && !likesPaging.value("next").toString().isEmpty()) {
+#endif
+
+        QNetworkRequest req;
+        req.setUrl(QUrl(likesPaging.value("next").toString()));
+
+        QNetworkReply *netRep = m_networkAccessManager->get(req);
+
+        // connect
+        connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
+        connect(netRep, SIGNAL(finished()), this, SLOT(onLikeDataReceived()));
+    }
+}
+
+
+void Facebook::parseNewUrl(const QString &url)
 {
     qDebug() << "[Facebook::parseNewUrl] got url: " << url;
 
