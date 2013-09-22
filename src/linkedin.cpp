@@ -14,6 +14,7 @@
 
 #ifdef USING_QT5
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 #else
 #include <qjson/parser.h>
 #endif
@@ -192,34 +193,6 @@ QString LinkedIn::createScope()
 }
 
 
-bool LinkedIn::isResponseValid(const QByteArray &msg)
-{
-    qDebug("[LinkedIn::isResponseValid]");
-
-    QXmlStreamReader xmlReader(msg);
-
-    while (!xmlReader.atEnd()) {
-        if (xmlReader.readNextStartElement()) {
-
-            // TODO save error code and string
-            if (xmlReader.name() == "error") {
-                // extract error code and message
-                while (!xmlReader.atEnd()) {
-                    if (xmlReader.readNextStartElement()) {
-                        if (xmlReader.name() == "status") {
-                            qDebug() << "[LinkedIn::isResponseValid] ERROR CODE: " << xmlReader.readElementText();
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return true;
-}
-
-
 void LinkedIn::obtainAuthPageUrl()
 {
     qDebug("[LinkedIn::obtainAuthPageUrl]");
@@ -340,383 +313,6 @@ void LinkedIn::requestAuthToken(const QString &code)
 }
 
 
-void LinkedIn::parseDateOfBirth(QXmlStreamReader &xmlStrReader)
-{
-    qDebug("[LinkedIn::parseDateOfBirth]");
-
-    QString year("0000");
-    QString month("01");
-    QString day("01");
-
-    // move on
-    xmlStrReader.readNextStartElement();
-
-    while (xmlStrReader.name() != "date-of-birth") {
-        QString name = xmlStrReader.name().toString();
-        qDebug() << "NAME IS: " << xmlStrReader.name();
-
-        if (name == "year") {
-            year = xmlStrReader.readElementText();
-        } else if (name == "month") {
-            month = xmlStrReader.readElementText();
-        } else if (name == "day") {
-            day = xmlStrReader.readElementText();
-        }
-
-        xmlStrReader.readNext();
-    }
-
-    QString bdayStr = year + "/" + month + "/" + day;
-    m_linkedinUser->setBirthday(QDate::fromString(bdayStr, "yyyy/MM/dd"));
-}
-
-
-void LinkedIn::parseEducationXml(QXmlStreamReader &xmlStrReader)
-{
-    qDebug("[LinkedIn::parseEducationXml]");
-
-    xmlStrReader.readNextStartElement();
-
-    QString id;
-    QString schoolName;
-    QString notes;
-    QString activities;
-    QString degree;
-    QString fieldOfStudy;
-    QString startDate;
-    QString endDate;
-
-    while (xmlStrReader.name() != "educations") {
-        if (xmlStrReader.isStartElement()) {
-            if (xmlStrReader.name() == "id") {
-                id = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "school-name") {
-                schoolName = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "notes") {
-                notes = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "activities") {
-                activities = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "degree") {
-                degree = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "field-of-study") {
-                fieldOfStudy = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "start-date") {
-                // move to next tag
-                xmlStrReader.readNextStartElement();
-                startDate = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "end-date") {
-                // move to next tag
-                xmlStrReader.readNextStartElement();
-                endDate = xmlStrReader.readElementText();
-            }
-        } else if (xmlStrReader.name() == "education") {
-            // add to hash
-            LinkedInUser::Education education;
-            education.activities = activities;
-            education.degree = degree;
-            education.endDate = endDate;
-            education.fieldOfStudy = fieldOfStudy;
-            education.notes = notes;
-            education.schoolName = schoolName;
-            education.startDate = startDate;
-            education.id = id;
-
-            m_linkedinUser->addEducation(id, education);
-
-            // clear
-            id.clear();
-            schoolName.clear();
-            notes.clear();
-            activities.clear();
-            degree.clear();
-            fieldOfStudy.clear();
-            startDate.clear();
-            endDate.clear();
-        }
-
-        xmlStrReader.readNext();
-    }
-}
-
-
-void LinkedIn::parseGroupsXml(QXmlStreamReader &xmlStrReader)
-{
-    qDebug("[LinkedIn::parseGroupsXml]");
-
-    QString id;
-    QString groupName;
-    QString groupMembershipState;
-
-    xmlStrReader.readNextStartElement();
-
-    while (xmlStrReader.name() != "group-memberships") {
-        qDebug() << "start element: " << xmlStrReader.name();
-        if (xmlStrReader.isStartElement()) {
-            if (xmlStrReader.name() == "id") {
-                id = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "name") {
-                groupName = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "code") {
-                groupMembershipState = xmlStrReader.readElementText();
-            }
-        } else {
-            if (xmlStrReader.name() == "group-membership") {
-                LinkedInUser::Group group;
-                group.id = id;
-                group.name = groupName;
-                group.membershipState = groupMembershipState;
-
-                // add to hash
-                m_linkedinUser->addGroup(id, group);
-            }
-        }
-
-        xmlStrReader.readNext();
-    }
-}
-
-
-void LinkedIn::parseLanguageXml(QXmlStreamReader &xmlStrReader)
-{
-    qDebug("[LinkedIn::parseLanguageXml]");
-
-    bool flag = true;
-    QString id;
-    QString langName;
-
-    xmlStrReader.readNextStartElement();
-
-    while (xmlStrReader.name() != "languages") {
-        if (xmlStrReader.isStartElement()) {
-            if (xmlStrReader.name() == "id") {
-                id = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "name") {
-                langName = xmlStrReader.readElementText();
-            }
-        } else {
-            if (xmlStrReader.name() == "language" && !flag) {
-                flag = true;
-                LinkedInUser::Language lang;
-                lang.language = langName;
-                lang.id = id;
-
-                // add to hash
-                m_linkedinUser->addLanguage(id, lang);
-            } else if (xmlStrReader.name() == "language" && flag) {
-                flag = false;
-            }
-        }
-
-        xmlStrReader.readNext();
-    }
-}
-
-
-void LinkedIn::parsePositionsXml(QXmlStreamReader &xmlStrReader)
-{
-    qDebug("[LinkedIn::parsePositionsXml]");
-
-    xmlStrReader.readNextStartElement();
-
-    QString id;
-    QString title;
-    QString startDate;
-    QString endDate;
-    bool isCurrent = false;
-    QString summary;
-
-    QString companyId;
-    QString companyName;
-    QString companySize;
-    QString companyType;
-    QString companyIndustry;
-
-    bool inStartDate = false;
-    bool inEndDate = false;
-
-    // TODO start/end date
-
-    while (xmlStrReader.name() != "positions") {
-        if (xmlStrReader.isStartElement()) {
-            if (xmlStrReader.name() == "id") {
-                id = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "title") {
-                title = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "is-current") {
-                isCurrent = xmlStrReader.readElementText() == "true" ? true : false;
-            } else if (xmlStrReader.name() == "summary") {
-                summary = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "start-date") {
-                inStartDate = true;
-            } else if (xmlStrReader.name() == "end-date") {
-                inEndDate = true;
-            } else if (xmlStrReader.name() == "company") {
-                // save company data
-                xmlStrReader.readNextStartElement();    // move to id
-                companyId = xmlStrReader.readElementText();
-                xmlStrReader.readNextStartElement();
-                companyName = xmlStrReader.readElementText();
-                xmlStrReader.readNextStartElement();
-                companySize = xmlStrReader.readElementText();
-                xmlStrReader.readNextStartElement();
-                companyType = xmlStrReader.readElementText();
-                xmlStrReader.readNextStartElement();
-                companyIndustry = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "year") {
-                if (inStartDate) {
-                    startDate += xmlStrReader.readElementText();
-                } else if (inEndDate) {
-                    endDate += xmlStrReader.readElementText();
-                }
-            } else if (xmlStrReader.name() == "month") {
-                if (inStartDate) {
-                    startDate.prepend(xmlStrReader.readElementText() + "-");
-                } else if (inEndDate) {
-                    endDate.prepend(xmlStrReader.readElementText() + "-");
-                }
-            } else if (xmlStrReader.name() == "day") {
-                if (inStartDate) {
-                    startDate.prepend(xmlStrReader.readElementText() + "-");
-                } else if (inEndDate) {
-                    endDate.prepend(xmlStrReader.readElementText() + "-");
-                }
-            }
-        } else {
-            if (xmlStrReader.name() == "position") {
-                // add position
-
-                LinkedInUser::Position position;
-                position.isCurrent = isCurrent;
-                position.startDate = startDate;
-                position.endDate = endDate;
-                position.summary = summary;
-                position.title = title;
-                position.id = id;
-
-                // company
-                position.company.id = companyId;
-                position.company.industry = companyIndustry;
-                position.company.name = companyName;
-                position.company.size = companySize;
-                position.company.type = companyType;
-
-                m_linkedinUser->addPosition(id, position);
-
-                // clear data
-                id.clear();
-                title.clear();
-                startDate.clear();
-                endDate.clear();
-                isCurrent = false;
-                summary.clear();
-
-                companyId.clear();
-                companyName.clear();
-                companySize.clear();
-                companyType.clear();
-                companyIndustry.clear();
-            } else if (xmlStrReader.name() == "start-date") {
-                inStartDate = false;
-            } else if (xmlStrReader.name() == "end-date") {
-                inEndDate = false;
-            }
-        }
-
-        xmlStrReader.readNext();
-    }
-}
-
-
-void LinkedIn::parseRecommendationsXml(QXmlStreamReader &xmlStrReader)
-{
-    qDebug("[LinkedIn::parseRecommendationsXml]");
-
-    QString id;
-    QString recommendationText;
-    QString recommendationType;
-    QString recommenderId;
-    QString recommenderFirstName;
-    QString recommenderLastName;
-
-    xmlStrReader.readNextStartElement();
-
-    while (!xmlStrReader.isEndDocument() && xmlStrReader.name() != "recommendations-received") {
-        if (xmlStrReader.isStartElement()) {
-            if (xmlStrReader.name() == "id") {
-                id = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "recommendation-text") {
-                recommendationText = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "recommendation-type") {
-                // move to next tag
-                xmlStrReader.readNextStartElement();
-                recommendationType = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "recommender") {
-                // store recommender info
-                xmlStrReader.readNextStartElement();
-                recommenderId = xmlStrReader.readElementText();
-                xmlStrReader.readNextStartElement();
-                recommenderFirstName = xmlStrReader.readElementText();
-                xmlStrReader.readNextStartElement();
-                recommenderLastName = xmlStrReader.readElementText();
-            }
-        } else if (xmlStrReader.name() == "recommendation" && xmlStrReader.isEndElement()) {
-            // add to has
-            LinkedInUser::Recommendation recommendation;
-            recommendation.text = recommendationText;
-            recommendation.type = recommendationType;
-            recommendation.recommender.id = recommenderId;
-            recommendation.recommender.firstName = recommenderFirstName;
-            recommendation.recommender.lastName = recommenderLastName;
-
-            m_linkedinUser->addRecommendation(id, recommendation);
-
-            // clear data
-            id.clear();
-            recommendationText.clear();
-            recommendationType.clear();
-            recommenderId.clear();
-            recommenderFirstName.clear();
-            recommenderLastName.clear();
-        }
-
-        xmlStrReader.readNext();
-    }
-}
-
-
-void LinkedIn::parseSkillsXml(QXmlStreamReader &xmlStrReader)
-{
-    qDebug("[LinkedIn::parseSkillsXml]");
-
-    bool flag = true;
-    QString id;
-    QString skill;
-
-    xmlStrReader.readNextStartElement();
-
-    while (xmlStrReader.name() != "skills") {
-        if (xmlStrReader.isStartElement()) {
-            if (xmlStrReader.name() == "id") {
-                id = xmlStrReader.readElementText();
-            } else if (xmlStrReader.name() == "name") {
-                skill = xmlStrReader.readElementText();
-            }
-        } else {
-            if (xmlStrReader.name() == "skill" && !flag) {
-                flag = true;
-
-                // add to hash
-                m_linkedinUser->addSkill(id, skill);
-            } else if (xmlStrReader.name() == "skill" && flag) {
-                flag = false;
-            }
-        }
-
-        xmlStrReader.readNext();
-    }
-}
-
-
 void LinkedIn::prepareAuthPageUrl()
 {
     // once i have the access token, return the authentication url
@@ -738,108 +334,228 @@ void LinkedIn::profileInfoReceived()
 
     rep->deleteLater();
 
-    qDebug() << "[LinkedIn::profileInfoReceived] xml received: " << rcv;
+    qDebug() << "[LinkedIn::profileInfoReceived] json received: " << rcv;
 
-    // parse
-    QXmlStreamReader xmlParser(rcv);
+#ifdef USING_QT5
+    QJsonObject jsonObj = jsonObject(rcv);
 
-    while (!xmlParser.atEnd()) {
-        if (xmlParser.readNextStartElement()) {
-            QString startTag = xmlParser.name().toString();
-            qDebug() << "start elem: " << startTag;
-
-            if (startTag == "id") {
-                m_linkedinUser->setProfileId(xmlParser.readElementText());
-            }
-
-            if (startTag == "first-name") {
-                m_linkedinUser->setFirstName(xmlParser.readElementText());
-            }
-
-            if (startTag == "last-name") {
-                m_linkedinUser->setLastName(xmlParser.readElementText());
-            }
-
-            if (startTag == "email-address") {
-                m_linkedinUser->setEmail(xmlParser.readElementText());
-            }
-
-            if (startTag == "num-recommenders") {
-                m_linkedinUser->setNumberOfRecommenders(xmlParser.readElementText().toInt());
-            }
-
-            if (startTag == "num-connections") {
-                m_linkedinUser->setNumberOfConnections(xmlParser.readElementText().toInt());
-            }
-
-            if (startTag == "headline") {
-                m_linkedinUser->setHeadLine(xmlParser.readElementText());
-            }
-
-            if (startTag == "industry") {
-                m_linkedinUser->setIndustry(xmlParser.readElementText());
-            }
-
-            if (startTag == "picture-url") {
-                m_linkedinUser->setProfilePictureUrl(xmlParser.readElementText());
-            }
-
-            // languages
-            if (startTag == "languages") {
-                parseLanguageXml(xmlParser);
-            }
-
-            // location
-            if (startTag == "location") {
-                xmlParser.readNextStartElement();
-
-                // get location name
-                m_linkedinUser->setLocation(xmlParser.readElementText());
-
-                // move to country
-                xmlParser.readNextStartElement();
-
-                // move to code
-                xmlParser.readNextStartElement();
-                m_linkedinUser->setLocationCountryCode(xmlParser.readElementText());
-            }
-
-            // skills
-            if (startTag == "skills") {
-                parseSkillsXml(xmlParser);
-            }
-
-            // recommendations
-            if (startTag == "recommendations-received") {
-                parseRecommendationsXml(xmlParser);
-            }
-
-            // positions
-            if (startTag == "positions") {
-                parsePositionsXml(xmlParser);
-            }
-
-            // education
-            if (startTag == "educations") {
-                parseEducationXml(xmlParser);
-            }
-
-            // date of birth
-            if (startTag == "date-of-birth") {
-                parseDateOfBirth(xmlParser);
-            }
-
-            // groups
-            if (startTag == "group-memberships") {
-                parseGroupsXml(xmlParser);
-            }
-        }
+    if (jsonObj.isEmpty()) {
+        qWarning("[LinkedIn::profileInfoReceived] error parsing json");
+        return;
     }
+#else
+    // TODO
+#endif
+
+    m_linkedinUser->setEmail(jsonObj.value("emailAddress").toString());
+    m_linkedinUser->setFirstName(jsonObj.value("firstName").toString());
+    m_linkedinUser->setLastName(jsonObj.value("lastName").toString());
+    m_linkedinUser->setHeadLine(jsonObj.value("headline").toString());
+    m_linkedinUser->setIndustry(jsonObj.value("industry").toString());
+
+#ifdef USING_QT5
+    m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toVariant().toInt());
+    m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toVariant().toInt());
+#else
+    m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toInt());
+    m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toInt());
+#endif
+
+    m_linkedinUser->setProfileId(jsonObj.value("id").toString());
+    m_linkedinUser->setProfilePictureUrl(jsonObj.value("pictureUrl").toString());
+    m_linkedinUser->setPublicProfileUrl(jsonObj.value("publicProfileUrl").toString());
+
+
+    // BIRTHDAY
+#ifdef USING_QT5
+    QJsonObject birthdayObj = jsonObj.value("dateOfBirth").toObject();
+    m_linkedinUser->setBirthday(QDate(birthdayObj.value("year").toVariant().toInt()
+                                    , birthdayObj.value("month").toVariant().toInt()
+                                    , birthdayObj.value("day").toVariant().toInt()))    ;
+#else
+    // TODO
+#endif
+
+
+    // EDUCATION
+#ifdef USING_QT5
+    QJsonObject educationsObj = jsonObj.value("educations").toObject();
+    QJsonArray educationsList = educationsObj.value("values").toArray();
+
+    Q_FOREACH (QJsonValue eduValue, educationsList) {
+        LinkedInUser::Education edu;
+#else
+        // TODO
+#endif
+
+#ifdef USING_QT5
+        QJsonObject eduObj = eduValue.toObject();
+        QJsonObject eduStartDate = eduObj.value("startDate").toObject();
+        QJsonObject eduEndDate = eduObj.value("endDate").toObject();
+
+        edu.id = QString::number(eduObj.value("id").toVariant().toInt());
+
+        edu.startDate = QDate(eduStartDate.value("year").toVariant().toInt()
+                            , eduStartDate.value("month").toVariant().toInt()
+                            , eduStartDate.value("day").toVariant().toInt()).toString();
+
+        edu.endDate = QDate(eduEndDate.value("year").toVariant().toInt()
+                            , eduEndDate.value("month").toVariant().toInt()
+                            , eduEndDate.value("day").toVariant().toInt()).toString();
+#else
+        // TODO
+#endif
+
+        edu.activities = eduObj.value("activities").toString();
+        edu.degree = eduObj.value("degree").toString();
+        edu.fieldOfStudy = eduObj.value("fieldOfStudy").toString();
+        edu.notes = eduObj.value("notes").toString();
+        edu.schoolName = eduObj.value("schoolName").toString();
+
+        m_linkedinUser->addEducation(edu.id, edu);
+    }
+
+
+    // GROUPS
+#ifdef USING_QT5
+    QJsonObject groupMembershipsObj = jsonObj.value("groupMemberships").toObject();
+    QJsonArray groupMembershipsList = groupMembershipsObj.value("values").toArray();
+
+    Q_FOREACH (QJsonValue groupValue, groupMembershipsList) {
+        LinkedInUser::Group group;
+        QJsonObject groupObj = groupValue.toObject();
+
+        QJsonObject groupData = groupObj.value("group").toObject();
+        QJsonObject membershipData = groupObj.value("membershipState").toObject();
+
+        group.id = QString::number(groupData.value("id").toVariant().toInt());
+#else
+    // TODO
+#endif
+
+        group.name = groupData.value("name").toString();
+        group.membershipState = membershipData.value("code").toString();
+
+        m_linkedinUser->addGroup(group.id, group);
+    }
+
+
+    // LANGUAGES
+#ifdef USING_QT5
+    QJsonObject languageObj = jsonObj.value("languages").toObject();
+    QJsonArray languageList = languageObj.value("values").toArray();
+
+    Q_FOREACH (QJsonValue langVal, languageList) {
+        LinkedInUser::Language lang;
+        lang.language = langVal.toObject().value("language").toObject().value("name").toString();
+        lang.id = QString::number(langVal.toObject().value("id").toVariant().toInt());
+#else
+    // TODO
+#endif
+
+        m_linkedinUser->addLanguage(lang.id, lang);
+    }
+
+
+    // LOCATION
+#ifdef USING_QT5
+    m_linkedinUser->setLocation(jsonObj.value("location").toObject().value("name").toString());
+#else
+    // TODO
+#endif
+
+
+    // POSITIONS
+#ifdef USING_QT5
+    QJsonObject positionsObj = jsonObj.value("positions").toObject();
+    QJsonArray positionsList = positionsObj.value("values").toArray();
+
+    Q_FOREACH (QJsonValue positionVal, positionsList) {
+        LinkedInUser::Position position;
+
+        QJsonObject positionObj = positionVal.toObject();
+        QJsonObject companyObj = positionObj.value("company").toObject();
+        QJsonObject startDateObj = positionObj.value("startDate").toObject();
+
+        position.id = QString::number(positionObj.value("id").toVariant().toInt());
+        position.company.id = QString::number(companyObj.value("id").toVariant().toInt());
+        position.isCurrent = companyObj.value("isCurrent").toBool();
+
+        if (position.isCurrent) {
+            QJsonObject endDateObj = positionObj.value("endDate").toObject();
+
+            position.endDate = QDate(endDateObj.value("year").toVariant().toInt()
+                                    , endDateObj.value("month").isUndefined() ? 1 : endDateObj.value("month").toVariant().toInt()
+                                    , endDateObj.value("day").isUndefined() ? 1 : endDateObj.value("day").toVariant().toInt()).toString();
+
+        }
+
+        position.startDate = QDate(startDateObj.value("year").toVariant().toInt()
+                                , startDateObj.value("month").isUndefined() ? 1 : startDateObj.value("month").toVariant().toInt()
+                                , startDateObj.value("day").isUndefined() ? 1 : startDateObj.value("day").toVariant().toInt()).toString();
+
+#else
+    // TODO
+#endif
+
+        position.isCurrent = positionObj.value("isCurrent").toBool();
+        position.summary = positionObj.value("summary").toString();
+        position.title = positionObj.value("title").toString();
+
+        // company
+        position.company.industry = companyObj.value("industry").toString();
+        position.company.name = companyObj.value("name").toString();
+        position.company.size = companyObj.value("size").toString();
+        position.company.ticker = companyObj.value("ticker").toString();
+        position.company.type = companyObj.value("type").toString();
+
+        m_linkedinUser->addPosition(position.id, position);
+    }
+
+
+    // RECCOMENDATIONS
+#ifdef USING_QT5
+    QJsonObject recommendationObj = jsonObj.value("recommendationsReceived").toObject();
+    QJsonArray recommendationList = recommendationObj.value("values").toArray();
+
+    Q_FOREACH (QJsonValue recommendationValue, recommendationList) {
+        LinkedInUser::Recommendation recommendation;
+        QJsonObject recommendationObj = recommendationValue.toObject();
+
+        recommendation.id = QString::number(recommendationObj.value("id").toVariant().toInt());
+        recommendation.text = recommendationObj.value("text").toString();
+        recommendation.type = recommendationObj.value("recommendationType").toObject().value("code").toString();
+
+        recommendation.recommender.id = QString::number(recommendationObj.value("recommender").toObject().value("id").toVariant().toInt());
+        recommendation.recommender.firstName = recommendationObj.value("recommender").toObject().value("firstName").toString();
+        recommendation.recommender.lastName = recommendationObj.value("recommender").toObject().value("lastName").toString();
+#else
+    // TODO
+#endif
+
+        m_linkedinUser->addRecommendation(recommendation.id, recommendation);
+    }
+
+
+    // SKILLS
+#ifdef USING_QT5
+    QJsonObject skillsObj = jsonObj.value("skills").toObject();
+    QJsonArray skillsList = skillsObj.value("values").toArray();
+
+    Q_FOREACH (QJsonValue skillValue, skillsList) {
+        m_linkedinUser->addSkill(QString::number(skillValue.toObject().value("id").toVariant().toInt())
+                                , skillValue.toObject().value("skill").toObject().value("name").toString());
+#else
+    // TODO
+#endif
+    }
+
 
     Q_EMIT profileUpdated();
 
     qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->profileId() <<  m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline()
             << " " << m_linkedinUser->location() << " " << m_linkedinUser->locationCountryCode();
+
 }
 
 
@@ -870,12 +586,12 @@ void LinkedIn::updateProfileInfo()
     // linkedin gen data
     infoStr += ",num-connections,headline,location:(name,country:(code)),industry,summary,picture-url,public-profile-url,positions";
 
-    // close
-    infoStr += ")";
+    // close and use json
+    infoStr += ")?format=json";
 
     reqUrl.append(infoStr);
 
-    reqUrl.append("?oauth2_access_token=" + authToken());
+    reqUrl.append("&oauth2_access_token=" + authToken());
 
     QNetworkRequest req(reqUrl);
     QNetworkReply *netRep = m_networkAccessManager->get(req);

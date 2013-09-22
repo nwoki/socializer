@@ -31,6 +31,7 @@ public:
     QString industry;
     QString profilePictureUrl;
     QDate birthday;
+    QString publicProfileUrl;
 
     QHash<QString, Position> positions;                 // id:Position
     QHash<QString, Language> languages;                 // id:Language
@@ -270,6 +271,20 @@ void LinkedInUser::setProfilePictureUrl(const QString& data)
 {
     d->profilePictureUrl = data;
 }
+
+
+QString LinkedInUser::publicProfileUrl() const
+{
+    return d->publicProfileUrl;
+}
+
+
+void LinkedInUser::setPublicProfileUrl(const QString &data)
+{
+    d->publicProfileUrl = data;
+}
+
+
 
 
 }       // socializer

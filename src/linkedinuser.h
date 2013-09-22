@@ -81,6 +81,7 @@ public:
     };
 
     struct Recommendation {
+        QString id;
         QString type;
         QString text;
         Recommender recommender;
@@ -107,6 +108,7 @@ public:
     QString profilePictureUrl() const;
     QHash<QString, Recommendation> recommendations() const;
     QHash<QString, QString> skills() const;
+    QString publicProfileUrl() const;
 
     void addEducation(const QString &id, const Education &education);
     void addGroup(const QString &id, const Group &group);
@@ -126,6 +128,7 @@ public:
     void setNumberOfRecommenders(quint16 recommenders);
     void setProfileId(const QString &data);
     void setProfilePictureUrl(const QString &data);
+    void setPublicProfileUrl(const QString &data);
 
 
 private:

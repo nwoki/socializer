@@ -12,8 +12,6 @@
 
 #include "oauth.h"
 
-#include <QtCore/QXmlStreamReader>
-
 class QDeclarativeView;
 
 namespace Socializer
@@ -99,18 +97,6 @@ private:
 
     // user update calls
     void updateProfileInfo();
-
-    // parsers
-    void parseDateOfBirth(QXmlStreamReader &xmlStrReader);
-    void parseEducationXml(QXmlStreamReader &xmlStrReader);
-    void parseGroupsXml(QXmlStreamReader &xmlStrReader);
-    void parseLanguageXml(QXmlStreamReader &xmlStrReader);
-    void parsePositionsXml(QXmlStreamReader &xmlStrReader);
-    void parseRecommendationsXml(QXmlStreamReader &xmlStrReader);
-    void parseSkillsXml(QXmlStreamReader &xmlStrReader);
-
-    /** checks to see if the response doesn't contain errors */
-    bool isResponseValid(const QByteArray &msg);
 
     bool m_basicProfileScope;           // Name, photo, headline, and current positions
     bool m_fullProfileScope;            // Full profile including experience, education, skills, and recommendations
