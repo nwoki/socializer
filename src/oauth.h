@@ -136,9 +136,11 @@ protected:
     // network
     QNetworkAccessManager *m_networkAccessManager;
 
-#ifdef USING_QT5
     /** extracts a QJsonObject from given json data */
+#ifdef USING_QT5
     QJsonObject jsonObject(const QByteArray &jsonData);
+#else
+    QVariantMap jsonObject(const QByteArray &jsonData);
 #endif
 
 private:

@@ -344,7 +344,8 @@ void LinkedIn::profileInfoReceived()
         return;
     }
 #else
-    // TODO
+    QJson::Parser parser;
+    QVariantMap jsonObj = jsonObject(rcv);
 #endif
 
     m_linkedinUser->setEmail(jsonObj.value("emailAddress").toString());
@@ -370,10 +371,13 @@ void LinkedIn::profileInfoReceived()
 #ifdef USING_QT5
     QJsonObject birthdayObj = jsonObj.value("dateOfBirth").toObject();
     m_linkedinUser->setBirthday(QDate(birthdayObj.value("year").toVariant().toInt()
-                                    , birthdayObj.value("month").toVariant().toInt()
-                                    , birthdayObj.value("day").toVariant().toInt()))    ;
+                                    , birthdayObj.value("month").isUndefined() ? 1 : birthdayObj.value("month").toVariant().toInt()
+                                    , birthdayObj.value("day").isUndefined() ? 1 : birthdayObj.value("month").toVariant().toInt()));
 #else
-    // TODO
+    QVariantMap birthdayObj = jsonObj.value("dateOfBirth").toMap();
+    m_linkedinUser->setBirthday(QDate(birthdayObj.value("year").toInt()
+                                    , birthdayObj.value("month").isNull() ? 1 : birthdayObj.value("month").toInt()
+                                    , birthdayObj.value("day").isNull() ? 1 : birthdayObj.value("day").toInt()));
 #endif
 
 
@@ -384,11 +388,6 @@ void LinkedIn::profileInfoReceived()
 
     Q_FOREACH (QJsonValue eduValue, educationsList) {
         LinkedInUser::Education edu;
-#else
-        // TODO
-#endif
-
-#ifdef USING_QT5
         QJsonObject eduObj = eduValue.toObject();
         QJsonObject eduStartDate = eduObj.value("startDate").toObject();
         QJsonObject eduEndDate = eduObj.value("endDate").toObject();
@@ -396,14 +395,33 @@ void LinkedIn::profileInfoReceived()
         edu.id = QString::number(eduObj.value("id").toVariant().toInt());
 
         edu.startDate = QDate(eduStartDate.value("year").toVariant().toInt()
-                            , eduStartDate.value("month").toVariant().toInt()
-                            , eduStartDate.value("day").toVariant().toInt()).toString();
+        , eduStartDate.value("month").toVariant().toInt()
+        , eduStartDate.value("day").toVariant().toInt()).toString();
 
         edu.endDate = QDate(eduEndDate.value("year").toVariant().toInt()
-                            , eduEndDate.value("month").toVariant().toInt()
-                            , eduEndDate.value("day").toVariant().toInt()).toString();
+        , eduEndDate.value("month").toVariant().toInt()
+        , eduEndDate.value("day").toVariant().toInt()).toString();
 #else
-        // TODO
+    QVariantMap educationsObj = jsonObj.value("educations").toMap();
+    QList<QVariant> educationsList = educationsObj.value("values").toList();
+
+    Q_FOREACH (QVariant eduValue, educationsObj.value("values").toList()) {
+
+        LinkedInUser::Education edu;
+        QVariantMap eduObj = eduValue.toMap();
+        QVariantMap eduStartDate = eduObj.value("startDate").toMap();
+        QVariantMap eduEndDate = eduObj.value("endDate").toMap();
+
+        edu.id = QString::number(eduObj.value("id").toInt());
+
+        edu.startDate = QDate(eduStartDate.value("year").toInt()
+                            , eduStartDate.value("month").isNull() ? 1 : eduStartDate.value("month").toInt()
+                            , eduStartDate.value("day").isNull() ? 1 : eduStartDate.value("day").toInt()).toString();
+
+        edu.endDate = QDate(eduEndDate.value("year").toInt()
+                            , eduEndDate.value("month").isNull() ? 1 : eduEndDate.value("month").toInt()
+                            , eduEndDate.value("day").isNull() ? 1 : eduEndDate.value("day").toInt()).toString();
+
 #endif
 
         edu.activities = eduObj.value("activities").toString();
@@ -430,7 +448,16 @@ void LinkedIn::profileInfoReceived()
 
         group.id = QString::number(groupData.value("id").toVariant().toInt());
 #else
-    // TODO
+    QVariantMap groupMembershipsObj = jsonObj.value("groupMemberships").toMap();
+
+    Q_FOREACH (QVariant groupValue, groupMembershipsObj.value("values").toList()) {
+        LinkedInUser::Group group;
+        QVariantMap groupObj = groupValue.toMap();
+
+        QVariantMap groupData = groupObj.value("group").toMap();
+        QVariantMap membershipData = groupObj.value("membershipState").toMap();
+
+        group.id = QString::number(groupData.value("id").toInt());
 #endif
 
         group.name = groupData.value("name").toString();
@@ -450,7 +477,12 @@ void LinkedIn::profileInfoReceived()
         lang.language = langVal.toObject().value("language").toObject().value("name").toString();
         lang.id = QString::number(langVal.toObject().value("id").toVariant().toInt());
 #else
-    // TODO
+    QVariantMap languageObj = jsonObj.value("languages").toMap();
+
+    Q_FOREACH (QVariant langVal, languageObj.value("values").toList()) {
+        LinkedInUser::Language lang;
+        lang.language = langVal.toMap().value("language").toMap().value("name").toString();
+        lang.id = QString::number(langVal.toMap().value("id").toInt());
 #endif
 
         m_linkedinUser->addLanguage(lang.id, lang);
@@ -461,7 +493,7 @@ void LinkedIn::profileInfoReceived()
 #ifdef USING_QT5
     m_linkedinUser->setLocation(jsonObj.value("location").toObject().value("name").toString());
 #else
-    // TODO
+    m_linkedinUser->setLocation(jsonObj.value("location").toMap().value("name").toString());
 #endif
 
 
@@ -495,7 +527,31 @@ void LinkedIn::profileInfoReceived()
                                 , startDateObj.value("day").isUndefined() ? 1 : startDateObj.value("day").toVariant().toInt()).toString();
 
 #else
-    // TODO
+    QVariantMap positionsObj = jsonObj.value("positions").toMap();
+
+    Q_FOREACH (QVariant positionVal, positionsObj.value("values").toList()) {
+        LinkedInUser::Position position;
+
+        QVariantMap positionObj = positionVal.toMap();
+        QVariantMap companyObj = positionObj.value("company").toMap();
+        QVariantMap startDateObj = positionObj.value("startDate").toMap();
+
+        position.id = QString::number(positionObj.value("id").toInt());
+        position.company.id = QString::number(companyObj.value("id").toInt());
+        position.isCurrent = companyObj.value("isCurrent").toBool();
+
+        if (position.isCurrent) {
+            QVariantMap endDateObj = positionObj.value("endDate").toMap();
+
+            position.endDate = QDate(endDateObj.value("year").toInt()
+            , endDateObj.value("month").isNull() ? 1 : endDateObj.value("month").toInt()
+            , endDateObj.value("day").isNull() ? 1 : endDateObj.value("day").toInt()).toString();
+
+        }
+
+        position.startDate = QDate(startDateObj.value("year").toInt()
+        , startDateObj.value("month").isNull() ? 1 : startDateObj.value("month").toInt()
+        , startDateObj.value("day").isNull() ? 1 : startDateObj.value("day").toInt()).toString();
 #endif
 
         position.isCurrent = positionObj.value("isCurrent").toBool();
@@ -530,7 +586,19 @@ void LinkedIn::profileInfoReceived()
         recommendation.recommender.firstName = recommendationObj.value("recommender").toObject().value("firstName").toString();
         recommendation.recommender.lastName = recommendationObj.value("recommender").toObject().value("lastName").toString();
 #else
-    // TODO
+    QVariantMap recommendationObj = jsonObj.value("recommendationsReceived").toMap();
+
+    Q_FOREACH (QVariant recommendationValue, recommendationObj.value("values").toList()) {
+        LinkedInUser::Recommendation recommendation;
+        QVariantMap recommendationObj = recommendationValue.toMap();
+
+        recommendation.id = QString::number(recommendationObj.value("id").toInt());
+        recommendation.text = recommendationObj.value("text").toString();
+        recommendation.type = recommendationObj.value("recommendationType").toMap().value("code").toString();
+
+        recommendation.recommender.id = QString::number(recommendationObj.value("recommender").toMap().value("id").toInt());
+        recommendation.recommender.firstName = recommendationObj.value("recommender").toMap().value("firstName").toString();
+        recommendation.recommender.lastName = recommendationObj.value("recommender").toMap().value("lastName").toString();
 #endif
 
         m_linkedinUser->addRecommendation(recommendation.id, recommendation);
@@ -546,7 +614,11 @@ void LinkedIn::profileInfoReceived()
         m_linkedinUser->addSkill(QString::number(skillValue.toObject().value("id").toVariant().toInt())
                                 , skillValue.toObject().value("skill").toObject().value("name").toString());
 #else
-    // TODO
+    QVariantMap skillsObj = jsonObj.value("skills").toMap();
+
+    Q_FOREACH (QVariant skillValue, skillsObj.value("values").toList()) {
+        m_linkedinUser->addSkill(QString::number(skillValue.toMap().value("id").toInt())
+                                , skillValue.toMap().value("skill").toMap().value("name").toString());
 #endif
     }
 
