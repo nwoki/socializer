@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
         Socializer::Facebook *fb = new Socializer::Facebook(argv[1]);
         Q_UNUSED(fb)
     } else {
-        Socializer::Facebook *fb = new Socializer::Facebook("CAACEdEose0cBAIW5kPJCF2r2hWFTOKM91vGqCFzf2IMKg7nCC4zx6OPVQRZCoKqq8IUqkwsx1qlaOGm3TrCaZB1FxoAKCWZAdMgNgniuQslLKdxtZA9pmlSk61gv3tGcZBh2NJdZCAvw8Weh4FZA3yqZC4s6eRQAXAkZD");
+        Socializer::Facebook *fb = new Socializer::Facebook("CAAGEQS531rkBAOijB9Fx0HwpSyR8LgTuUBLSHm0G2fVkY8X8jBGaOfFedwKn89CmkjzoKODmgF0aSNovCokyPJCZCMKHi5BKZAhGb884jRtYLdqbQ3lNvLsRdXR4nubTlzQqkg8Dji4ZAFlwVz5s7RTqJWGzW7RwIM9NlphZADHBU1TRL7Eijm4zr3uczH0ZD");
         Q_UNUSED(fb)
     }
 

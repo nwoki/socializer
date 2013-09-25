@@ -32,6 +32,7 @@ public:
     QString locale;
     QPair<QString, QString> location;
     QPair<QString, QString> hometown;
+    QString lastUpdatedTime;
 
     QList<Education> education;       /** List of the users education history */
     QHash<QString, Like> likes;       /** List of the users "likes" */        // key is ID
@@ -136,6 +137,12 @@ QString FacebookUser::id() const
 QString FacebookUser::lastName() const
 {
     return d->lastName;
+}
+
+
+QString FacebookUser::lastUpdatedTime() const
+{
+    return d->lastUpdatedTime;
 }
 
 
@@ -251,6 +258,12 @@ void FacebookUser::setId(const QString &id)
 void FacebookUser::setLastName(const QString &lastName)
 {
     d->lastName = lastName;
+}
+
+
+void FacebookUser::setLastUpdatedTime(const QString &lastUpdate)
+{
+    d->lastUpdatedTime = lastUpdate;
 }
 
 

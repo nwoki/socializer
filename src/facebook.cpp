@@ -311,8 +311,9 @@ void Facebook::onPopulateDataReplyReceived()
     m_fbUser->setVerified(jsonObj.value("verified").toString());
     m_fbUser->setBio(jsonObj.value("bio").toString());
     m_fbUser->setLocale(jsonObj.value("locale").toString());
+    m_fbUser->setLastUpdatedTime(jsonObj.value("updated_time").toString());
 
-    qDebug() << m_fbUser->id() << m_fbUser->email() << m_fbUser->birthday().toString() << m_fbUser->birthday() << m_fbUser->locale();
+    qDebug() << m_fbUser->id() << m_fbUser->email() << m_fbUser->birthday().toString() << m_fbUser->birthday() << m_fbUser->locale() << m_fbUser->lastUpdatedTime();
 
 
     // hometown
@@ -654,7 +655,7 @@ void Facebook::populateData()
     // statuses.limit(1) -> keep last status the user posted
     QString reqStr(GRAPH_URL);
 
-    reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,education,sports,username,verified,work,website,statuses.limit(1),picture.type(large)";
+    reqStr += "?fields=id,name,first_name,last_name,email,birthday,address,gender,hometown,link,locale,political,relationship_status,religion,education,sports,username,verified,work,website,statuses.limit(1),picture.type(large),updated_time";
     reqStr += ",likes.fields(id,description,name,created_time,link,category)";
     reqStr += ",friends.fields(id,name,username,first_name,birthday,last_name,locale,gender,link,picture.type(large))";                  // friends
 //                 ",games.fields(id,link,website,name,picture.type(large))";                           // games

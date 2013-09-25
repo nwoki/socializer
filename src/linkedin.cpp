@@ -380,6 +380,7 @@ void LinkedIn::profileInfoReceived()
     m_linkedinUser->setLastName(jsonObj.value("lastName").toString());
     m_linkedinUser->setHeadLine(jsonObj.value("headline").toString());
     m_linkedinUser->setIndustry(jsonObj.value("industry").toString());
+    m_linkedinUser->setLastUpdatedTime(jsonObj.value("lastModifiedTimestamp").toString());
 
 #ifdef USING_QT5
     m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toVariant().toInt());
@@ -653,7 +654,7 @@ void LinkedIn::profileInfoReceived()
     Q_EMIT profileUpdated();
 
     qDebug() << "\n\nUSE IFNO: " << m_linkedinUser->profileId() <<  m_linkedinUser->firstName() << " " << m_linkedinUser->lastName() << " " << m_linkedinUser->headline()
-            << " " << m_linkedinUser->location() << " " << m_linkedinUser->locationCountryCode();
+            << " " << m_linkedinUser->location() << " " << m_linkedinUser->locationCountryCode() << " " << m_linkedinUser->lastUpdatedTime();
 
 }
 
@@ -677,7 +678,7 @@ void LinkedIn::updateProfileInfo()
     QString infoStr(":(");
 
     // personal data
-    infoStr += "id,first-name,last-name,email-address,date-of-birth,group-memberships";
+    infoStr += "id,first-name,last-name,email-address,date-of-birth,group-memberships,last-modified-timestamp";
 
     // full profile info
     infoStr += ",associations,interests,languages,skills,certifications,educations,num-recommenders,recommendations-received";

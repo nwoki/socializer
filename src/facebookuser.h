@@ -119,6 +119,7 @@ public:
     QString gender() const;
     QPair<QString, QString> &hometown() const;
     QString lastName() const;
+    QString lastUpdatedTime() const;
     QHash<QString, Like> likes() const;
     QString link() const;
     QString locale() const;
@@ -138,6 +139,7 @@ public:
     void setFirstName(const QString &firstName);
     void setGender(const QString &gender);
     void setLastName(const QString &lastName);
+    void setLastUpdatedTime(const QString &lastUpdate);
     void setLink(const QString &link);
     void setLocale(const QString &locale);
     void setName(const QString &name);
