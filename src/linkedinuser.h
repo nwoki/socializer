@@ -99,7 +99,7 @@ public:
     QString industry() const;
     QHash<QString, Language> languages() const;
     QString lastName() const;
-    QString lastUpdatedTime() const;
+    quint64 lastUpdatedTime() const;
     QString location() const;
     QString locationCountryCode() const;
     quint16 numberOfConnections() const;
@@ -123,7 +123,7 @@ public:
     void setHeadLine(const QString &data);
     void setIndustry(const QString &data);
     void setLastName(const QString &data);
-    void setLastUpdatedTime(const QString &data);
+    void setLastUpdatedTime(quint64 data);
     void setLocation(const QString &data);
     void setLocationCountryCode(const QString &data);
     void setNumberOfConnections(quint16 connections);

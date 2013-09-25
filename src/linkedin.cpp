@@ -380,14 +380,15 @@ void LinkedIn::profileInfoReceived()
     m_linkedinUser->setLastName(jsonObj.value("lastName").toString());
     m_linkedinUser->setHeadLine(jsonObj.value("headline").toString());
     m_linkedinUser->setIndustry(jsonObj.value("industry").toString());
-    m_linkedinUser->setLastUpdatedTime(QString::number(jsonObj.value("lastModifiedTimestamp").toInt()));
 
 #ifdef USING_QT5
     m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toVariant().toInt());
     m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toVariant().toInt());
+    m_linkedinUser->setLastUpdatedTime(jsonObj.value("lastModifiedTimestamp").toVariant().toULongLong());
 #else
     m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toInt());
     m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toInt());
+    m_linkedinUser->setLastUpdatedTime(jsonObj.value("lastModifiedTimestamp").toULongLong());
 #endif
 
     m_linkedinUser->setProfileId(jsonObj.value("id").toString());
