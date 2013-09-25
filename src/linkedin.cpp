@@ -307,7 +307,7 @@ void LinkedIn::onLastUpdatedTimeReceived()
 #endif
 
     // check if new time differs from old. If so, update the profile data
-    if (jsonObj.value("lastModifiedTimestamp").toLongLong() != m_linkedinUser->lastUpdatedTime()) {
+    if ((quint64)(jsonObj.value("lastModifiedTimestamp").toLongLong()) != m_linkedinUser->lastUpdatedTime()) {
         populateData();
     }
 }
