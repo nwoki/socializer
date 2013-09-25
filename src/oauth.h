@@ -116,6 +116,8 @@ public:
 Q_SIGNALS:
     void authPageUrlReady(const QString &authPageUrl);
     void authTokenChanged();
+    void authTokenExpired();
+    void authTokenInvalid();
     void requestTokenRecieved();
 
 private Q_SLOTS:

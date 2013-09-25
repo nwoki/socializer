@@ -187,19 +187,48 @@ void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QString errStr = reply->errorString();
-
-    qDebug() << "Error msg: " << errStr;
-    qDebug() << "Status code: " << statusCode;
-
+    QByteArray rcv = reply->readAll();
 
     reply->deleteLater();
 
-    /// TODO implement cases
+#ifdef USING_QT5
+    QJsonObject jsonObj = jsonObject(rcv);
+
+    if (jsonObj.isEmpty()) {
+        qWarning("[LinkedIn::profileInfoReceived] error parsing json");
+        return;
+    }
+
+    if (jsonObj.value("error").toObject().value("code").toVariant().toInt() == 190) {
+        int errorSubCode = jsonObj.value("error").toObject().value("error_subcode").toVariant().toInt();
+#else
+    QVariantMap jsonObj = jsonObject(rcv);
+
+    // problem with oauth token.
+    if (jsonObj.value("error").toMap().value("code").toInt() == 190) {
+        int errorSubCode = jsonObj.value("error").toMap().value("error_subcode").toInt();
+#endif
+        switch (errorSubCode) {
+            case 458:
+            case 459:
+            case 460:
+                break;
+            case 463:
+                Q_EMIT authTokenExpired();
+                break;
+            case 464:
+                break;
+            case 467:
+                Q_EMIT authTokenInvalid();
+                break;
+            default:
+                authTokenInvalid();
+        };
+    }
+
     Q_UNUSED(error)
     Q_UNUSED(errStr)
     Q_UNUSED(statusCode)
-
-//     qDebug() << "Remaining replies in list: " << m_fbNetReplies.count();
 }
 
 
@@ -239,6 +268,12 @@ void Facebook::onPopulateDataReplyReceived()
     qDebug("[Facebook::onPopulateDataReplyReceived]");
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+
+    if (reply->error() != QNetworkReply::NoError) {
+        // don't want to handle errors here
+        return;
+    }
+
     QByteArray rcv = reply->readAll();
 
     reply->deleteLater();

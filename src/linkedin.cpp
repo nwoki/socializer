@@ -270,11 +270,33 @@ void LinkedIn::onAuthTokenChanged()
 void LinkedIn::onNetReplyError(QNetworkReply::NetworkError error)
 {
     qDebug("[LinkedIn::onNetReplyError]");
-    // TODO
     Q_UNUSED(error);
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    QByteArray rcv = reply->readAll();
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
     reply->deleteLater();
+
+#ifdef USING_QT5
+    QJsonObject jsonObj = jsonObject(rcv);
+
+    if (jsonObj.isEmpty()) {
+        qWarning("[LinkedIn::profileInfoReceived] error parsing json");
+        return;
+    }
+#else
+    QVariantMap jsonObj = jsonObject(rcv);
+#endif
+
+    // problem with access token
+    if (statusCode == 401) {
+        if (jsonObj.value("message").toString().contains("invalid", Qt::CaseInsensitive)) {
+            Q_EMIT authTokenInvalid();
+        } else if (jsonObj.value("message").toString().contains("expired", Qt::CaseInsensitive)) {
+            Q_EMIT authTokenExpired();
+        }
+    }
 }
 
 
@@ -330,6 +352,11 @@ void LinkedIn::profileInfoReceived()
     qDebug("[LinkedIn::profileInfoReceived]");
 
     QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
+
+    if (rep->error() != QNetworkReply::NoError) {
+        return;
+    }
+
     QByteArray rcv = rep->readAll();
 
     rep->deleteLater();
