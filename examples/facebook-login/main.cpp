@@ -8,6 +8,7 @@
  */
 
 #include <Facebook>
+#include <../src/facebookuser.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
@@ -20,8 +21,11 @@ int main(int argc, char *argv[])
         Socializer::Facebook *fb = new Socializer::Facebook(argv[1]);
         Q_UNUSED(fb)
     } else {
-        Socializer::Facebook *fb = new Socializer::Facebook("CAAGEQS531rkBAOijB9Fx0HwpSyR8LgTuUBLSHm0G2fVkY8X8jBGaOfFedwKn89CmkjzoKODmgF0aSNovCokyPJCZCMKHi5BKZAhGb884jRtYLdqbQ3lNvLsRdXR4nubTlzQqkg8Dji4ZAFlwVz5s7RTqJWGzW7RwIM9NlphZADHBU1TRL7Eijm4zr3uczH0ZD");
-        Q_UNUSED(fb)
+        Socializer::Facebook *fb = new Socializer::Facebook("CAAGEQS531rkBANQjiK4aHDMrxZBvAdal3WX1tZAZAgbrt8Kyf0gFvaYAYddwRbhslEpvB8wq6r027NZAHd3ZBkO1DuaVY0wUiQtsqdcOvGBlvwtpZCIr3qwwtOXMugPTPcP9eppgRiVEwQLebnJG21WXz3yfzOfXj7CwbReERLOxk3omSW0YDyGHD2NnPyCOIZD"
+                                                            , false);
+        fb->facebookUser()->setLastUpdatedTime("2013-09-23T08:09:43+0000");
+
+        fb->update();
     }
 
     return app.exec();

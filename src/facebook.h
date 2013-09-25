@@ -38,7 +38,7 @@ public:
      *
      * @param authToken auth token for the facebook account
      */
-    Facebook(const QByteArray &authToken, QObject *parent = 0);
+    Facebook(const QByteArray &authToken, bool updateOnCreate = true, QObject *parent = 0);
 
     ~Facebook();
 
@@ -68,16 +68,31 @@ public:
 
     FacebookUser *facebookUser() const;             /** returns facebook profile data stored */
 
+    /**
+     * updates the users profile.
+     *
+     * CAREFUL!
+     * if you create this object just to populate data, REMEMBER to set the "lastUpdateTime" of
+     * the FbUser if it's not the first time you pull information
+     *
+     * @param lastUpdateTime string of the last update time for the facebook account
+     */
+    void update();
+
 Q_SIGNALS:
     void profileUpdated();      /** emitted when new profile data has been parsed */
 
 private Q_SLOTS:
     void onAuthTokenChanged();
     void onLikeDataReceived();
+    void onLastUpdatedTimeReceived();
     void onPopulateDataReplyReceived();
     void onNetReplyError(QNetworkReply::NetworkError error);
 
 private:
+    /** calls faceboook api to retreive last update time string */
+    void checkLastUpdateTime() const;
+
     QString createScope();                      /** generates the scopes to add to the request url */
     void parseLikeData(const QByteArray &data);
 

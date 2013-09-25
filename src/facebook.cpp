@@ -42,7 +42,7 @@ Facebook::Facebook(const QByteArray &appId, const QByteArray &redirectUrl, QObje
 }
 
 
-Facebook::Facebook(const QByteArray &authToken, QObject *parent)
+Facebook::Facebook(const QByteArray &authToken, bool updateOnCreate, QObject *parent)
     : OAuth(authToken, parent)
     , m_scopeEmail(false)
     , m_scopePublishAcions(false)
@@ -54,13 +54,37 @@ Facebook::Facebook(const QByteArray &authToken, QObject *parent)
 {
     connect(this, SIGNAL(authTokenChanged()), this, SLOT(onAuthTokenChanged()));
 
-    populateData();
+    if (updateOnCreate) {
+        populateData();
+    }
 }
 
 
 
 Facebook::~Facebook()
 {
+}
+
+
+void Facebook::checkLastUpdateTime() const
+{
+    if (m_authToken.isEmpty()) {
+        qWarning("[Facebook::checkLastUpdateTime] auth token empty");
+        return;
+    }
+
+    QNetworkRequest req;
+    QNetworkReply *netRep;
+    QString reqStr(GRAPH_URL);
+
+    reqStr += "?fields=updated_time&access_token=" + m_authToken;
+
+    req.setUrl(QUrl(reqStr));
+    netRep = m_networkAccessManager->get(req);
+
+    // connect
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
+    connect(netRep, SIGNAL(finished()), this, SLOT(onLastUpdatedTimeReceived()));
 }
 
 
@@ -260,6 +284,32 @@ void Facebook::onLikeDataReceived()
     rep->deleteLater();
 
     parseLikeData(data);
+}
+
+
+void Facebook::onLastUpdatedTimeReceived()
+{
+    qDebug("[Facebook::onLastUpdatedTimeReceived]");
+
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+
+    if (reply->error() != QNetworkReply::NoError) {
+        return;
+    }
+
+    QByteArray rcv = reply->readAll();
+    reply->deleteLater();
+
+#ifdef USING_QT5
+    QJsonObject jsonObj = jsonObject(rcv);
+#else
+    QVariantMap jsonObj = jsonObject(rcv);
+#endif
+
+    // check if new time differs from old. If so, update the profile data
+    if (jsonObj.value("updated_time").toString() != m_fbUser->lastUpdatedTime()) {
+        populateData();
+    }
 }
 
 
@@ -719,3 +769,14 @@ FacebookUser *Facebook::facebookUser() const
 {
     return m_fbUser;
 }
+
+
+void Facebook::update()
+{
+    qDebug("[Facebook::update]");
+
+    // get new "lastUpdatedTime" from the fb server. We don't know if the user has modified
+    // any info
+    m_fbUser->lastUpdatedTime().isEmpty() ? populateData() : checkLastUpdateTime();
+}
+

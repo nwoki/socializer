@@ -91,6 +91,8 @@ public:
      */
     virtual void parseNewUrl(const QString &url) = 0;
 
+    // TODO add virtual pure method : void update() = 0
+
 
     /**
      * sends request to service for access token to be used with OAuth::obtainAuthPage
