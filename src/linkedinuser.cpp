@@ -50,6 +50,7 @@ LinkedInUser::LinkedInUser(QObject *parent)
 {
     d->numOfConnections = 0;
     d->numOfRecommenders = 0;
+    d->lastUpdatedTime = 0;
 }
 
 

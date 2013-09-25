@@ -39,7 +39,7 @@ public:
      *
      * @param authToken auth token for the facebook account
      */
-    LinkedIn(const QByteArray &authToken, QObject *parent = 0);
+    LinkedIn(const QByteArray &authToken, bool updateOnCreate = true, QObject *parent = 0);
 
     /**
      * Creates the Linkedin class with the auth code, and obtains the auth token by itself
@@ -78,6 +78,15 @@ public:
 //      */
 //     void setContextProperty(QDeclarativeView *view);
 
+    /**
+     * updates the users profile.
+     *
+     * CAREFUL!
+     * if you create this object just to populate data, REMEMBER to set the "lastUpdateTime" of
+     * the LinkedinUser if it's not the first time you pull information
+     */
+    void update();
+
 Q_SIGNALS:
     void profileUpdated();              /** emitted when new profile data has been parsed */
 
@@ -85,18 +94,19 @@ private Q_SLOTS:
     QString createScope();              /** generates the scopes to add to the request url */
     void onAccessTokenChanged();
     void onAccessTokenReceived();       /** parses json to extract access token */
+    void onLastUpdatedTimeReceived();
     void onNetReplyError(QNetworkReply::NetworkError error);
 
     void profileInfoReceived();
 
 private:
+    /** calls linkedin api to retreive last update time string */
+    void checkLastUpdateTime() const;
+
     void onAuthTokenChanged();
     void populateData();
     void prepareAuthPageUrl();
     void requestAuthToken(const QString &code);
-
-    // user update calls
-    void updateProfileInfo();
 
     bool m_basicProfileScope;           // Name, photo, headline, and current positions
     bool m_fullProfileScope;            // Full profile including experience, education, skills, and recommendations

@@ -74,8 +74,6 @@ public:
      * CAREFUL!
      * if you create this object just to populate data, REMEMBER to set the "lastUpdateTime" of
      * the FbUser if it's not the first time you pull information
-     *
-     * @param lastUpdateTime string of the last update time for the facebook account
      */
     void update();
 

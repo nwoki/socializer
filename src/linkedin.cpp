@@ -31,11 +31,13 @@
 namespace Socializer {
 
 
-LinkedIn::LinkedIn(const QByteArray &authToken, QObject *parent)
+LinkedIn::LinkedIn(const QByteArray &authToken, bool updateOnCreate, QObject *parent)
     : OAuth(authToken, parent)
     , m_linkedinUser(new LinkedInUser(this))
 {
-    populateData();
+    if (updateOnCreate) {
+        populateData();
+    }
 }
 
 
@@ -65,6 +67,24 @@ bool LinkedIn::basicProfileScope() const
     qDebug("[LinkedIn::basicProfileScope]");
 
     return m_basicProfileScope;
+}
+
+
+void LinkedIn::checkLastUpdateTime() const
+{
+    qDebug("[LinkedIn::checkLastUpdateTime]");
+
+    QString reqUrl(UPDATE_INFO_URL);
+    QString infoStr(":(last-modified-timestamp)?format=json");
+
+    reqUrl.append(infoStr);
+    reqUrl.append("&oauth2_access_token=" + authToken());
+
+    QNetworkRequest req(reqUrl);
+    QNetworkReply *netRep = m_networkAccessManager->get(req);
+
+    connect(netRep, SIGNAL(finished()), this, SLOT(onLastUpdatedTimeReceived()));
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
 }
 
 
@@ -267,6 +287,32 @@ void LinkedIn::onAuthTokenChanged()
 }
 
 
+void LinkedIn::onLastUpdatedTimeReceived()
+{
+    qDebug("[LinkedIn::onLastUpdatedTimeReceived]");
+
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+
+    if (reply->error() != QNetworkReply::NoError) {
+        return;
+    }
+
+    QByteArray rcv = reply->readAll();
+    reply->deleteLater();
+
+#ifdef USING_QT5
+    QJsonObject jsonObj = jsonObject(rcv);
+#else
+    QVariantMap jsonObj = jsonObject(rcv);
+#endif
+
+    // check if new time differs from old. If so, update the profile data
+    if (jsonObj.value("lastModifiedTimestamp").toLongLong() != m_linkedinUser->lastUpdatedTime()) {
+        populateData();
+    }
+}
+
+
 void LinkedIn::onNetReplyError(QNetworkReply::NetworkError error)
 {
     qDebug("[LinkedIn::onNetReplyError]");
@@ -304,8 +350,30 @@ void LinkedIn::populateData()
 {
     qDebug("[LinkedIn::populateData]");
 
-    // for every scope, update use info
-    updateProfileInfo();
+    QString reqUrl(UPDATE_INFO_URL);
+    QString infoStr(":(");
+
+    // personal data
+    infoStr += "id,first-name,last-name,email-address,date-of-birth,group-memberships,last-modified-timestamp";
+
+    // full profile info
+    infoStr += ",associations,interests,languages,skills,certifications,educations,num-recommenders,recommendations-received";
+
+    // linkedin gen data
+    infoStr += ",num-connections,headline,location:(name,country:(code)),industry,summary,picture-url,public-profile-url,positions";
+
+    // close and use json
+    infoStr += ")?format=json";
+
+    reqUrl.append(infoStr);
+
+    reqUrl.append("&oauth2_access_token=" + authToken());
+
+    QNetworkRequest req(reqUrl);
+    QNetworkReply *netRep = m_networkAccessManager->get(req);
+
+    connect(netRep, SIGNAL(finished()), this, SLOT(profileInfoReceived()));
+    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
 }
 
 
@@ -660,6 +728,14 @@ void LinkedIn::profileInfoReceived()
 }
 
 
+void LinkedIn::update()
+{
+    // get new "lastUpdatedTime" from the fb server. We don't know if the user has modified
+    // any info
+    m_linkedinUser->lastUpdatedTime() == 0 ? populateData() : checkLastUpdateTime();
+}
+
+
 // DEPRECATED
 // void LinkedIn::setContextProperty(QDeclarativeView *view)
 // {
@@ -668,38 +744,6 @@ void LinkedIn::profileInfoReceived()
 //     view->rootContext()->setContextProperty("LinkedIn", this);
 // }
 
-
-void LinkedIn::updateProfileInfo()
-{
-    qDebug("[LinkedIn::updateProfileInfo]");
-
-    QString reqUrl(UPDATE_INFO_URL);
-
-    // INFO STRING
-    QString infoStr(":(");
-
-    // personal data
-    infoStr += "id,first-name,last-name,email-address,date-of-birth,group-memberships,last-modified-timestamp";
-
-    // full profile info
-    infoStr += ",associations,interests,languages,skills,certifications,educations,num-recommenders,recommendations-received";
-
-    // linkedin gen data
-    infoStr += ",num-connections,headline,location:(name,country:(code)),industry,summary,picture-url,public-profile-url,positions";
-
-    // close and use json
-    infoStr += ")?format=json";
-
-    reqUrl.append(infoStr);
-
-    reqUrl.append("&oauth2_access_token=" + authToken());
-
-    QNetworkRequest req(reqUrl);
-    QNetworkReply *netRep = m_networkAccessManager->get(req);
-
-    connect(netRep, SIGNAL(finished()), this, SLOT(profileInfoReceived()));
-    connect(netRep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onNetReplyError(QNetworkReply::NetworkError)));
-}
 
 }       // Socializer
 

@@ -8,6 +8,7 @@
  */
 
 #include <LinkedIn>
+#include <../src/linkedinuser.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
@@ -21,7 +22,11 @@ int main(int argc, char *argv[])
         Socializer::LinkedIn *link = new Socializer::LinkedIn(argv[1], "1fx5y8590q6r", "1tTwdCxMuiycme2R", "http://www.2s2h.com");
         Q_UNUSED(link)
     } else {
-        Socializer::LinkedIn *link = new Socializer::LinkedIn("AQUs_qmfAzNjDJfUFTuUKWCcNeYoHq2GIhENwkaUwLYLVHW0Iv8XzT1hEO_dftDSJDrstpVAEGZM2TipLwkY932fr1HuGmgXJF_W7w0QwWKMW2LPX8olotsYYg8YB3g60bkO3fwVqeUmz0V3ks64aarkNBG9gvc1uNEhheNOqc6kz-tmEqE");
+        Socializer::LinkedIn *link = new Socializer::LinkedIn("AQUs_qmfAzNjDJfUFTuUKWCcNeYoHq2GIhENwkaUwLYLVHW0Iv8XzT1hEO_dftDSJDrstpVAEGZM2TipLwkY932fr1HuGmgXJF_W7w0QwWKMW2LPX8olotsYYg8YB3g60bkO3fwVqeUmz0V3ks64aarkNBG9gvc1uNEhheNOqc6kz-tmEqE"
+                                                            , false);
+        link->userInfo()->setLastUpdatedTime(1377879703802);
+        link->update();
+
         Q_UNUSED(link)
     }
 
