@@ -32,7 +32,7 @@ public:
     QString profilePictureUrl;
     QDate birthday;
     QString publicProfileUrl;
-    quint64 lastUpdatedTime;                            // string with the last time the profile was edited
+    QString lastUpdatedTime;                            // string with the last time the profile was edited
 
     QHash<QString, Position> positions;                 // id:Position
     QHash<QString, Language> languages;                 // id:Language
@@ -50,7 +50,6 @@ LinkedInUser::LinkedInUser(QObject *parent)
 {
     d->numOfConnections = 0;
     d->numOfRecommenders = 0;
-    d->lastUpdatedTime = 0;
 }
 
 
@@ -113,7 +112,7 @@ QString LinkedInUser::lastName() const
 }
 
 
-quint64 LinkedInUser::lastUpdatedTime() const
+QString LinkedInUser::lastUpdatedTime() const
 {
     return d->lastUpdatedTime;
 }
@@ -245,7 +244,7 @@ void LinkedInUser::setLastName(const QString &data)
 }
 
 
-void LinkedInUser::setLastUpdatedTime(quint64 data)
+void LinkedInUser::setLastUpdatedTime(const QString &data)
 {
     d->lastUpdatedTime = data;
 }

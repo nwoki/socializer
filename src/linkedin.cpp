@@ -307,7 +307,7 @@ void LinkedIn::onLastUpdatedTimeReceived()
 #endif
 
     // check if new time differs from old. If so, update the profile data
-    if ((quint64)(jsonObj.value("lastModifiedTimestamp").toLongLong()) != m_linkedinUser->lastUpdatedTime()) {
+    if (QString::number((jsonObj.value("lastModifiedTimestamp").toULongLong())) != m_linkedinUser->lastUpdatedTime()) {
         populateData();
     }
 }
@@ -452,11 +452,11 @@ void LinkedIn::profileInfoReceived()
 #ifdef USING_QT5
     m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toVariant().toInt());
     m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toVariant().toInt());
-    m_linkedinUser->setLastUpdatedTime(jsonObj.value("lastModifiedTimestamp").toVariant().toULongLong());
+    m_linkedinUser->setLastUpdatedTime(QString::number(jsonObj.value("lastModifiedTimestamp").toVariant().toULongLong()));
 #else
     m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toInt());
     m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toInt());
-    m_linkedinUser->setLastUpdatedTime(jsonObj.value("lastModifiedTimestamp").toULongLong());
+    m_linkedinUser->setLastUpdatedTime(QString::number(jsonObj.value("lastModifiedTimestamp").toULongLong()));
 #endif
 
     m_linkedinUser->setProfileId(jsonObj.value("id").toString());
