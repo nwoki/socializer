@@ -732,7 +732,7 @@ void LinkedIn::update()
 {
     // get new "lastUpdatedTime" from the fb server. We don't know if the user has modified
     // any info
-    m_linkedinUser->lastUpdatedTime() == 0 ? populateData() : checkLastUpdateTime();
+    m_linkedinUser->lastUpdatedTime().isEmpty() ? populateData() : checkLastUpdateTime();
 }
 
 
