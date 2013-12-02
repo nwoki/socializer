@@ -219,7 +219,7 @@ void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
     QJsonObject jsonObj = jsonObject(rcv);
 
     if (jsonObj.isEmpty()) {
-        qWarning("[LinkedIn::profileInfoReceived] error parsing json");
+        qWarning("[Facebook::profileInfoReceived] error parsing json");
         return;
     }
 
@@ -233,9 +233,8 @@ void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
         int errorSubCode = jsonObj.value("error").toMap().value("error_subcode").toInt();
 #endif
         switch (errorSubCode) {
-            case 458:
-            case 459:
             case 460:
+                Q_EMIT authTokenError(PasswordChanged);
                 break;
             case 463:
                 Q_EMIT authTokenError(Expired);

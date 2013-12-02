@@ -42,6 +42,7 @@ public:
     enum OAuthError {
         Expired = 0,
         Invalid,
+        PasswordChanged,
         Unknown
     };
 
