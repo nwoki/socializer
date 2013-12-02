@@ -238,15 +238,15 @@ void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
             case 460:
                 break;
             case 463:
-                Q_EMIT authTokenExpired();
+                Q_EMIT authTokenError(Expired);
                 break;
             case 464:
                 break;
             case 467:
-                Q_EMIT authTokenInvalid();
+                Q_EMIT authTokenError(Invalid);
                 break;
             default:
-                authTokenInvalid();
+                Q_EMIT authTokenError(Unknown);
         };
     }
 

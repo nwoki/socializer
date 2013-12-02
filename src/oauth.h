@@ -39,6 +39,12 @@ class OAuth : public QObject
     Q_PROPERTY(QByteArray redirectUrl   READ redirectUrl)
 
 public:
+    enum OAuthError {
+        Expired = 0,
+        Invalid,
+        Unknown
+    };
+
     /// TODO should redirectUrl be a needed param?
     OAuth(const QByteArray &appId, const QByteArray &redirectUrl, const QByteArray &consumerSecret = QByteArray(), QObject *parent = 0);
     OAuth(const QByteArray &authToken, QObject *parent = 0);
@@ -118,9 +124,8 @@ public:
 Q_SIGNALS:
     void authPageUrlReady(const QString &authPageUrl);
     void authTokenChanged();
-    void authTokenExpired();
-    void authTokenInvalid();
     void requestTokenRecieved();
+    void authTokenError(uint error);
 
 private Q_SLOTS:
     void onNetworkErrorRecieved(QNetworkReply::NetworkError error);

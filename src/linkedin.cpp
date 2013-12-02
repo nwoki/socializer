@@ -309,6 +309,8 @@ void LinkedIn::onLastUpdatedTimeReceived()
     // check if new time differs from old. If so, update the profile data
     if (QString::number((jsonObj.value("lastModifiedTimestamp").toULongLong())) != m_linkedinUser->lastUpdatedTime()) {
         populateData();
+    } else {
+        Q_EMIT profileUpdated();
     }
 }
 
@@ -338,9 +340,11 @@ void LinkedIn::onNetReplyError(QNetworkReply::NetworkError error)
     // problem with access token
     if (statusCode == 401) {
         if (jsonObj.value("message").toString().contains("invalid", Qt::CaseInsensitive)) {
-            Q_EMIT authTokenInvalid();
+            Q_EMIT authTokenError(Invalid);
         } else if (jsonObj.value("message").toString().contains("expired", Qt::CaseInsensitive)) {
-            Q_EMIT authTokenExpired();
+            Q_EMIT authTokenError(Expired);
+        } else {
+            Q_EMIT authTokenError(Unknown);
         }
     }
 }
@@ -422,6 +426,7 @@ void LinkedIn::profileInfoReceived()
     QNetworkReply *rep = qobject_cast<QNetworkReply*>(sender());
 
     if (rep->error() != QNetworkReply::NoError) {
+        Q_EMIT authTokenError(Unknown);
         return;
     }
 
