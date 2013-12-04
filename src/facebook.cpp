@@ -239,8 +239,6 @@ void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
             case 463:
                 Q_EMIT authTokenError(Expired);
                 break;
-            case 464:
-                break;
             case 467:
                 Q_EMIT authTokenError(Invalid);
                 break;
