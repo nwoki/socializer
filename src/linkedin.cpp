@@ -496,13 +496,17 @@ void LinkedIn::profileInfoReceived()
 
         edu.id = QString::number(eduObj.value("id").toVariant().toInt());
 
-        edu.startDate = QDate(eduStartDate.value("year").toVariant().toInt()
-        , eduStartDate.value("month").toVariant().toInt()
-        , eduStartDate.value("day").toVariant().toInt()).toString();
+        if (!eduStartDate.value("year").isNull()) {
+            edu.startDate = QDate(eduStartDate.value("year").toVariant().toInt(),
+                                  eduStartDate.value("month").isNull() ? 1 : eduStartDate.value("month").toVariant().toInt(),
+                                  eduStartDate.value("day").isNull() ? 1 : eduStartDate.value("day").toVariant().toInt());
+        }
 
-        edu.endDate = QDate(eduEndDate.value("year").toVariant().toInt()
-        , eduEndDate.value("month").toVariant().toInt()
-        , eduEndDate.value("day").toVariant().toInt()).toString();
+        if (!eduEndDate.value("year").isNull()) {
+            edu.endDate = QDate(eduEndDate.value("year").toVariant().toInt(),
+                                eduEndDate.value("month").isNull() ? 1 : eduEndDate.value("month").toVariant().toInt(),
+                                eduEndDate.value("day").isNull() ? 1 : eduEndDate.value("day").toVariant().toInt());
+        }
 #else
     QVariantMap educationsObj = jsonObj.value("educations").toMap();
     QList<QVariant> educationsList = educationsObj.value("values").toList();
@@ -516,13 +520,17 @@ void LinkedIn::profileInfoReceived()
 
         edu.id = QString::number(eduObj.value("id").toInt());
 
-        edu.startDate = QDate(eduStartDate.value("year").toInt()
-                            , eduStartDate.value("month").isNull() ? 1 : eduStartDate.value("month").toInt()
-                            , eduStartDate.value("day").isNull() ? 1 : eduStartDate.value("day").toInt()).toString();
+        if (!eduStartDate.value("year").isNull()) {
+            edu.startDate = QDate(eduStartDate.value("year").toInt(),
+                                  eduStartDate.value("month").isNull() ? 1 : eduStartDate.value("month").toInt(),
+                                  eduStartDate.value("day").isNull() ? 1 : eduStartDate.value("day").toInt());
+        }
 
-        edu.endDate = QDate(eduEndDate.value("year").toInt()
-                            , eduEndDate.value("month").isNull() ? 1 : eduEndDate.value("month").toInt()
-                            , eduEndDate.value("day").isNull() ? 1 : eduEndDate.value("day").toInt()).toString();
+        if (!eduEndDate.value("year").isNull()) {
+            edu.endDate = QDate(eduEndDate.value("year").toInt(),
+                                eduEndDate.value("month").isNull() ? 1 : eduEndDate.value("month").toInt(),
+                                eduEndDate.value("day").isNull() ? 1 : eduEndDate.value("day").toInt());
+        }
 
 #endif
 
@@ -618,15 +626,19 @@ void LinkedIn::profileInfoReceived()
         if (position.isCurrent) {
             QJsonObject endDateObj = positionObj.value("endDate").toObject();
 
-            position.endDate = QDate(endDateObj.value("year").toVariant().toInt()
-                                    , endDateObj.value("month").isUndefined() ? 1 : endDateObj.value("month").toVariant().toInt()
-                                    , endDateObj.value("day").isUndefined() ? 1 : endDateObj.value("day").toVariant().toInt()).toString();
+            if (!endDateObj.value("year").isNull()) {
+                position.endDate = QDate(endDateObj.value("year").toVariant().toInt(),
+                                         endDateObj.value("month").isUndefined() ? 1 : endDateObj.value("month").toVariant().toInt(),
+                                         endDateObj.value("day").isUndefined() ? 1 : endDateObj.value("day").toVariant().toInt());
+            }
 
         }
 
-        position.startDate = QDate(startDateObj.value("year").toVariant().toInt()
-                                , startDateObj.value("month").isUndefined() ? 1 : startDateObj.value("month").toVariant().toInt()
-                                , startDateObj.value("day").isUndefined() ? 1 : startDateObj.value("day").toVariant().toInt()).toString();
+        if (!startDateObj.value("year").isNull()) {
+            position.startDate = QDate(startDateObj.value("year").toVariant().toInt(),
+                                       startDateObj.value("month").isUndefined() ? 1 : startDateObj.value("month").toVariant().toInt(),
+                                       startDateObj.value("day").isUndefined() ? 1 : startDateObj.value("day").toVariant().toInt());
+        }
 
 #else
     QVariantMap positionsObj = jsonObj.value("positions").toMap();
@@ -645,15 +657,20 @@ void LinkedIn::profileInfoReceived()
         if (position.isCurrent) {
             QVariantMap endDateObj = positionObj.value("endDate").toMap();
 
-            position.endDate = QDate(endDateObj.value("year").toInt()
-            , endDateObj.value("month").isNull() ? 1 : endDateObj.value("month").toInt()
-            , endDateObj.value("day").isNull() ? 1 : endDateObj.value("day").toInt()).toString();
+            // check date has at least a year field
+            if (!endDateObj.value("year").isNull()) {
+                position.endDate = QDate(endDateObj.value("year").toInt(),
+                                        endDateObj.value("month").isNull() ? 1 : endDateObj.value("month").toInt(),
+                                        endDateObj.value("day").isNull() ? 1 : endDateObj.value("day").toInt());
+            }
 
         }
 
-        position.startDate = QDate(startDateObj.value("year").toInt()
-        , startDateObj.value("month").isNull() ? 1 : startDateObj.value("month").toInt()
-        , startDateObj.value("day").isNull() ? 1 : startDateObj.value("day").toInt()).toString();
+        if (!startDateObj.value("year").isNull()) {
+            position.startDate = QDate(startDateObj.value("year").toInt(),
+                                       startDateObj.value("month").isNull() ? 1 : startDateObj.value("month").toInt(),
+                                       startDateObj.value("day").isNull() ? 1 : startDateObj.value("day").toInt());
+        }
 #endif
 
         position.isCurrent = positionObj.value("isCurrent").toBool();

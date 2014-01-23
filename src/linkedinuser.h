@@ -49,8 +49,8 @@ public:
         QString id;
         QString title;
         QString summary;
-        QString startDate;
-        QString endDate;
+        QDate startDate;
+        QDate endDate;
         bool isCurrent;
         Company company;
     };
@@ -67,8 +67,8 @@ public:
         QString id;
         QString schoolName;
         QString fieldOfStudy;
-        QString startDate;
-        QString endDate;
+        QDate startDate;
+        QDate endDate;
         QString degree;
         QString activities;
         QString notes;
