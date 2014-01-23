@@ -623,7 +623,7 @@ void LinkedIn::profileInfoReceived()
         position.company.id = QString::number(companyObj.value("id").toVariant().toInt());
         position.isCurrent = companyObj.value("isCurrent").toBool();
 
-        if (position.isCurrent) {
+        if (!position.isCurrent) {
             QJsonObject endDateObj = positionObj.value("endDate").toObject();
 
             if (!endDateObj.value("year").isNull()) {
@@ -654,7 +654,7 @@ void LinkedIn::profileInfoReceived()
         position.company.id = QString::number(companyObj.value("id").toInt());
         position.isCurrent = companyObj.value("isCurrent").toBool();
 
-        if (position.isCurrent) {
+        if (!position.isCurrent) {
             QVariantMap endDateObj = positionObj.value("endDate").toMap();
 
             // check date has at least a year field
