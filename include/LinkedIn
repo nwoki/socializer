@@ -1,1 +1,1 @@
-#include "../src/linkedin.h"
+#include "../src/linkedin/linkedin.h"

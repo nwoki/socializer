@@ -1,13 +1,18 @@
 set(socializer_SRCS
-    facebook.cpp
-    facebookuser.cpp
-    foursquare.cpp
-    foursquareuser.cpp
-    linkedin.cpp
-    linkedinuser.cpp
     oauth.cpp
-    twitter.cpp
+    facebook/facebook.cpp
+    facebook/facebookuser.cpp
+    foursquare/foursquare.cpp
+    foursquare/foursquareuser.cpp
+    linkedin/linkedin.cpp
+    linkedin/linkedinuser.cpp
+    twitter/twitter.cpp
 )
+
+include_directories(facebook)
+include_directories(foursquare)
+include_directories(linkedin)
+include_directories(twitter)
 
 # final lib
 if (ENABLE_DYNAMIC)

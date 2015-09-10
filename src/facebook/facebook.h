@@ -9,7 +9,7 @@
 #ifndef FACEBOOK_H
 #define FACEBOOK_H
 
-#include "oauth.h"
+#include "../oauth.h"
 
 #include <QtCore/QDate>
 
