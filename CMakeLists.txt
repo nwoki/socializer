@@ -23,19 +23,15 @@ endif(QT5_BUILD)
 
 set(CMAKE_AUTOMOC TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
-option(SOCIALIZER_DEVELOPMENT_RELEASE "Must be ON unless we're releasing" ON)
-
+# Library version
 set(SOCIALIZER_ABI_VERSION 0)
 set(SOCIALIZER_MINOR_VERSION 1)
 set(SOCIALIZER_RELEASE_VERSION 0)
 
-find_package(CommonModules 4 REQUIRED)
-
-include(EnableCoverageReport)
-include(EnableSlocCount)
-include(GenerateCppcheck)
+# include(EnableCoverageReport)
+# include(EnableSlocCount)
+# include(GenerateCppcheck)
 
 # Warnings. Enable WError, this component is critical.
 if(${ENABLE_WERROR})
