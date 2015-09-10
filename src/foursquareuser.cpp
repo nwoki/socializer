@@ -1,8 +1,9 @@
 /*
- * This file is part of the Socializer lib
- * Copyright (C) 2012-2013 Ispirata <info@ispirata.com>
+ * foursquareuser.cpp
  *
- * Author Francesco Nwokeka <francesco.nwokeka@ispirata.com>
+ * This file is part of the Socializer lib
+ *
+ * Author Francesco Nwokeka <francesco.nwokeka@gmail.com>
  */
 
 #include "foursquareuser.h"

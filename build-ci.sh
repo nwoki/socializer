@@ -10,18 +10,6 @@ mkdir deps
 cd deps
 export DEPS_DIR=$(pwd)
 
-# Common CMake Modules
-git clone git@git.ispirata.com:ispirata/common-cmake-modules.git
-cd common-cmake-modules
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=$MAIN_DIR/deps/install || return 1
-make || return 1
-make install || return 1
-cd $DEPS_DIR
-
-cd $MAIN_DIR
-
 # Build qt5
 mkdir buildQt5
 cd buildQt5

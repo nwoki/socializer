@@ -2,9 +2,9 @@
  * main.cpp
  *
  * This file is part of the Socializer library
- * Copyright (C) 2013 Ispirata <info@ispirata.com>
  *
- * Author Francesco Nwokeka <francesco.nwokeka@ispirata.com>
+ *
+ * Author Francesco Nwokeka <francesco.nwokeka@gmail.com>
  */
 
 #include <Foursquare>
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
         Q_UNUSED(fq);
     } else {
         Socializer::Foursquare *fq = new Socializer::Foursquare("T53ZTLQSG1CVGKHYRA3OPEUVDGQ5ICFXMMHB01XNEESMSJQP"
-                                                            , "http://www.ispirata.com"
+                                                            , "http://www.testwebsite.com"
                                                             , "QOMLRRLTNM3L0CRLNGMBM1MZTCUFNKUFIFOKAU2QZBS3RPPR");
         Q_UNUSED(fq);
     }

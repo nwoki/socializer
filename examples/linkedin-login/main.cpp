@@ -2,9 +2,9 @@
  * main.cpp
  *
  * This file is part of the Socializer library
- * Copyright (C) 2013 Ispirata <info@ispirata.com>
+ * 
  *
- * Author Francesco Nwokeka <francesco.nwokeka@ispirata.com>
+ * Author Francesco Nwokeka <francesco.nwokeka@gmail.com>
  */
 
 #include <LinkedIn>

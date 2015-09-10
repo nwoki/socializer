@@ -1,3 +1,0 @@
-[submodule "cmake/common-modules"]
-	path = cmake/common-modules
-	url = git@git.ispirata.com:ispirata/common-cmake-modules.git

@@ -1,8 +1,9 @@
 /*
- * This file is part of the Socializer lib
- * Copyright (C) 2013 Ispirata <info@ispirata.com>
+ * facebookuser.cpp
  *
- * Author Francesco Nwokeka <francesco.nwokeka@ispirata.com>
+ * This file is part of the Socializer lib
+ *
+ * Author Francesco Nwokeka <francesco.nwokeka@gmail.com>
  */
 
 #include "facebookuser.h"
