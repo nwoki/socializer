@@ -1,33 +1,26 @@
 project(socializer)
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.3.1)
 
-option(QT5_BUILD "Enable compilation with Qt5" FALSE)
 option(ENABLE_DYNAMIC "Enable dynamic library build" FALSE)
 option(ENABLE_SOCIALIZER_EXAMPLES "Enable compilation of examples" ON)
 option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" OFF)
 option(ENABLE_SOCIALIZER_COVERAGE "Enable compiler coverage" OFF)
 option(ENABLE_WERROR "Enables WError. Always enable when developing, and disable when releasing." ON)
 
-# Qt version
-if (QT5_BUILD)
-    message(STATUS "Building for Qt5")
-    find_package(Qt5 COMPONENTS Core Network REQUIRED)
-    add_definitions(-DUSING_QT5)
-else ()
-    message(STATUS "Building for Qt4")
-    find_package(Qt4 REQUIRED QtCore QtNetwork QtXml)
-    include(${QT_USE_FILE})
-    add_definitions(${QT_DEFINITIONS})
-endif(QT5_BUILD)
+# Build only for Qt5
+find_package(Qt5 COMPONENTS Core Network)
 
-set(CMAKE_AUTOMOC TRUE)
-set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Library version
 set(SOCIALIZER_ABI_VERSION 0)
 set(SOCIALIZER_MINOR_VERSION 1)
 set(SOCIALIZER_RELEASE_VERSION 0)
+
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # include(EnableCoverageReport)
 # include(EnableSlocCount)
@@ -103,7 +96,7 @@ endif (ENABLE_SOCIALIZER_TESTS)
 #     # --- coverage ---
 #
 #     if (ENABLE_SOCIALIZER_COVERAGE)
-#         #enable_coverage_report(TARGETS Socializer
+#         #enable_coverage_report(TARGErm -rf depsrm -rf depsTS Socializer
 #         #                       TESTS   socializer-test
 #         #                       FILTER "tests/* src/*")
 #         #add_definitions(-fprofile-arcs -ftest-coverage)

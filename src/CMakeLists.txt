@@ -20,8 +20,4 @@ set_target_properties(Socializer PROPERTIES
                         SOVERSION ${SOCIALIZER_ABI_VERSION}
                         VERSION ${SOCIALIZER_VERSION})
 
-if (QT5_BUILD)
-    qt5_use_modules(Socializer Core Network)
-else()
-    target_link_libraries(Socializer ${QT_LIBRARIES} qjson)
-endif(QT5_BUILD)
+qt5_use_modules(Socializer Core Network)

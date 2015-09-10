@@ -17,12 +17,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 
-#ifdef USING_QT5
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonParseError>
-#else
-#include <qjson/parser.h>
-#endif
 
 #include <QtNetwork/QNetworkRequest>
 
@@ -194,15 +190,10 @@ QByteArray OAuth::hmacsha1Encode(const QByteArray &baseStr, QByteArray key)
 }
 
 
-#ifdef USING_QT5
 QJsonObject OAuth::jsonObject(const QByteArray &jsonData)
-#else
-QVariantMap OAuth::jsonObject(const QByteArray& jsonData)
-#endif
 {
     qDebug("[OAuth::jsonObject]");
 
-#ifdef USING_QT5
     QJsonParseError jsonError;
     QJsonDocument jsonParser = QJsonDocument::fromJson(jsonData, &jsonError);
 
@@ -217,18 +208,6 @@ QVariantMap OAuth::jsonObject(const QByteArray& jsonData)
 
     // extract json object
     return jsonParser.object();
-#else
-    QJson::Parser parser;
-    bool ok;
-    QVariantMap jsonObj = parser.parse(jsonData, &ok).toMap();
-
-    if (!ok) {
-        qWarning("[OAuth::jsonObject] error parsing json");
-        return QVariantMap();
-    } else {
-        return jsonObj;
-    }
-#endif
 }
 
 

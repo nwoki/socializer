@@ -92,12 +92,7 @@ private:
 
     QString createScope();                      /** generates the scopes to add to the request url */
     void parseLikeData(const QByteArray &data);
-
-#ifdef USING_QT5
     void parseLikeData(const QJsonObject &jsonObj);
-#else
-    void parseLikeData(const QVariantMap &jsonObj);
-#endif
 
     void populateData();                        /** pulls info from all graphs where permissions allow it and populates data */
 

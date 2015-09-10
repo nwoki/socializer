@@ -10,13 +10,7 @@
 #define OAUTH_H
 
 #include <QtCore/QByteArray>
-
-#ifdef USING_QT5
 #include <QtCore/QJsonObject>
-#else
-
-#endif
-
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 
@@ -146,11 +140,7 @@ protected:
     QNetworkAccessManager *m_networkAccessManager;
 
     /** extracts a QJsonObject from given json data */
-#ifdef USING_QT5
     QJsonObject jsonObject(const QByteArray &jsonData);
-#else
-    QVariantMap jsonObject(const QByteArray &jsonData);
-#endif
 
 private:
     QNetworkReply *m_networkReply;
