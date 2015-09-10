@@ -85,7 +85,7 @@ QByteArray OAuth::generateBaseString(QNetworkAccessManager::Operation opType, co
     // Sort the list of parameters alphabetically
     qSort(params);
 
-    foreach (param, params) {
+    for (const QPair<QByteArray, QByteArray> &param : params) {
         paramStr += QUrl::toPercentEncoding(param.first) + "=" + QUrl::toPercentEncoding(param.second) + "&";
     }
 
@@ -269,7 +269,7 @@ void OAuth::onObtainRequestTokenReplyRecieved()
     QList<QByteArray> parts = rcv.split('&');
     bool valid = true;
 
-    foreach (QByteArray part, parts) {
+    for (const QByteArray &part : parts) {
         QList<QByteArray>subPart = part.split('=');
 
         if (subPart.at(0) == "oauth_token") {
@@ -339,7 +339,7 @@ void OAuth::onRequestAccessTokenReceived()
     // extract values
     QList<QByteArray> params = rcv.split('&');
 
-    foreach (QByteArray param, params) {
+    for (const QByteArray &param : params) {
         QList<QByteArray> elements = param.split('=');
 
         if (elements.at(0) == "oauth_token") {

@@ -189,7 +189,7 @@ QString LinkedIn::createScope()
     }
 
 
-    Q_FOREACH (const QString &scope, scopeList) {
+    for (const QString &scope : scopeList) {
         if (!isFirst) {
             scopeLine.append(' ');
         } else {
@@ -439,7 +439,7 @@ void LinkedIn::profileInfoReceived()
     QJsonObject educationsObj = jsonObj.value("educations").toObject();
     QJsonArray educationsList = educationsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue eduValue, educationsList) {
+    for (const QJsonValue &eduValue : educationsList) {
         LinkedInUser::Education edu;
         QJsonObject eduObj = eduValue.toObject();
         QJsonObject eduStartDate = eduObj.value("startDate").toObject();
@@ -473,7 +473,7 @@ void LinkedIn::profileInfoReceived()
     QJsonObject groupMembershipsObj = jsonObj.value("groupMemberships").toObject();
     QJsonArray groupMembershipsList = groupMembershipsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue groupValue, groupMembershipsList) {
+    for (const QJsonValue &groupValue : groupMembershipsList) {
         LinkedInUser::Group group;
         QJsonObject groupObj = groupValue.toObject();
 
@@ -493,7 +493,7 @@ void LinkedIn::profileInfoReceived()
     QJsonObject languageObj = jsonObj.value("languages").toObject();
     QJsonArray languageList = languageObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue langVal, languageList) {
+    for (const QJsonValue &langVal : languageList) {
         LinkedInUser::Language lang;
         lang.language = langVal.toObject().value("language").toObject().value("name").toString();
         lang.id = QString::number(langVal.toObject().value("id").toVariant().toInt());
@@ -509,7 +509,7 @@ void LinkedIn::profileInfoReceived()
     QJsonObject positionsObj = jsonObj.value("positions").toObject();
     QJsonArray positionsList = positionsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue positionVal, positionsList) {
+    for (const QJsonValue &positionVal : positionsList) {
         LinkedInUser::Position position;
 
         QJsonObject positionObj = positionVal.toObject();
@@ -556,7 +556,7 @@ void LinkedIn::profileInfoReceived()
     QJsonObject recommendationObj = jsonObj.value("recommendationsReceived").toObject();
     QJsonArray recommendationList = recommendationObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue recommendationValue, recommendationList) {
+    for (const QJsonValue &recommendationValue : recommendationList) {
         LinkedInUser::Recommendation recommendation;
         QJsonObject recommendationObj = recommendationValue.toObject();
 
@@ -576,7 +576,7 @@ void LinkedIn::profileInfoReceived()
     QJsonObject skillsObj = jsonObj.value("skills").toObject();
     QJsonArray skillsList = skillsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue skillValue, skillsList) {
+    for (const QJsonValue &skillValue : skillsList) {
         m_linkedinUser->addSkill(QString::number(skillValue.toObject().value("id").toVariant().toInt())
                                 , skillValue.toObject().value("skill").toObject().value("name").toString());
     }

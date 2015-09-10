@@ -121,7 +121,7 @@ QString Facebook::createScope()
         scopeList.append("user_relationship_details");
     }
 
-    foreach(const QString &scope, scopeList) {
+    for (const QString &scope : scopeList) {
         if (!isFirst) {
             scopeLine.append(',');
         } else {
