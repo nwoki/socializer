@@ -28,10 +28,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Warnings. Enable WError, this component is critical.
 if(${ENABLE_WERROR})
-    set(RET_W 1)
-else(${ENABLE_WERROR})
-    set(RET_W 0)
+    add_definitions("-Werror")
 endif(${ENABLE_WERROR})
+
+
 
 # VERSIONING
 set(SOCIALIZER_VERSION ${SOCIALIZER_ABI_VERSION}.${SOCIALIZER_MINOR_VERSION}.${SOCIALIZER_RELEASE_VERSION})
