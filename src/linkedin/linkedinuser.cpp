@@ -16,10 +16,7 @@ public:
     Private() {}
 
     QString profileId;
-    QString email;
-    QString firstName;
     QString headline;
-    QString lastName;
     quint16 numOfConnections;
     quint16 numOfRecommenders;
     QString specialities;
@@ -29,7 +26,6 @@ public:
     QString locationCountryCode;
     QString industry;
     QString profilePictureUrl;
-    QDate birthday;
     QString publicProfileUrl;
     QString lastUpdatedTime;                            // string with the last time the profile was edited
 
@@ -45,6 +41,7 @@ public:
 
 LinkedInUser::LinkedInUser(QObject *parent)
     : QObject(parent)
+    , User()
     , d(new Private)
 {
     d->numOfConnections = 0;
@@ -56,30 +53,10 @@ LinkedInUser::~LinkedInUser()
 {
 }
 
-
-QDate LinkedInUser::birthday() const
-{
-    return d->birthday;
-}
-
-
 QHash<QString, LinkedInUser::Education> LinkedInUser::educaitons() const
 {
     return d->education;
 }
-
-
-QString LinkedInUser::email() const
-{
-    return d->email;
-}
-
-
-QString LinkedInUser::firstName() const
-{
-    return d->firstName;
-}
-
 
 QHash<QString, LinkedInUser::Group> LinkedInUser::groups() const
 {
@@ -103,13 +80,6 @@ QHash<QString, LinkedInUser::Language> LinkedInUser::languages() const
 {
     return d->languages;
 }
-
-
-QString LinkedInUser::lastName() const
-{
-    return d->lastName;
-}
-
 
 QString LinkedInUser::lastUpdatedTime() const
 {
@@ -206,25 +176,6 @@ void LinkedInUser::addSkill(const QString &id, const QString &skill)
     d->skills.insert(id, skill);
 }
 
-
-void LinkedInUser::setBirthday(const QDate &birthday)
-{
-    d->birthday = birthday;
-}
-
-
-void LinkedInUser::setEmail(const QString &data)
-{
-    d->email = data;
-}
-
-
-void LinkedInUser::setFirstName(const QString &data)
-{
-    d->firstName = data;
-}
-
-
 void LinkedInUser::setHeadLine(const QString& data)
 {
     d->headline = data;
@@ -235,13 +186,6 @@ void LinkedInUser::setIndustry(const QString& data)
 {
     d->industry = data;
 }
-
-
-void LinkedInUser::setLastName(const QString &data)
-{
-    d->lastName = data;
-}
-
 
 void LinkedInUser::setLastUpdatedTime(const QString &data)
 {
@@ -295,8 +239,6 @@ void LinkedInUser::setPublicProfileUrl(const QString &data)
 {
     d->publicProfileUrl = data;
 }
-
-
 
 
 }       // socializer

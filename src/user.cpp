@@ -5,18 +5,20 @@ namespace Socializer {
 class User::Private
 {
 public:
-    Private();
+    Private() {};
 
+    QDate birthday;
     QString email;
     QString firstName;
     QString id;
-    QString surname;
+    QString lastName;
 };
 
 
-User::User(const QString &id, const QString &firstName, const QString &surname, const QString &email)
+User::User(const QString &id, const QString &firstName, const QString &surname, const QString &email, const QDate &birthday)
     : d(new Private)
 {
+    d->birthday = birthday;
     d->email = email;
     d->firstName = firstName;
     d->id = id;
@@ -26,6 +28,11 @@ User::User(const QString &id, const QString &firstName, const QString &surname, 
 User::~User()
 {
     delete d;
+}
+
+QDate User::birthday() const
+{
+    return d->birthday;
 }
 
 QString User::email() const
@@ -43,6 +50,11 @@ QString User::id() const
     return d->id;
 }
 
+void User::setBirthday(const QDate &birthday)
+{
+    d->birthday = birthday;
+}
+
 void User::setEmail(const QString &email)
 {
     d->email = email;
@@ -58,34 +70,15 @@ void User::setId(const QString &id)
     d->id = id;
 }
 
-void User::setSurname(const QString &surname)
+void User::setLastName(const QString &lastName)
 {
-    d->surname = surname;
+    d->lastName = lastName;
 }
 
-QString User::surname() const
+QString User::lastName() const
 {
-    return d->surname;
+    return d->lastName;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
