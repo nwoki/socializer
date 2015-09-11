@@ -16,12 +16,8 @@ class FacebookUser::Private {
 public:
     Private() {};
 
-    QString id;
     QString bio;
     QString name;
-    QString firstName;
-    QString lastName;
-    QString email;
     QString link;
     QString username;
     QDate birthday;
@@ -44,6 +40,7 @@ public:
 
 FacebookUser::FacebookUser(QObject *parent)
     : QObject(parent)
+    , User()
     , d(new Private)
 {
     d->birthday = QDate::fromString("01-01-1970", "dd-MM-yyyy");
@@ -92,54 +89,20 @@ QString FacebookUser::bio() const
     return d->bio;
 }
 
-
-QDate FacebookUser::birthday() const
-{
-    return d->birthday;
-}
-
-
 QList<FacebookUser::Education> FacebookUser::education() const
 {
     return d->education;
 }
-
-
-QString FacebookUser::email() const
-{
-    return d->email;
-}
-
-
-QString FacebookUser::firstName() const
-{
-    return d->firstName;
-}
-
 
 QString FacebookUser::gender() const
 {
     return d->gender;
 }
 
-
 QPair<QString, QString> &FacebookUser::hometown() const
 {
     return d->hometown;
 }
-
-
-QString FacebookUser::id() const
-{
-    return d->id;
-}
-
-
-QString FacebookUser::lastName() const
-{
-    return d->lastName;
-}
-
 
 QString FacebookUser::lastUpdatedTime() const
 {
@@ -224,43 +187,10 @@ void FacebookUser::setBio(const QString &bio)
     d->bio = bio;
 }
 
-
-void FacebookUser::setBirthday(const QDate& birthday)
-{
-    d->birthday = birthday;
-}
-
-
-void FacebookUser::setEmail(const QString &email)
-{
-    d->email = email;
-}
-
-
-void FacebookUser::setFirstName(const QString &firstName)
-{
-    d->firstName = firstName;
-}
-
-
 void FacebookUser::setGender(const QString &gender)
 {
     d->gender = gender;
 }
-
-
-void FacebookUser::setId(const QString &id)
-{
-    d->id = id;
-}
-
-
-
-void FacebookUser::setLastName(const QString &lastName)
-{
-    d->lastName = lastName;
-}
-
 
 void FacebookUser::setLastUpdatedTime(const QString &lastUpdate)
 {

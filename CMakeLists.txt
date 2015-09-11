@@ -4,12 +4,12 @@ cmake_minimum_required(VERSION 3.3.1)
 
 option(ENABLE_DYNAMIC "Enable dynamic library build" FALSE)
 option(ENABLE_SOCIALIZER_EXAMPLES "Enable compilation of examples" ON)
-option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" OFF)
+option(ENABLE_SOCIALIZER_TESTS "Enable compilation of tests" ON)
 option(ENABLE_SOCIALIZER_COVERAGE "Enable compiler coverage" OFF)
 option(ENABLE_WERROR "Enables WError. Always enable when developing, and disable when releasing." ON)
 
 # Build only for Qt5
-find_package(Qt5 COMPONENTS Core Network)
+find_package(Qt5 COMPONENTS Core Network Test)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -76,8 +76,9 @@ if (ENABLE_SOCIALIZER_EXAMPLES)
 endif (ENABLE_SOCIALIZER_EXAMPLES)
 
 if (ENABLE_SOCIALIZER_TESTS)
+    message(STATUS "Tests are enabled!")
     enable_testing()
-    #add_subdirectory(tests)
+    add_subdirectory(tests)
 endif (ENABLE_SOCIALIZER_TESTS)
 
 

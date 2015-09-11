@@ -1,5 +1,6 @@
 set(socializer_SRCS
     oauth.cpp
+    user.cpp
     facebook/facebook.cpp
     facebook/facebookuser.cpp
     foursquare/foursquare.cpp
