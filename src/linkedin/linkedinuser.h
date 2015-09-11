@@ -14,9 +14,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
+#include <user.h>
+
+
 namespace Socializer {
 
-class LinkedInUser : public QObject
+class LinkedInUser : public QObject, public User
 {
     Q_OBJECT
 
@@ -89,15 +92,11 @@ public:
     LinkedInUser(QObject *parent = 0);
     ~LinkedInUser();
 
-    QDate birthday() const;
     QHash<QString, Education> educaitons() const;
-    QString email() const;
-    QString firstName() const;
     QHash<QString, Group> groups() const;
     QString headline() const;
     QString industry() const;
     QHash<QString, Language> languages() const;
-    QString lastName() const;
     QString lastUpdatedTime() const;
     QString location() const;
     QString locationCountryCode() const;
@@ -116,12 +115,8 @@ public:
     void addPosition(const QString &id, const Position &position);
     void addRecommendation(const QString &id, const Recommendation &recommendation);
     void addSkill(const QString &id, const QString &skill);
-    void setBirthday(const QDate &birthday);
-    void setEmail(const QString &data);
-    void setFirstName(const QString &data);
     void setHeadLine(const QString &data);
     void setIndustry(const QString &data);
-    void setLastName(const QString &data);
     void setLastUpdatedTime(const QString &data);
     void setLocation(const QString &data);
     void setLocationCountryCode(const QString &data);
