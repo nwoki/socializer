@@ -15,10 +15,11 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 
+#include <user.h>
 
 namespace Socializer {
 
-class FacebookUser : public QObject
+class FacebookUser : public QObject, public User
 {
     Q_OBJECT
 
@@ -111,15 +112,10 @@ public:
     void addWork(const Work &work);
 
     QString bio() const;
-    QDate birthday() const;
     QList<Education> education() const;
-    QString email() const;
-    QString id() const;
-    QString firstName() const;
     QHash<QString, Friend> friends() const;
     QString gender() const;
     QPair<QString, QString> &hometown() const;
-    QString lastName() const;
     QString lastUpdatedTime() const;
     QHash<QString, Like> likes() const;
     QString link() const;
@@ -134,12 +130,7 @@ public:
     QString username() const;
 
     void setBio(const QString &bio);
-    void setBirthday(const QDate &birthday);
-    void setEmail(const QString &email);
-    void setId(const QString &id);
-    void setFirstName(const QString &firstName);
     void setGender(const QString &gender);
-    void setLastName(const QString &lastName);
     void setLastUpdatedTime(const QString &lastUpdate);
     void setLink(const QString &link);
     void setLocale(const QString &locale);
@@ -155,6 +146,6 @@ private:
     Private * const d;
 };
 
-};
+}       // Socializer
 
 #endif  // FACEBOOKUSER_H

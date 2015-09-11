@@ -2,6 +2,8 @@
 set(TestLibraries ${QT_QTTEST_LIBRARY} ${QT_LIBRARIES} Socializer)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR})
 
 set(CMAKE_AUTOMOC ON)
 
