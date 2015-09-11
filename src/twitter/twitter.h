@@ -9,7 +9,7 @@
 #ifndef TWITTER_H
 #define TWITTER_H
 
-#include "oauth.h"
+#include "../oauth.h"
 
 #include <QtCore/QByteArray>
 

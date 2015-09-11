@@ -2,13 +2,13 @@
  * main.cpp
  *
  * This file is part of the Socializer library
- *  
+ *
  *
  * Author Francesco Nwokeka <francesco.nwokeka@gmail.com>
  */
 
 #include <Facebook>
-#include <../src/facebookuser.h>
+#include <FacebookUser>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>

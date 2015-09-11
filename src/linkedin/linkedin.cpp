@@ -10,13 +10,8 @@
 #include "linkedinuser.h"
 
 #include <QtCore/QDebug>
-
-#ifdef USING_QT5
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
-#else
-#include <qjson/parser.h>
-#endif
 
 #include <qabstractitemmodel.h>
 
@@ -194,7 +189,7 @@ QString LinkedIn::createScope()
     }
 
 
-    Q_FOREACH (const QString &scope, scopeList) {
+    for (const QString &scope : scopeList) {
         if (!isFirst) {
             scopeLine.append(' ');
         } else {
@@ -247,10 +242,9 @@ void LinkedIn::onAccessTokenReceived()
     QByteArray rcv = netReply->readAll();
 
     qDebug() << "[LinkedIn::onAccessTokenReceived] got: " << rcv;
-
     netReply->deleteLater();
 
-#ifdef USING_QT5
+
     QJsonObject jsonObj = jsonObject(rcv);
 
     if (jsonObj.isEmpty()) {
@@ -260,20 +254,6 @@ void LinkedIn::onAccessTokenReceived()
 
     // extract auth token
     setAuthToken(jsonObj.value("access_token").toString().toLatin1());
-#else
-    QJson::Parser parser;
-    bool ok;
-
-    QVariantMap jsonMap = parser.parse(rcv, &ok).toMap();
-
-    if (!ok) {
-        // error occored
-        return;
-    }
-
-    // extract auth token
-    setAuthToken(jsonMap.value("access_token").toString().toLatin1());
-#endif
 }
 
 
@@ -299,14 +279,10 @@ void LinkedIn::onLastUpdatedTimeReceived()
     QByteArray rcv = reply->readAll();
     reply->deleteLater();
 
-#ifdef USING_QT5
     QJsonObject jsonObj = jsonObject(rcv);
-#else
-    QVariantMap jsonObj = jsonObject(rcv);
-#endif
 
     // check if new time differs from old. If so, update the profile data
-    if (QString::number((jsonObj.value("lastModifiedTimestamp").toULongLong())) != m_linkedinUser->lastUpdatedTime()) {
+    if (QString::number((jsonObj.value("lastModifiedTimestamp").toVariant().toULongLong())) != m_linkedinUser->lastUpdatedTime()) {
         populateData();
     } else {
         Q_EMIT profileUpdated();
@@ -325,16 +301,12 @@ void LinkedIn::onNetReplyError(QNetworkReply::NetworkError error)
 
     reply->deleteLater();
 
-#ifdef USING_QT5
     QJsonObject jsonObj = jsonObject(rcv);
 
     if (jsonObj.isEmpty()) {
         qWarning("[LinkedIn::profileInfoReceived] error parsing json");
         return;
     }
-#else
-    QVariantMap jsonObj = jsonObject(rcv);
-#endif
 
     // problem with access token
     if (statusCode == 401) {
@@ -435,17 +407,12 @@ void LinkedIn::profileInfoReceived()
 
     qDebug() << "[LinkedIn::profileInfoReceived] json received: " << rcv;
 
-#ifdef USING_QT5
     QJsonObject jsonObj = jsonObject(rcv);
 
     if (jsonObj.isEmpty()) {
         qWarning("[LinkedIn::profileInfoReceived] error parsing json");
         return;
     }
-#else
-    QJson::Parser parser;
-    QVariantMap jsonObj = jsonObject(rcv);
-#endif
 
     m_linkedinUser->setEmail(jsonObj.value("emailAddress").toString());
     m_linkedinUser->setFirstName(jsonObj.value("firstName").toString());
@@ -453,15 +420,9 @@ void LinkedIn::profileInfoReceived()
     m_linkedinUser->setHeadLine(jsonObj.value("headline").toString());
     m_linkedinUser->setIndustry(jsonObj.value("industry").toString());
 
-#ifdef USING_QT5
     m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toVariant().toInt());
     m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toVariant().toInt());
     m_linkedinUser->setLastUpdatedTime(QString::number(jsonObj.value("lastModifiedTimestamp").toVariant().toULongLong()));
-#else
-    m_linkedinUser->setNumberOfConnections(jsonObj.value("numConnections").toInt());
-    m_linkedinUser->setNumberOfRecommenders(jsonObj.value("numReccomenders").toInt());
-    m_linkedinUser->setLastUpdatedTime(QString::number(jsonObj.value("lastModifiedTimestamp").toULongLong()));
-#endif
 
     m_linkedinUser->setProfileId(jsonObj.value("id").toString());
     m_linkedinUser->setProfilePictureUrl(jsonObj.value("pictureUrl").toString());
@@ -469,25 +430,16 @@ void LinkedIn::profileInfoReceived()
 
 
     // BIRTHDAY
-#ifdef USING_QT5
     QJsonObject birthdayObj = jsonObj.value("dateOfBirth").toObject();
     m_linkedinUser->setBirthday(QDate(birthdayObj.value("year").toVariant().toInt()
                                     , birthdayObj.value("month").isUndefined() ? 1 : birthdayObj.value("month").toVariant().toInt()
                                     , birthdayObj.value("day").isUndefined() ? 1 : birthdayObj.value("month").toVariant().toInt()));
-#else
-    QVariantMap birthdayObj = jsonObj.value("dateOfBirth").toMap();
-    m_linkedinUser->setBirthday(QDate(birthdayObj.value("year").toInt()
-                                    , birthdayObj.value("month").isNull() ? 1 : birthdayObj.value("month").toInt()
-                                    , birthdayObj.value("day").isNull() ? 1 : birthdayObj.value("day").toInt()));
-#endif
-
 
     // EDUCATION
-#ifdef USING_QT5
     QJsonObject educationsObj = jsonObj.value("educations").toObject();
     QJsonArray educationsList = educationsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue eduValue, educationsList) {
+    for (const QJsonValue &eduValue : educationsList) {
         LinkedInUser::Education edu;
         QJsonObject eduObj = eduValue.toObject();
         QJsonObject eduStartDate = eduObj.value("startDate").toObject();
@@ -506,32 +458,6 @@ void LinkedIn::profileInfoReceived()
                                 eduEndDate.value("month").isNull() ? 1 : eduEndDate.value("month").toVariant().toInt(),
                                 eduEndDate.value("day").isNull() ? 1 : eduEndDate.value("day").toVariant().toInt());
         }
-#else
-    QVariantMap educationsObj = jsonObj.value("educations").toMap();
-    QList<QVariant> educationsList = educationsObj.value("values").toList();
-
-    Q_FOREACH (QVariant eduValue, educationsObj.value("values").toList()) {
-
-        LinkedInUser::Education edu;
-        QVariantMap eduObj = eduValue.toMap();
-        QVariantMap eduStartDate = eduObj.value("startDate").toMap();
-        QVariantMap eduEndDate = eduObj.value("endDate").toMap();
-
-        edu.id = QString::number(eduObj.value("id").toInt());
-
-        if (!eduStartDate.value("year").isNull()) {
-            edu.startDate = QDate(eduStartDate.value("year").toInt(),
-                                  eduStartDate.value("month").isNull() ? 1 : eduStartDate.value("month").toInt(),
-                                  eduStartDate.value("day").isNull() ? 1 : eduStartDate.value("day").toInt());
-        }
-
-        if (!eduEndDate.value("year").isNull()) {
-            edu.endDate = QDate(eduEndDate.value("year").toInt(),
-                                eduEndDate.value("month").isNull() ? 1 : eduEndDate.value("month").toInt(),
-                                eduEndDate.value("day").isNull() ? 1 : eduEndDate.value("day").toInt());
-        }
-
-#endif
 
         edu.activities = eduObj.value("activities").toString();
         edu.degree = eduObj.value("degree").toString();
@@ -544,11 +470,10 @@ void LinkedIn::profileInfoReceived()
 
 
     // GROUPS
-#ifdef USING_QT5
     QJsonObject groupMembershipsObj = jsonObj.value("groupMemberships").toObject();
     QJsonArray groupMembershipsList = groupMembershipsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue groupValue, groupMembershipsList) {
+    for (const QJsonValue &groupValue : groupMembershipsList) {
         LinkedInUser::Group group;
         QJsonObject groupObj = groupValue.toObject();
 
@@ -556,18 +481,6 @@ void LinkedIn::profileInfoReceived()
         QJsonObject membershipData = groupObj.value("membershipState").toObject();
 
         group.id = QString::number(groupData.value("id").toVariant().toInt());
-#else
-    QVariantMap groupMembershipsObj = jsonObj.value("groupMemberships").toMap();
-
-    Q_FOREACH (QVariant groupValue, groupMembershipsObj.value("values").toList()) {
-        LinkedInUser::Group group;
-        QVariantMap groupObj = groupValue.toMap();
-
-        QVariantMap groupData = groupObj.value("group").toMap();
-        QVariantMap membershipData = groupObj.value("membershipState").toMap();
-
-        group.id = QString::number(groupData.value("id").toInt());
-#endif
 
         group.name = groupData.value("name").toString();
         group.membershipState = membershipData.value("code").toString();
@@ -577,41 +490,26 @@ void LinkedIn::profileInfoReceived()
 
 
     // LANGUAGES
-#ifdef USING_QT5
     QJsonObject languageObj = jsonObj.value("languages").toObject();
     QJsonArray languageList = languageObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue langVal, languageList) {
+    for (const QJsonValue &langVal : languageList) {
         LinkedInUser::Language lang;
         lang.language = langVal.toObject().value("language").toObject().value("name").toString();
         lang.id = QString::number(langVal.toObject().value("id").toVariant().toInt());
-#else
-    QVariantMap languageObj = jsonObj.value("languages").toMap();
-
-    Q_FOREACH (QVariant langVal, languageObj.value("values").toList()) {
-        LinkedInUser::Language lang;
-        lang.language = langVal.toMap().value("language").toMap().value("name").toString();
-        lang.id = QString::number(langVal.toMap().value("id").toInt());
-#endif
-
         m_linkedinUser->addLanguage(lang.id, lang);
     }
 
 
     // LOCATION
-#ifdef USING_QT5
     m_linkedinUser->setLocation(jsonObj.value("location").toObject().value("name").toString());
-#else
-    m_linkedinUser->setLocation(jsonObj.value("location").toMap().value("name").toString());
-#endif
 
 
     // POSITIONS
-#ifdef USING_QT5
     QJsonObject positionsObj = jsonObj.value("positions").toObject();
     QJsonArray positionsList = positionsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue positionVal, positionsList) {
+    for (const QJsonValue &positionVal : positionsList) {
         LinkedInUser::Position position;
 
         QJsonObject positionObj = positionVal.toObject();
@@ -639,39 +537,6 @@ void LinkedIn::profileInfoReceived()
                                        startDateObj.value("day").isUndefined() ? 1 : startDateObj.value("day").toVariant().toInt());
         }
 
-#else
-    QVariantMap positionsObj = jsonObj.value("positions").toMap();
-
-    Q_FOREACH (QVariant positionVal, positionsObj.value("values").toList()) {
-        LinkedInUser::Position position;
-
-        QVariantMap positionObj = positionVal.toMap();
-        QVariantMap companyObj = positionObj.value("company").toMap();
-        QVariantMap startDateObj = positionObj.value("startDate").toMap();
-
-        position.id = QString::number(positionObj.value("id").toInt());
-        position.company.id = QString::number(companyObj.value("id").toInt());
-        position.isCurrent = companyObj.value("isCurrent").toBool();
-
-        if (!position.isCurrent) {
-            QVariantMap endDateObj = positionObj.value("endDate").toMap();
-
-            // check date has at least a year field
-            if (!endDateObj.value("year").isNull()) {
-                position.endDate = QDate(endDateObj.value("year").toInt(),
-                                        endDateObj.value("month").isNull() ? 1 : endDateObj.value("month").toInt(),
-                                        endDateObj.value("day").isNull() ? 1 : endDateObj.value("day").toInt());
-            }
-
-        }
-
-        if (!startDateObj.value("year").isNull()) {
-            position.startDate = QDate(startDateObj.value("year").toInt(),
-                                       startDateObj.value("month").isNull() ? 1 : startDateObj.value("month").toInt(),
-                                       startDateObj.value("day").isNull() ? 1 : startDateObj.value("day").toInt());
-        }
-#endif
-
         position.isCurrent = positionObj.value("isCurrent").toBool();
         position.summary = positionObj.value("summary").toString();
         position.title = positionObj.value("title").toString();
@@ -688,11 +553,10 @@ void LinkedIn::profileInfoReceived()
 
 
     // RECCOMENDATIONS
-#ifdef USING_QT5
     QJsonObject recommendationObj = jsonObj.value("recommendationsReceived").toObject();
     QJsonArray recommendationList = recommendationObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue recommendationValue, recommendationList) {
+    for (const QJsonValue &recommendationValue : recommendationList) {
         LinkedInUser::Recommendation recommendation;
         QJsonObject recommendationObj = recommendationValue.toObject();
 
@@ -703,41 +567,18 @@ void LinkedIn::profileInfoReceived()
         recommendation.recommender.id = QString::number(recommendationObj.value("recommender").toObject().value("id").toVariant().toInt());
         recommendation.recommender.firstName = recommendationObj.value("recommender").toObject().value("firstName").toString();
         recommendation.recommender.lastName = recommendationObj.value("recommender").toObject().value("lastName").toString();
-#else
-    QVariantMap recommendationObj = jsonObj.value("recommendationsReceived").toMap();
-
-    Q_FOREACH (QVariant recommendationValue, recommendationObj.value("values").toList()) {
-        LinkedInUser::Recommendation recommendation;
-        QVariantMap recommendationObj = recommendationValue.toMap();
-
-        recommendation.id = QString::number(recommendationObj.value("id").toInt());
-        recommendation.text = recommendationObj.value("text").toString();
-        recommendation.type = recommendationObj.value("recommendationType").toMap().value("code").toString();
-
-        recommendation.recommender.id = QString::number(recommendationObj.value("recommender").toMap().value("id").toInt());
-        recommendation.recommender.firstName = recommendationObj.value("recommender").toMap().value("firstName").toString();
-        recommendation.recommender.lastName = recommendationObj.value("recommender").toMap().value("lastName").toString();
-#endif
 
         m_linkedinUser->addRecommendation(recommendation.id, recommendation);
     }
 
 
     // SKILLS
-#ifdef USING_QT5
     QJsonObject skillsObj = jsonObj.value("skills").toObject();
     QJsonArray skillsList = skillsObj.value("values").toArray();
 
-    Q_FOREACH (QJsonValue skillValue, skillsList) {
+    for (const QJsonValue &skillValue : skillsList) {
         m_linkedinUser->addSkill(QString::number(skillValue.toObject().value("id").toVariant().toInt())
                                 , skillValue.toObject().value("skill").toObject().value("name").toString());
-#else
-    QVariantMap skillsObj = jsonObj.value("skills").toMap();
-
-    Q_FOREACH (QVariant skillValue, skillsObj.value("values").toList()) {
-        m_linkedinUser->addSkill(QString::number(skillValue.toMap().value("id").toInt())
-                                , skillValue.toMap().value("skill").toMap().value("name").toString());
-#endif
     }
 
 

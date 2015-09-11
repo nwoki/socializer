@@ -1,1 +1,1 @@
-#include "../src/foursquare.h"
+#include "../src/foursquare/foursquare.h"

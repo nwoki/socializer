@@ -9,7 +9,7 @@
 #ifndef LINKEDIN_H
 #define LINKEDIN_H
 
-#include "oauth.h"
+#include "../oauth.h"
 
 class QDeclarativeView;
 

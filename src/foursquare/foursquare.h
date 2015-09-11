@@ -9,7 +9,7 @@
 #ifndef FOURSQUARE_H
 #define FOURSQUARE_H
 
-#include "oauth.h"
+#include "../oauth.h"
 
 #include <QtCore/QByteArray>
 #include <QtCore/QWeakPointer>

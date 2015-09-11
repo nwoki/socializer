@@ -1,13 +1,18 @@
 set(socializer_SRCS
-    facebook.cpp
-    facebookuser.cpp
-    foursquare.cpp
-    foursquareuser.cpp
-    linkedin.cpp
-    linkedinuser.cpp
     oauth.cpp
-    twitter.cpp
+    facebook/facebook.cpp
+    facebook/facebookuser.cpp
+    foursquare/foursquare.cpp
+    foursquare/foursquareuser.cpp
+    linkedin/linkedin.cpp
+    linkedin/linkedinuser.cpp
+    twitter/twitter.cpp
 )
+
+include_directories(facebook)
+include_directories(foursquare)
+include_directories(linkedin)
+include_directories(twitter)
 
 # final lib
 if (ENABLE_DYNAMIC)
@@ -20,8 +25,4 @@ set_target_properties(Socializer PROPERTIES
                         SOVERSION ${SOCIALIZER_ABI_VERSION}
                         VERSION ${SOCIALIZER_VERSION})
 
-if (QT5_BUILD)
-    qt5_use_modules(Socializer Core Network)
-else()
-    target_link_libraries(Socializer ${QT_LIBRARIES} qjson)
-endif(QT5_BUILD)
+qt5_use_modules(Socializer Core Network)

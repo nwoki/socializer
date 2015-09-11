@@ -17,12 +17,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 
-#ifdef USING_QT5
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonParseError>
-#else
-#include <qjson/parser.h>
-#endif
 
 #include <QtNetwork/QNetworkRequest>
 
@@ -89,7 +85,7 @@ QByteArray OAuth::generateBaseString(QNetworkAccessManager::Operation opType, co
     // Sort the list of parameters alphabetically
     qSort(params);
 
-    foreach (param, params) {
+    for (const QPair<QByteArray, QByteArray> &param : params) {
         paramStr += QUrl::toPercentEncoding(param.first) + "=" + QUrl::toPercentEncoding(param.second) + "&";
     }
 
@@ -194,15 +190,10 @@ QByteArray OAuth::hmacsha1Encode(const QByteArray &baseStr, QByteArray key)
 }
 
 
-#ifdef USING_QT5
 QJsonObject OAuth::jsonObject(const QByteArray &jsonData)
-#else
-QVariantMap OAuth::jsonObject(const QByteArray& jsonData)
-#endif
 {
     qDebug("[OAuth::jsonObject]");
 
-#ifdef USING_QT5
     QJsonParseError jsonError;
     QJsonDocument jsonParser = QJsonDocument::fromJson(jsonData, &jsonError);
 
@@ -217,18 +208,6 @@ QVariantMap OAuth::jsonObject(const QByteArray& jsonData)
 
     // extract json object
     return jsonParser.object();
-#else
-    QJson::Parser parser;
-    bool ok;
-    QVariantMap jsonObj = parser.parse(jsonData, &ok).toMap();
-
-    if (!ok) {
-        qWarning("[OAuth::jsonObject] error parsing json");
-        return QVariantMap();
-    } else {
-        return jsonObj;
-    }
-#endif
 }
 
 
@@ -290,7 +269,7 @@ void OAuth::onObtainRequestTokenReplyRecieved()
     QList<QByteArray> parts = rcv.split('&');
     bool valid = true;
 
-    foreach (QByteArray part, parts) {
+    for (const QByteArray &part : parts) {
         QList<QByteArray>subPart = part.split('=');
 
         if (subPart.at(0) == "oauth_token") {
@@ -360,7 +339,7 @@ void OAuth::onRequestAccessTokenReceived()
     // extract values
     QList<QByteArray> params = rcv.split('&');
 
-    foreach (QByteArray param, params) {
+    for (const QByteArray &param : params) {
         QList<QByteArray> elements = param.split('=');
 
         if (elements.at(0) == "oauth_token") {

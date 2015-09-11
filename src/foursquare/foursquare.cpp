@@ -10,13 +10,8 @@
 #include "foursquareuser.h"
 
 #include <QtCore/QDebug>
-
-#ifdef USING_QT5
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
-#else
-#include <qjson/parser.h>
-#endif
 
 #include <QtDeclarative/QDeclarativeContext>
 #include <QtDeclarative/QDeclarativeView>
@@ -135,7 +130,6 @@ void Foursquare::onPopulateDataReplyReceived()
 
     reply->deleteLater();
 
-#ifdef USING_QT5
     QJsonObject jsonObj = jsonObject(rcv);
     if (jsonObj.isEmpty()) {
         // error occurred
@@ -150,23 +144,6 @@ void Foursquare::onPopulateDataReplyReceived()
 
     // main response obj
     QJsonObject responseObj = jsonObj.value("response").toObject();
-#else
-    QJson::Parser parser;
-    bool ok;
-
-    QVariantMap jsonObj = parser.parse(rcv, &ok).toMap();
-
-    if (!ok) {
-        return;
-    }
-
-    if (jsonObj.value("meta").toMap().value("code").toInt() != 200) {
-        return;
-    }
-
-    // main response obj
-    QVariantMap responseObj = jsonObj.value("response").toMap();
-#endif
 
     // security check (should never be empty)
     if (responseObj.isEmpty()) {
@@ -174,11 +151,7 @@ void Foursquare::onPopulateDataReplyReceived()
     }
 
     // user info
-#ifdef USING_QT5
     QJsonObject userObj = responseObj.value("user").toObject();
-#else
-    QVariantMap userObj = responseObj.value("user").toMap();
-#endif
 
     m_fqUser->setId(userObj.value("id").toString());
     m_fqUser->setFirstName(userObj.value("firstName").toString());
@@ -191,20 +164,12 @@ void Foursquare::onPopulateDataReplyReceived()
 //     qDebug() << m_fqUser->id() << " - " << m_fqUser->lastName() << " - " << m_fqUser->homecity();
 
     // user photo
-#ifdef USING_QT5
     QJsonObject photoObj = userObj.value("photo").toObject();
-#else
-    QVariantMap photoObj = userObj.value("photo").toMap();
-#endif
 
     m_fqUser->setPhoto(photoObj.value("prefix").toString() + photoObj.value("suffix").toString());
 
     // contact
-#ifdef USING_QT5
     QJsonObject contactObj = userObj.value("contact").toObject();
-#else
-    QVariantMap contactObj = userObj.value("contact").toMap();
-#endif
 
     m_fqUser->contact().email = contactObj.value("email").toString();
     m_fqUser->contact().facebook = contactObj.value("facebook").toString();
@@ -214,31 +179,17 @@ void Foursquare::onPopulateDataReplyReceived()
 //     qDebug() << "CONTACTS : " << m_fqUser->contact().email << m_fqUser->contact().facebook << m_fqUser->contact().twitter;
 
     // last checkin
-#ifdef USING_QT5
     QJsonObject checkinsObj = userObj.value("checkins").toObject();
     m_fqUser->setTotalCheckins(checkinsObj.value("count").toVariant().toInt());
-#else
-    QVariantMap checkinsObj = userObj.value("checkins").toMap();
-    m_fqUser->setTotalCheckins(checkinsObj.value("count").toInt());
-#endif
 
 //     qDebug() << "Tptl checkins: " << m_fqUser->totalCheckins();
 
-#ifdef USING_QT5
     QJsonArray checkinsArray = checkinsObj.value("items").toArray();
-#else
-    QList<QVariant> checkinsArray = checkinsObj.value("items").toList();
-#endif
 
     // use last checkin
     if (checkinsArray.size() != 0) {
-#ifdef USING_QT5
         QJsonObject lastCheckinObj = checkinsArray.at(0).toObject();
         QJsonObject lastCheckingVenueObj = lastCheckinObj.value("venue").toObject();
-#else
-        QVariantMap lastCheckinObj = checkinsArray.at(0).toMap();
-        QVariantMap lastCheckingVenueObj = lastCheckinObj.value("venue").toMap();
-#endif
 
         m_fqUser->lastCheckin().id = lastCheckingVenueObj.value("id").toString();
         m_fqUser->lastCheckin().name = lastCheckingVenueObj.value("name").toString();
@@ -247,17 +198,10 @@ void Foursquare::onPopulateDataReplyReceived()
         m_fqUser->lastCheckin().isMayor = lastCheckingVenueObj.value("isMayor").toBool();
 
         // location info
-#ifdef USING_QT5
         QJsonObject locationObj = lastCheckingVenueObj.value("location").toObject();
 
         m_fqUser->lastCheckin().latitude = locationObj.value("lat").toVariant().toDouble();
         m_fqUser->lastCheckin().longitude = locationObj.value("lng").toVariant().toDouble();
-#else
-        QVariantMap locationObj = lastCheckingVenueObj.value("location").toMap();
-
-        m_fqUser->lastCheckin().latitude = locationObj.value("lat").toDouble();
-        m_fqUser->lastCheckin().longitude = locationObj.value("lng").toDouble();
-#endif
         m_fqUser->lastCheckin().cc = locationObj.value("cc").toString();
         m_fqUser->lastCheckin().country = locationObj.value("country").toString();
 

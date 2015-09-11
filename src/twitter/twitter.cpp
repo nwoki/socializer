@@ -69,7 +69,7 @@ void Twitter::parseNewUrl(const QString &url)
         // TODO sort twitter auth request validity
 //         bool valid = false;
 
-        foreach (QString part, parts) {
+        for (const QString &part : parts) {
             QStringList subPart = part.split('=');
 
             if (subPart.at(0) == "oauth_token") {

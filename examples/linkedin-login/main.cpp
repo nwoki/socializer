@@ -2,13 +2,13 @@
  * main.cpp
  *
  * This file is part of the Socializer library
- * 
+ *
  *
  * Author Francesco Nwokeka <francesco.nwokeka@gmail.com>
  */
 
 #include <LinkedIn>
-#include <../src/linkedinuser.h>
+#include <LinkedInUser>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>

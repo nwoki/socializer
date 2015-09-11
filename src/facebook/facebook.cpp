@@ -10,14 +10,8 @@
 #include "facebookuser.h"
 
 #include <QtCore/QDebug>
-
-#ifdef USING_QT5
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
-#else
-#include <qjson/parser.h>
-#endif
-
 #include <QtCore/QRegExp>
 #include <QtCore/QStringList>
 
@@ -127,7 +121,7 @@ QString Facebook::createScope()
         scopeList.append("user_relationship_details");
     }
 
-    foreach(const QString &scope, scopeList) {
+    for (const QString &scope : scopeList) {
         if (!isFirst) {
             scopeLine.append(',');
         } else {
@@ -214,7 +208,6 @@ void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
 
     reply->deleteLater();
 
-#ifdef USING_QT5
     QJsonObject jsonObj = jsonObject(rcv);
 
     if (jsonObj.isEmpty()) {
@@ -224,13 +217,7 @@ void Facebook::onNetReplyError(QNetworkReply::NetworkError error)
 
     if (jsonObj.value("error").toObject().value("code").toVariant().toInt() == 190) {
         int errorSubCode = jsonObj.value("error").toObject().value("error_subcode").toVariant().toInt();
-#else
-    QVariantMap jsonObj = jsonObject(rcv);
 
-    // problem with oauth token.
-    if (jsonObj.value("error").toMap().value("code").toInt() == 190) {
-        int errorSubCode = jsonObj.value("error").toMap().value("error_subcode").toInt();
-#endif
         switch (errorSubCode) {
             case 460:
                 Q_EMIT authTokenError(PasswordChanged);
@@ -296,11 +283,7 @@ void Facebook::onLastUpdatedTimeReceived()
     QByteArray rcv = reply->readAll();
     reply->deleteLater();
 
-#ifdef USING_QT5
     QJsonObject jsonObj = jsonObject(rcv);
-#else
-    QVariantMap jsonObj = jsonObject(rcv);
-#endif
 
     // check if new time differs from old. If so, update the profile data
     if (jsonObj.value("updated_time").toString() != m_fbUser->lastUpdatedTime()) {
@@ -324,7 +307,6 @@ void Facebook::onPopulateDataReplyReceived()
 
     reply->deleteLater();
 
-#ifdef USING_QT5
     // extract json object from data received
     QJsonObject jsonObj = jsonObject(rcv);
 
@@ -332,16 +314,6 @@ void Facebook::onPopulateDataReplyReceived()
         // error occured
         return;
     }
-#else
-    QJson::Parser parser;
-    bool ok;
-
-    QVariantMap jsonObj = parser.parse(rcv, &ok).toMap();
-
-    if (jsonObj.isEmpty()) {
-        return;
-    }
-#endif
 
     // populate user data
     m_fbUser->setBirthday(QDate::fromString(jsonObj.value("birthday").toString(), "MM/dd/yyyy"));
@@ -363,11 +335,7 @@ void Facebook::onPopulateDataReplyReceived()
 
 
     // hometown
-#ifdef USING_QT5
     QJsonObject hometownObj = jsonObj.value("hometown").toObject();
-#else
-    QVariantMap hometownObj = jsonObj.value("hometown").toMap();
-#endif
 
     if (!hometownObj.isEmpty()) {
         m_fbUser->hometown().first = hometownObj.value("id").toString();
@@ -376,11 +344,7 @@ void Facebook::onPopulateDataReplyReceived()
     }
 
     // location
-#ifdef USING_QT5
     QJsonObject locationObj = jsonObj.value("location").toObject();
-#else
-    QVariantMap locationObj = jsonObj.value("location").toMap();
-#endif
 
     if (!locationObj.isEmpty()) {
         m_fbUser->location().first = locationObj.value("id").toString();
@@ -389,40 +353,22 @@ void Facebook::onPopulateDataReplyReceived()
     }
 
     // status (for now, just the last one)
-#ifdef USING_QT5
     QJsonObject  statusesObj = jsonObj.value("statuses").toObject();
 
     if (!statusesObj.isEmpty()) {
         QJsonArray statusArray = statusesObj.value("data").toArray();
         m_fbUser->setStatus(statusArray[0].toObject().value("message").toString());
     }
-#else
-    QVariantMap  statusesObj = jsonObj.value("statuses").toMap();
-
-    if (!statusesObj.isEmpty()) {
-        QList<QVariant> statusArray = statusesObj.value("data").toList();
-        m_fbUser->setStatus(statusArray[0].toMap().value("message").toString());
-    }
-#endif
 
     qDebug() << "[Facebook::onPopulateDataReplyReceived] user status: " << m_fbUser->status();
 
     // user avatar
-#ifdef USING_QT5
     QJsonObject pictureObj = jsonObj.value("picture").toObject();
 
     if (!pictureObj.isEmpty()) {
         QJsonObject pictureDataObj = pictureObj.value("data").toObject();
         m_fbUser->setPicture(pictureDataObj.value("url").toString());
     }
-#else
-    QVariantMap pictureObj = jsonObj.value("picture").toMap();
-
-    if (!pictureObj.isEmpty()) {
-        QVariantMap pictureDataObj = pictureObj.value("data").toMap();
-        m_fbUser->setPicture(pictureDataObj.value("url").toString());
-    }
-#endif
 
     qDebug() << "[Facebook::onPopulateDataReplyReceived] Picture: " << m_fbUser->picture();
 
@@ -430,22 +376,12 @@ void Facebook::onPopulateDataReplyReceived()
     parseLikeData(jsonObj);
 
     // FRIENDS
-#ifdef USING_QT5
     QJsonObject friendsObj = jsonObj.value("friends").toObject();
     if (!friendsObj.isEmpty()) {
         QJsonArray friendsArray = friendsObj.value("data").toArray();
 
         for (int i = 0; i < friendsArray.size(); ++i) {
             QJsonObject friendDetail = friendsArray.at(i).toObject();
-#else
-    QVariantMap friendsObj = jsonObj.value("friends").toMap();
-    if (!friendsObj.isEmpty()) {
-        QList<QVariant> friendsArray = friendsObj.value("data").toList();
-
-        for (int i = 0; i < friendsArray.size(); ++i) {
-            QVariantMap friendDetail = friendsArray.at(i).toMap();
-#endif
-
             FacebookUser::Friend myFriend;
 
             myFriend.about = friendDetail.value("about").toString();
@@ -461,19 +397,11 @@ void Facebook::onPopulateDataReplyReceived()
             myFriend.username = friendDetail.value("username").toString();
 
             // picture
-#ifdef USING_QT5
             QJsonObject friendPictureObj = friendDetail.value("picture").toObject();
             if (!friendPictureObj.isEmpty()) {
                 QJsonObject pictureDataObj = friendPictureObj.value("data").toObject();
                 myFriend.picture = friendPictureObj.value("url").toString();
             }
-#else
-            QVariantMap friendPictureObj = friendDetail.value("picture").toMap();
-            if (!friendPictureObj.isEmpty()) {
-                QVariantMap pictureDataObj = friendPictureObj.value("data").toMap();
-                myFriend.picture = friendPictureObj.value("url").toString();
-            }
-#endif
 
             m_fbUser->addFriend(myFriend.id, myFriend);
             qDebug() << "[Facebook::onPopulateDataReplyReceived] new friend id: " << myFriend.id;
@@ -482,52 +410,35 @@ void Facebook::onPopulateDataReplyReceived()
 
 
     // WORK
-#ifdef USING_QT5
     QJsonArray workArray = jsonObj.value("work").toArray();
-#else
-    QList<QVariant> workArray = jsonObj.value("work").toList();
-#endif
 
     for (int i = 0; i < workArray.size(); ++i) {
         FacebookUser::Work work;
-#ifdef USING_QT5
         QJsonObject workObj = workArray.at(i).toObject();
-#else
-        QVariantMap workObj = workArray.at(i).toMap();
-#endif
 
         work.description = workObj.value("description").toString();
         work.endDate = QDate::fromString(workObj.value("end_date").toString(), "yyyy-MM-dd");
         work.startDate = QDate::fromString(workObj.value("start_date").toString(), "yyyy-MM-dd");
 
         // employer
-#ifdef USING_QT5
         QJsonObject workEmployer = workObj.value("employer").toObject();
-#else
-        QVariantMap workEmployer = workObj.value("employer").toMap();
-#endif
+
         if (!workEmployer.isEmpty()) {
             work.employer.first = workEmployer.value("id").toString();
             work.employer.second = workEmployer.value("name").toString();
         }
 
         // location
-#ifdef USING_QT5
         QJsonObject workLocation = workObj.value("location").toObject();
-#else
-        QVariantMap workLocation = workObj.value("location").toMap();
-#endif
+
         if (!workLocation.isEmpty()) {
             work.location.first = workLocation.value("id").toString();
             work.location.second = workLocation.value("name").toString();
         }
 
         // position
-#ifdef USING_QT5
         QJsonObject workPosition = workObj.value("position").toObject();
-#else
-        QVariantMap workPosition = workObj.value("position").toMap();
-#endif
+
         if (!workPosition.isEmpty()) {
             work.position.first = workPosition.value("id").toString();
             work.position.second = workPosition.value("name").toString();
@@ -539,27 +450,17 @@ void Facebook::onPopulateDataReplyReceived()
 
 
     // education
-#ifdef USING_QT5
     QJsonArray educationArray = jsonObj.value("education").toArray();
-#else
-    QList<QVariant> educationArray = jsonObj.value("education").toList();
-#endif
 
     for (int i = 0; i < educationArray.size(); ++i) {
         FacebookUser::Education education;
 
-#ifdef USING_QT5
+
         QJsonObject educationObj = educationArray.at(i).toObject();
-#else
-        QVariantMap educationObj = educationArray.at(i).toMap();
-#endif
         education.type = educationObj.value("type").toString();
 
-#ifdef USING_QT5
+
         QJsonObject educationSchool = educationObj.value("school").toObject();
-#else
-        QVariantMap educationSchool = educationObj.value("school").toMap();
-#endif
         education.school.first = educationSchool.value("id").toString();;
         education.school.second = educationSchool.value("name").toString();
 
@@ -576,7 +477,6 @@ void Facebook::parseLikeData(const QByteArray &data)
 {
     qDebug("[Facebook::parseLikeData]");
 
-#ifdef USING_QT5
     // extract json object from data received
     QJsonObject jsonObj = jsonObject(data);
 
@@ -584,47 +484,23 @@ void Facebook::parseLikeData(const QByteArray &data)
         // error occured
         return;
     }
-#else
-    QJson::Parser parser;
-    bool ok;
-
-    QVariantMap jsonObj = parser.parse(data, &ok).toMap();
-
-    if (jsonObj.isEmpty()) {
-        return;
-    }
-#endif
 
     parseLikeData(jsonObj);
 }
 
-#ifdef USING_QT5
+
 void Facebook::parseLikeData(const QJsonObject &jsonObj)
-#else
-void Facebook::parseLikeData(const QVariantMap &jsonObj)
-#endif
 {
     qDebug("[Facebook::parseLikeData]");
 
-#ifdef USING_QT5
     QJsonObject likesObj = jsonObj.value("likes").toObject();
     QJsonArray likesArray;
 
     likesObj.isEmpty() ? likesArray = jsonObj.value("data").toArray() : likesArray = likesObj.value("data").toArray();
-#else
-    QVariantMap likesObj = jsonObj.value("likes").toMap();
-    QList<QVariant> likesArray;
-
-    likesObj.isEmpty() ? likesArray = jsonObj.value("data").toList() : likesArray = likesObj.value("data").toList();
-#endif
 
 
     for (int i = 0; i < likesArray.size(); ++i) {
-#ifdef USING_QT5
         QJsonObject likeDetail = likesArray.at(i).toObject();
-#else
-        QVariantMap likeDetail = likesArray.at(i).toMap();
-#endif
         FacebookUser::Like like;
 
         like.description = likeDetail.value("description").toString();
@@ -640,18 +516,10 @@ void Facebook::parseLikeData(const QVariantMap &jsonObj)
     }
 
     // now check for next page
-#ifdef USING_QT5
     QJsonObject likesPaging;
     likesObj.isEmpty() ? likesPaging = jsonObj.value("paging").toObject() : likesPaging = likesObj.value("paging").toObject();
 
     if (!likesPaging.isEmpty() && !likesPaging.value("next").toString().isEmpty()) {
-#else
-    QVariantMap likesPaging;
-    likesObj.isEmpty() ? likesPaging = jsonObj.value("paging").toMap() : likesPaging = likesObj.value("paging").toMap();
-
-    if (!likesPaging.isEmpty() && !likesPaging.value("next").toString().isEmpty()) {
-#endif
-
         QNetworkRequest req;
         req.setUrl(QUrl(likesPaging.value("next").toString()));
 
